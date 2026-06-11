@@ -1,0 +1,411 @@
+<!doctype html>
+<html lang="sr-Latn-RS">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ReShape90 — prijava</title>
+<meta name="description" content="Prijavi se za ReShape90 program sa Teodorom Dunjom. 90 dana održive promene.">
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Dancing+Script:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --teal: #4ec2cb;
+    --teal-dark: #2ea7b0;
+    --peach: #ffbc7d;
+    --pink: #f6cac9;
+    --cream: #f3d9c7;
+    --rose: #dba1ae;
+    --ink: #232323;
+    --muted: #6b6663;
+    --line: #e8e0db;
+    --bg: #fbf7f4;
+    --card: #ffffff;
+    --error: #c4423a;
+    --radius: 14px;
+    --shadow: 0 10px 40px rgba(35,35,35,.06), 0 2px 8px rgba(35,35,35,.04);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    color: var(--ink);
+    background: var(--bg);
+    background-image:
+      radial-gradient(800px 400px at 90% -10%, rgba(78,194,203,.18), transparent 60%),
+      radial-gradient(700px 500px at -10% 110%, rgba(255,188,125,.22), transparent 60%);
+    background-attachment: fixed;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    line-height: 1.5;
+    min-height: 100svh;
+  }
+
+  .page {
+    max-width: 540px;
+    margin: 0 auto;
+    padding: 32px 20px 64px;
+  }
+
+  .brand {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+  .brand img {
+    max-width: 200px;
+    width: 60%;
+    height: auto;
+  }
+
+  .card {
+    background: var(--card);
+    border-radius: 24px;
+    padding: 32px 24px;
+    box-shadow: var(--shadow);
+    border: 1px solid rgba(35,35,35,.04);
+  }
+
+  @media (min-width: 480px) {
+    .card { padding: 40px 36px; }
+  }
+
+  .eyebrow {
+    text-transform: uppercase;
+    letter-spacing: .14em;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--teal-dark);
+    margin: 0 0 12px;
+    text-align: center;
+  }
+
+  h1 {
+    font-size: 28px;
+    line-height: 1.15;
+    font-weight: 700;
+    margin: 0 0 12px;
+    text-align: center;
+    letter-spacing: -0.02em;
+  }
+  h1 .script {
+    font-family: 'Dancing Script', cursive;
+    font-weight: 700;
+    color: var(--teal-dark);
+    font-size: 1.15em;
+    letter-spacing: 0;
+  }
+
+  .lede {
+    text-align: center;
+    color: var(--muted);
+    font-size: 15.5px;
+    margin: 0 0 28px;
+    max-width: 38ch;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  form { display: grid; gap: 16px; }
+
+  .row { display: grid; gap: 16px; }
+  @media (min-width: 480px) {
+    .row.two { grid-template-columns: 1fr 1fr; }
+  }
+
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: -0.005em;
+  }
+  label .req { color: var(--rose); margin-left: 2px; }
+
+  input {
+    font: inherit;
+    color: var(--ink);
+    background: #fff;
+    border: 1.5px solid var(--line);
+    border-radius: var(--radius);
+    padding: 13px 14px;
+    width: 100%;
+    transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  input::placeholder { color: #b5aea9; }
+  input:hover { border-color: #d6cdc7; }
+  input:focus {
+    outline: none;
+    border-color: var(--teal);
+    box-shadow: 0 0 0 4px rgba(78,194,203,.18);
+  }
+  input.invalid {
+    border-color: var(--error);
+    background: #fff5f4;
+  }
+  input.invalid:focus {
+    box-shadow: 0 0 0 4px rgba(196,66,58,.15);
+  }
+
+  .err {
+    font-size: 12.5px;
+    color: var(--error);
+    min-height: 0;
+    display: none;
+  }
+  .field.has-error .err { display: block; }
+
+  button[type="submit"] {
+    margin-top: 12px;
+    font: inherit;
+    font-weight: 700;
+    font-size: 16px;
+    color: #fff;
+    background: var(--ink);
+    border: 0;
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    cursor: pointer;
+    transition: transform .08s ease, background .15s ease, box-shadow .15s ease;
+    letter-spacing: -0.005em;
+    box-shadow: 0 6px 18px rgba(35,35,35,.18);
+  }
+  button[type="submit"]:hover { background: #000; }
+  button[type="submit"]:active { transform: translateY(1px); }
+  button[type="submit"]:disabled {
+    background: #c9c2bd;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+
+  .spinner {
+    display: inline-block;
+    width: 14px; height: 14px;
+    border: 2px solid rgba(255,255,255,.4);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+    vertical-align: -2px;
+    margin-right: 8px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .footnote {
+    margin-top: 18px;
+    text-align: center;
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+
+  /* success state */
+  .success {
+    text-align: center;
+    padding: 8px 4px;
+  }
+  .success .check {
+    width: 64px; height: 64px;
+    margin: 0 auto 18px;
+    background: var(--teal);
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    color: #fff;
+    box-shadow: 0 10px 24px rgba(78,194,203,.35);
+  }
+  .success h2 {
+    font-size: 24px;
+    margin: 0 0 10px;
+    letter-spacing: -0.02em;
+  }
+  .success p {
+    color: var(--muted);
+    margin: 0 0 8px;
+  }
+  .success .hint {
+    margin-top: 18px;
+    padding: 14px 16px;
+    background: var(--bg);
+    border-radius: 12px;
+    font-size: 13.5px;
+    color: var(--muted);
+  }
+
+  .hidden { display: none !important; }
+
+  .form-error {
+    background: #fff5f4;
+    border: 1px solid #f1c5c1;
+    color: var(--error);
+    padding: 12px 14px;
+    border-radius: 12px;
+    font-size: 13.5px;
+    margin-bottom: 4px;
+    display: none;
+  }
+  .form-error.show { display: block; }
+</style>
+</head>
+<body>
+  <main class="page">
+    <div class="brand">
+      <img src="assets/logo.svg" alt="Teodora Dunja Fit" width="200">
+    </div>
+
+    <div class="card">
+      <div id="form-view">
+        <p class="eyebrow">ReShape90</p>
+        <h1>Spremna za <span class="script">održivu</span> promenu?</h1>
+        <p class="lede">Ostavi svoje podatke i poslaću ti sledeći korak na email.</p>
+
+        <form id="signup-form" novalidate>
+          <div class="form-error" id="form-error" role="alert"></div>
+
+          <div class="row two">
+            <div class="field">
+              <label for="firstName">Ime <span class="req">*</span></label>
+              <input id="firstName" name="firstName" type="text" autocomplete="given-name" required maxlength="60" placeholder="Marija">
+              <div class="err">Unesi svoje ime.</div>
+            </div>
+            <div class="field">
+              <label for="lastName">Prezime <span class="req">*</span></label>
+              <input id="lastName" name="lastName" type="text" autocomplete="family-name" required maxlength="60" placeholder="Petrović">
+              <div class="err">Unesi svoje prezime.</div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="email">Email <span class="req">*</span></label>
+            <input id="email" name="email" type="email" autocomplete="email" required inputmode="email" maxlength="120" placeholder="marija@email.com">
+            <div class="err">Unesi važeću email adresu.</div>
+          </div>
+
+          <div class="field">
+            <label for="phone">Broj telefona <span class="req">*</span></label>
+            <input id="phone" name="phone" type="tel" autocomplete="tel" required inputmode="tel" maxlength="25" placeholder="+381 60 000 0000">
+            <div class="err">Unesi važeći broj telefona (sa pozivnim brojem).</div>
+          </div>
+
+          <button type="submit" id="submit-btn">
+            <span id="btn-label">Pošalji prijavu</span>
+          </button>
+
+          <p class="footnote">Tvoji podaci se koriste samo za prijavu u ReShape90 program.</p>
+        </form>
+      </div>
+
+      <div id="success-view" class="success hidden">
+        <div class="check" aria-hidden="true">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        </div>
+        <h2>Hvala ti!</h2>
+        <p>Proveri svoj inbox — poslala sam ti sledeći korak na email.</p>
+        <div class="hint">
+          Email obično stigne u roku od par minuta. Ako ga ne vidiš, proveri <strong>spam / promocije</strong> folder.
+        </div>
+      </div>
+    </div>
+  </main>
+
+<script>
+(function () {
+  // ⚠️ ZAMENI sa pravim Make webhook URL-om pre deploy-a
+  const WEBHOOK_URL = 'https://hook.eu2.make.com/REPLACE_WITH_YOUR_WEBHOOK';
+
+  const form = document.getElementById('signup-form');
+  const formView = document.getElementById('form-view');
+  const successView = document.getElementById('success-view');
+  const submitBtn = document.getElementById('submit-btn');
+  const btnLabel = document.getElementById('btn-label');
+  const formError = document.getElementById('form-error');
+
+  const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+  function digitsOnly(s) { return (s || '').replace(/\D+/g, ''); }
+  function validPhone(s) {
+    const d = digitsOnly(s);
+    return d.length >= 8 && d.length <= 15;
+  }
+
+  function setFieldError(input, hasError) {
+    const wrap = input.closest('.field');
+    if (!wrap) return;
+    wrap.classList.toggle('has-error', hasError);
+    input.classList.toggle('invalid', hasError);
+    input.setAttribute('aria-invalid', hasError ? 'true' : 'false');
+  }
+
+  function validate() {
+    let ok = true;
+    const fields = [
+      ['firstName', v => v.trim().length >= 2],
+      ['lastName',  v => v.trim().length >= 2],
+      ['email',     v => emailRe.test(v.trim())],
+      ['phone',     v => validPhone(v)]
+    ];
+    for (const [id, check] of fields) {
+      const el = document.getElementById(id);
+      const valid = check(el.value);
+      setFieldError(el, !valid);
+      if (!valid && ok) {
+        el.focus({ preventScroll: false });
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      if (!valid) ok = false;
+    }
+    return ok;
+  }
+
+  // Live-clear errors as user types
+  ['firstName','lastName','email','phone'].forEach(id => {
+    const el = document.getElementById(id);
+    el.addEventListener('input', () => {
+      if (el.classList.contains('invalid')) setFieldError(el, false);
+    });
+  });
+
+  form.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    formError.classList.remove('show');
+
+    if (!validate()) return;
+
+    submitBtn.disabled = true;
+    btnLabel.innerHTML = '<span class="spinner"></span>Šaljem...';
+
+    const payload = {
+      firstName: document.getElementById('firstName').value.trim(),
+      lastName:  document.getElementById('lastName').value.trim(),
+      email:     document.getElementById('email').value.trim().toLowerCase(),
+      phone:     document.getElementById('phone').value.trim(),
+      submittedAt: new Date().toISOString(),
+      source: 'teodora-forma-step1',
+      pageUrl: window.location.href,
+      userAgent: navigator.userAgent
+    };
+
+    try {
+      const res = await fetch(WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+
+      formView.classList.add('hidden');
+      successView.classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (err) {
+      console.error('Submit failed:', err);
+      formError.textContent = 'Došlo je do greške. Pokušaj ponovo za par sekundi.';
+      formError.classList.add('show');
+      submitBtn.disabled = false;
+      btnLabel.textContent = 'Pošalji prijavu';
+    }
+  });
+})();
+</script>
+</body>
+</html>

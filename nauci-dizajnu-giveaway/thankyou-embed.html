@@ -1,0 +1,348 @@
+<!-- Nauči Dizajn — Giveaway Thank-you Page · Webflow Embed -->
+<!-- Paste-uj ceo ovaj fajl u Webflow Embed Code element na stranici /giveaway-maj-2026-uspesna-prijava -->
+<!-- Kad menjaš logiku, push novi commit pa Republish Webflow (browser cache se osvežava sledećeg page load-a) -->
+
+<style>
+  .nd-ty-wrap {
+    font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+    color: #FFFFFF;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 60px 24px 80px;
+    text-align: center;
+  }
+  .nd-ty-wrap * { box-sizing: border-box; }
+
+  .nd-ty-check {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: #DBFF00;
+    color: #232421;
+    margin-bottom: 22px;
+  }
+  .nd-ty-check svg { width: 32px; height: 32px; }
+
+  .nd-ty-eyebrow {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #DBFF00;
+    margin-bottom: 14px;
+  }
+  .nd-ty-title {
+    font-size: 28px;
+    line-height: 36px;
+    font-weight: 600;
+    margin-bottom: 32px;
+    color: #FFFFFF;
+  }
+  .nd-ty-title strong { color: #DBFF00; font-weight: 700; }
+  .nd-ty-subtitle {
+    font-size: 18px;
+    line-height: 26px;
+    color: #D3D3D3;
+    margin: 0 auto 32px;
+    max-width: 600px;
+  }
+  .nd-ty-subtitle strong { color: #DBFF00; font-weight: 700; }
+
+  /* Sakrij iClosed widget (Lift CTA bubble) na ovoj stranici */
+  [data-cta-widget],
+  iframe[src*="iclosed"],
+  [id^="iclosed"],
+  [class*="iclosed"],
+  [class*="iClosed"] {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+
+  .nd-ty-card {
+    background: #2E321F;
+    box-shadow: rgba(219, 255, 0, 0.1) 0 0 0 1px;
+    border-radius: 8px;
+    padding: 24px;
+    text-align: left;
+    margin-bottom: 16px;
+  }
+
+  .nd-ty-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(219, 255, 0, 0.65);
+    margin-bottom: 14px;
+  }
+
+  .nd-ty-row {
+    display: flex;
+    gap: 8px;
+    align-items: stretch;
+  }
+  .nd-ty-input {
+    flex: 1;
+    background: #232421;
+    box-shadow: rgba(219, 255, 0, 0.2) 0 0 0 1px;
+    color: #DBFF00;
+    font-family: Menlo, Monaco, monospace;
+    font-weight: 400;
+    font-size: 14px;
+    padding: 14px 16px;
+    border-radius: 6px;
+    border: none;
+    outline: none;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .nd-ty-input:focus { box-shadow: #DBFF00 0 0 0 1px; }
+
+  .nd-ty-btn {
+    background: #DBFF00;
+    color: #232421;
+    border: none;
+    padding: 14px 26px;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    cursor: pointer;
+    transition: filter 120ms ease, transform 100ms ease;
+    white-space: nowrap;
+  }
+  .nd-ty-btn:hover { filter: brightness(0.92); }
+  .nd-ty-btn:active { transform: scale(0.97); }
+  .nd-ty-btn.nd-ty-copied { background: #2E321F; color: #DBFF00; box-shadow: #DBFF00 0 0 0 1px; }
+
+  .nd-ty-footnote {
+    color: #D3D3D3;
+    font-size: 14px;
+    line-height: 22px;
+    margin-top: 16px;
+    text-align: left;
+  }
+  .nd-ty-footnote a {
+    color: #DBFF00;
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .nd-ty-footnote a:hover { filter: brightness(0.92); }
+
+  .nd-ty-status {
+    color: #D3D3D3;
+    font-size: 15px;
+    line-height: 22px;
+    text-align: center;
+    padding: 14px 0;
+  }
+  .nd-ty-status strong { color: #FFFFFF; }
+
+  .nd-ty-toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: #DBFF00;
+    color: #232421;
+    padding: 13px 22px;
+    border-radius: 6px;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s, transform 0.2s;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+    z-index: 9999;
+  }
+  .nd-ty-toast.nd-ty-show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  @media (max-width: 640px) {
+    .nd-ty-wrap { padding: 48px 18px 60px; }
+    .nd-ty-title { font-size: 22px; line-height: 28px; }
+    .nd-ty-subtitle { font-size: 16px; line-height: 22px; }
+    .nd-ty-row { flex-direction: column; }
+    .nd-ty-btn { width: 100%; padding: 14px 18px; }
+  }
+</style>
+
+<div id="nd-ty"></div>
+<div class="nd-ty-toast" id="nd-ty-toast">Link kopiran ✓</div>
+
+<script>
+(function () {
+  var CONFIG = {
+    apiUrl: 'https://nauci-dizajnu-referral.vercel.app/api/signup',
+    webinarUrl: 'https://naucidizajn.com/giveaway-maj-2026',
+    dashboardBaseUrl: 'https://app.naucidizajn.com'
+  };
+
+  var root = document.getElementById('nd-ty');
+  var params = new URLSearchParams(window.location.search);
+
+  var ND_IS_TEST_ENV = (function() {
+    var host = (location.hostname || '').toLowerCase();
+    return host === 'localhost' || host === '127.0.0.1' ||
+           host.indexOf('.github.io') !== -1 || host === '';
+  })();
+  var isDemo = params.get('demo') === '1' || (ND_IS_TEST_ENV && params.get('demo') !== '0');
+  if (isDemo) {
+    setTimeout(function () {
+      renderCard({
+        firstName: 'Marko',
+        shareUrl: CONFIG.webinarUrl + '?r=X7K2M9',
+        dashboardUrl: CONFIG.dashboardBaseUrl + '/?t=demo-token'
+      });
+    }, 150);
+    return;
+  }
+
+  var stashed = readStashedSignup();
+  var email = getParam(['email', 'Email']) || stashed.email;
+  var name  = getParam(['name', 'Name'])   || stashed.name;
+  var ref   = getParam(['ref', 'Ref'])     || stashed.ref || getStoredRef();
+
+  if (!email) {
+    renderStatus('Nismo pročitali prijavu. <strong>Proveri email</strong> — ako si se uspešno prijavio/la, javićemo ti pobednika tim putem.');
+    return;
+  }
+
+  try { localStorage.setItem('nd_ty_email', email); } catch (e) {}
+
+  fetch(CONFIG.apiUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      email: email,
+      name: name,
+      ref: ref,
+      webinarUrl: CONFIG.webinarUrl
+    })
+  })
+  .then(function (res) {
+    if (!res.ok) throw new Error('status ' + res.status);
+    return res.json();
+  })
+  .then(function (data) {
+    renderCard({
+      firstName: data.firstName || (name || '').split(' ')[0] || '',
+      shareUrl: data.shareUrl,
+      dashboardUrl: data.dashboardUrl
+    });
+  })
+  .catch(function (err) {
+    console.error('[nd-ty] signup failed', err);
+    renderStatus('Problem pri generisanju referral linka. <strong>Proveri email</strong> — javićemo ti detalje uskoro.');
+  });
+
+  function renderCard(data) {
+    var checkSvg =
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">' +
+        '<polyline points="20 6 9 17 4 12"/>' +
+      '</svg>';
+
+    root.innerHTML =
+      '<div class="nd-ty-wrap">' +
+        '<div class="nd-ty-check" aria-hidden="true">' + checkSvg + '</div>' +
+        '<div class="nd-ty-eyebrow">Prijava je uspešna</div>' +
+        '<h1 class="nd-ty-title">Dupliraj svoju šansu da osvojiš. Pozovi prijatelja da se prijavi i ako on osvoji, <strong>osvajaš i ti</strong>.</h1>' +
+        '<div class="nd-ty-card">' +
+          '<div class="nd-ty-label">Tvoj referral link</div>' +
+          '<div class="nd-ty-row">' +
+            '<input class="nd-ty-input" id="nd-ty-input" value="' + esc(data.shareUrl) + '" readonly />' +
+            '<button class="nd-ty-btn" id="nd-ty-btn" type="button">Kopiraj</button>' +
+          '</div>' +
+          '<div class="nd-ty-footnote">' +
+            'Prati ko se prijavio preko tvog linka na <a href="' + esc(data.dashboardUrl) + '" target="_blank" rel="noopener">svojoj platformi</a>.' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+
+    document.getElementById('nd-ty-btn').addEventListener('click', onCopy);
+    document.getElementById('nd-ty-input').addEventListener('click', function (e) { e.target.select(); });
+  }
+
+  function renderStatus(html) {
+    root.innerHTML =
+      '<div class="nd-ty-wrap">' +
+        '<div class="nd-ty-status">' + html + '</div>' +
+      '</div>';
+  }
+
+  function onCopy() {
+    var btn = document.getElementById('nd-ty-btn');
+    var input = document.getElementById('nd-ty-input');
+    var done = function () {
+      btn.textContent = 'Kopirano ✓';
+      btn.classList.add('nd-ty-copied');
+      showToast();
+      setTimeout(function () {
+        btn.textContent = 'Kopiraj';
+        btn.classList.remove('nd-ty-copied');
+      }, 2000);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(input.value).then(done, fallback);
+    } else {
+      fallback();
+    }
+    function fallback() {
+      input.select();
+      try { document.execCommand('copy'); } catch (e) {}
+      done();
+    }
+  }
+
+  function showToast() {
+    var t = document.getElementById('nd-ty-toast');
+    t.classList.add('nd-ty-show');
+    setTimeout(function () { t.classList.remove('nd-ty-show'); }, 1800);
+  }
+
+  function getParam(keys) {
+    for (var i = 0; i < keys.length; i++) {
+      var v = params.get(keys[i]);
+      if (v && v.trim()) return v.trim();
+    }
+    return '';
+  }
+
+  function getStoredRef() {
+    try { return localStorage.getItem('nd_ref') || ''; } catch (e) { return ''; }
+  }
+
+  function readStashedSignup() {
+    try {
+      var raw = sessionStorage.getItem('nd_signup');
+      if (!raw) return {};
+      var obj = JSON.parse(raw);
+      return {
+        email: (obj && obj.email) || '',
+        name:  (obj && obj.name)  || '',
+        ref:   (obj && obj.ref)   || ''
+      };
+    } catch (e) { return {}; }
+  }
+
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+})();
+</script>
+<!-- /Nauči Dizajn giveaway thank-you -->

@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Hormozi Timer — Summary</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    color-scheme: dark;
+    --bg: #08080d;
+    --panel: #101018;
+    --panel-2: #1a1a24;
+    --border: rgba(255, 255, 255, 0.1);
+    --border-strong: rgba(255, 255, 255, 0.18);
+    --text: #f3f3f7;
+    --muted: #9ca3af;
+    --accent: #6c5ce7;
+    --accent-hover: #7d6ee9;
+    --accent-soft: rgba(108, 92, 231, 0.15);
+    --accent-softer: rgba(108, 92, 231, 0.08);
+    --danger: #ef4444;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-size: 14px;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 32px 28px 60px; }
+
+  h1 { font-size: 24px; margin: 0 0 6px; font-weight: 700; letter-spacing: -0.3px; }
+  .subtitle { color: var(--muted); font-size: 13px; margin-bottom: 22px; }
+
+  /* ───── Range bar ───── */
+  .range-bar {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 4px;
+    margin-bottom: 22px;
+    width: fit-content;
+  }
+  .pill {
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .pill:hover { color: var(--text); }
+  .pill.active {
+    background: var(--panel-2);
+    color: var(--text);
+  }
+  .pill-range {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid var(--border);
+  }
+  .pill-range:hover { border-color: var(--border-strong); }
+  .pill-range.active { border-color: var(--accent); background: var(--accent-softer); color: var(--text); }
+  .pill-range .icon { font-size: 13px; opacity: 0.8; }
+
+  /* ───── Picker dropdown ───── */
+  .picker {
+    display: none;
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55);
+    z-index: 50;
+    overflow: hidden;
+  }
+  .picker.show { display: flex; }
+  .picker-sidebar {
+    width: 170px;
+    background: var(--panel-2);
+    border-right: 1px solid var(--border);
+    padding: 12px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .preset {
+    padding: 9px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 500;
+    user-select: none;
+    transition: all 0.12s;
+  }
+  .preset:hover { color: var(--text); background: rgba(255,255,255,0.04); }
+  .preset.active {
+    color: var(--text);
+    background: var(--bg);
+    border: 1px solid var(--border-strong);
+  }
+
+  .picker-main {
+    padding: 16px 18px;
+    width: 580px;
+  }
+  .picker-controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .picker-controls select {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-family: inherit;
+    font-size: 13px;
+    cursor: pointer;
+    outline: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2'%3e%3cpath d='M6 9l6 6 6-6'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    padding-right: 28px;
+  }
+  .picker-controls select:focus { border-color: var(--accent); }
+
+  .months {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  .month {
+    display: flex;
+    flex-direction: column;
+  }
+  .month-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .nav-btn {
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 16px;
+    line-height: 1;
+  }
+  .nav-btn:hover { color: var(--text); }
+  .nav-btn.invisible { visibility: hidden; }
+
+  .dow {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+    margin-bottom: 4px;
+  }
+  .dow div {
+    font-size: 11px;
+    color: var(--muted);
+    text-align: center;
+    padding: 6px 0;
+    font-weight: 500;
+  }
+  .days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+  }
+  .day {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    color: var(--muted);
+    cursor: pointer;
+    border-radius: 6px;
+    user-select: none;
+    border: 1px solid transparent;
+    transition: background 0.1s, border-color 0.1s;
+    font-variant-numeric: tabular-nums;
+  }
+  .day.in-month { color: var(--text); }
+  .day.empty { cursor: default; }
+  .day.empty:hover { background: transparent; }
+  .day:hover:not(.empty) { background: rgba(255,255,255,0.06); }
+  .day.in-range {
+    background: var(--accent-soft);
+    color: var(--text);
+    border-radius: 0;
+  }
+  .day.range-start {
+    background: var(--accent);
+    color: #fff;
+    border-radius: 6px 0 0 6px;
+    font-weight: 600;
+  }
+  .day.range-end {
+    background: var(--accent);
+    color: #fff;
+    border-radius: 0 6px 6px 0;
+    font-weight: 600;
+  }
+  .day.range-single {
+    background: var(--accent);
+    color: #fff;
+    border-radius: 6px;
+    font-weight: 600;
+  }
+  .day.today {
+    border-color: var(--border-strong);
+  }
+
+  .picker-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+  }
+  .btn {
+    border: none;
+    border-radius: 8px;
+    padding: 9px 18px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .btn-cancel {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border);
+  }
+  .btn-cancel:hover { color: var(--text); border-color: var(--border-strong); }
+  .btn-apply {
+    background: var(--accent);
+    color: #fff;
+  }
+  .btn-apply:hover { background: var(--accent-hover); }
+
+  /* ───── Stats ───── */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 22px;
+  }
+  .stat {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px;
+  }
+  .stat .label {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .stat .big {
+    font-size: 30px;
+    font-weight: 700;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .stat .sub {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 6px;
+  }
+
+  /* ───── Entries ───── */
+  .entries-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .entries-title {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    font-weight: 600;
+  }
+  .export {
+    font-size: 12px;
+    color: var(--muted);
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+    font-family: inherit;
+  }
+  .export:hover { color: var(--text); }
+
+  .entry {
+    display: grid;
+    grid-template-columns: 110px 1fr 30px;
+    gap: 14px;
+    align-items: start;
+    padding: 12px 14px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 6px;
+    transition: border-color 0.15s;
+  }
+  .entry:hover { border-color: var(--border-strong); }
+  .entry .ts {
+    font-size: 11px;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+    padding-top: 1px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    font-weight: 500;
+  }
+  .entry .text {
+    font-size: 14px;
+    line-height: 1.45;
+    user-select: text;
+  }
+  .entry .del {
+    cursor: pointer;
+    color: var(--muted);
+    background: none;
+    border: none;
+    font-size: 18px;
+    padding: 0;
+    opacity: 0;
+    transition: opacity 0.15s;
+    line-height: 1;
+  }
+  .entry:hover .del { opacity: 1; }
+  .entry .del:hover { color: var(--danger); }
+
+  .empty {
+    text-align: center;
+    color: var(--muted);
+    padding: 40px 0;
+    font-size: 14px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Summary</h1>
+  <div class="subtitle" id="range-label"></div>
+
+  <div class="range-bar">
+    <div class="pill active" data-quick="today">Today</div>
+    <div class="pill" data-quick="yesterday">Yesterday</div>
+    <div class="pill" data-quick="week">Week</div>
+    <div class="pill" data-quick="month">Month</div>
+    <div class="pill pill-range" id="range-pill">
+      <span class="icon">📅</span>
+      <span id="range-pill-label">Custom</span>
+    </div>
+
+    <!-- Picker dropdown -->
+    <div class="picker" id="picker">
+      <div class="picker-sidebar" id="presets">
+        <div class="preset" data-preset="today">Today</div>
+        <div class="preset" data-preset="yesterday">Yesterday</div>
+        <div class="preset" data-preset="this-month">This Month</div>
+        <div class="preset" data-preset="last-7">Last 7 Days</div>
+        <div class="preset" data-preset="last-14">Last 14 Days</div>
+        <div class="preset" data-preset="last-30">Last 30 Days</div>
+        <div class="preset" data-preset="last-3m">Last 3 Months</div>
+        <div class="preset" data-preset="last-6m">Last 6 Months</div>
+        <div class="preset" data-preset="last-year">Last Year</div>
+        <div class="preset" data-preset="ytd">Year to Date</div>
+        <div class="preset" data-preset="all">All Time</div>
+      </div>
+      <div class="picker-main">
+        <div class="picker-controls">
+          <select id="month-select"></select>
+          <select id="year-select"></select>
+        </div>
+        <div class="months">
+          <div class="month">
+            <div class="month-head">
+              <button class="nav-btn" id="prev-month">‹</button>
+              <span id="left-title"></span>
+              <button class="nav-btn invisible">›</button>
+            </div>
+            <div class="dow"><div>Su</div><div>Mo</div><div>Tu</div><div>We</div><div>Th</div><div>Fr</div><div>Sa</div></div>
+            <div class="days" id="left-days"></div>
+          </div>
+          <div class="month">
+            <div class="month-head">
+              <button class="nav-btn invisible">‹</button>
+              <span id="right-title"></span>
+              <button class="nav-btn" id="next-month">›</button>
+            </div>
+            <div class="dow"><div>Su</div><div>Mo</div><div>Tu</div><div>We</div><div>Th</div><div>Fr</div><div>Sa</div></div>
+            <div class="days" id="right-days"></div>
+          </div>
+        </div>
+        <div class="picker-actions">
+          <button class="btn btn-cancel" id="cancel">Cancel</button>
+          <button class="btn btn-apply" id="apply">Apply</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="stats" id="stats"></div>
+
+  <div class="entries-head">
+    <div class="entries-title">Entries</div>
+    <button class="export" id="export-csv">⬇ Export CSV</button>
+  </div>
+  <div id="entries"></div>
+</div>
+
+<script>
+  const { ipcRenderer } = require('electron');
+
+  // ───── helpers ─────
+  const startOfDay = (d) => { const x = new Date(d); x.setHours(0,0,0,0); return x; };
+  const endOfDay   = (d) => { const x = new Date(d); x.setHours(23,59,59,999); return x; };
+  const startOfWeek = (d) => {
+    const x = startOfDay(d);
+    const day = x.getDay();
+    const diff = day === 0 ? -6 : 1 - day;
+    x.setDate(x.getDate() + diff);
+    return x;
+  };
+  const startOfMonth = (d) => { const x = startOfDay(d); x.setDate(1); return x; };
+  const sameDay = (a, b) => a && b && startOfDay(a).getTime() === startOfDay(b).getTime();
+
+  const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const MONTHS_LONG = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  function fmtShort(d) { return `${MONTHS[d.getMonth()]} ${d.getDate()}`; }
+  function fmtPill(from, to) {
+    if (sameDay(from, to)) return `${MONTHS[from.getMonth()]} ${from.getDate()}`;
+    return `${MONTHS[from.getMonth()]} ${from.getDate()} – ${MONTHS[to.getMonth()]} ${to.getDate()}`;
+  }
+  function fmtDuration(mins) {
+    if (mins < 60) return `${mins}m`;
+    const h = Math.floor(mins / 60);
+    const m = mins % 60;
+    return m ? `${h}h ${m}m` : `${h}h`;
+  }
+  function escapeHTML(s) {
+    return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  // ───── state ─────
+  let state = { entries: [] };
+  let applied = null;          // { from, to, label, isAll? }
+  let pendingFrom = null;      // selection in-progress in picker
+  let pendingTo = null;
+  let viewMonth = startOfMonth(new Date()); // left calendar month
+  let activePresetId = null;
+  let activeQuickId = 'today';
+
+  // ───── preset → range ─────
+  function presetRange(id) {
+    const now = new Date();
+    const today = startOfDay(now);
+    const end = endOfDay(now);
+    if (id === 'today')     return { from: today, to: end, label: 'Today' };
+    if (id === 'yesterday') {
+      const y = new Date(today); y.setDate(y.getDate() - 1);
+      return { from: y, to: endOfDay(y), label: 'Yesterday' };
+    }
+    if (id === 'this-month') return { from: startOfMonth(now), to: end, label: 'This Month' };
+    if (id === 'last-7')     { const f = new Date(today); f.setDate(f.getDate() - 6); return { from: f, to: end, label: 'Last 7 Days' }; }
+    if (id === 'last-14')    { const f = new Date(today); f.setDate(f.getDate() - 13); return { from: f, to: end, label: 'Last 14 Days' }; }
+    if (id === 'last-30')    { const f = new Date(today); f.setDate(f.getDate() - 29); return { from: f, to: end, label: 'Last 30 Days' }; }
+    if (id === 'last-3m')    { const f = new Date(today); f.setMonth(f.getMonth() - 3); return { from: f, to: end, label: 'Last 3 Months' }; }
+    if (id === 'last-6m')    { const f = new Date(today); f.setMonth(f.getMonth() - 6); return { from: f, to: end, label: 'Last 6 Months' }; }
+    if (id === 'last-year')  { const f = new Date(today); f.setFullYear(f.getFullYear() - 1); return { from: f, to: end, label: 'Last Year' }; }
+    if (id === 'ytd')        return { from: new Date(now.getFullYear(), 0, 1), to: end, label: 'Year to Date' };
+    if (id === 'week')       return { from: startOfWeek(now), to: end, label: 'Week' };
+    if (id === 'month')      return { from: startOfMonth(now), to: end, label: 'Month' };
+    if (id === 'all')        return { from: null, to: null, label: 'All Time', isAll: true };
+    return null;
+  }
+
+  function applyRange(range, quickId, presetId) {
+    applied = range;
+    activeQuickId = quickId || null;
+    activePresetId = presetId || null;
+    render();
+  }
+
+  // ───── render summary ─────
+  function filterEntries() {
+    if (!applied || applied.isAll) return state.entries;
+    return state.entries.filter((e) => {
+      const t = new Date(e.timestamp);
+      return t >= applied.from && t <= applied.to;
+    });
+  }
+
+  function render() {
+    document.querySelectorAll('.pill[data-quick]').forEach((el) => {
+      el.classList.toggle('active', el.dataset.quick === activeQuickId);
+    });
+    document.getElementById('range-pill').classList.toggle('active', !activeQuickId);
+
+    // Range label
+    if (applied?.isAll) {
+      document.getElementById('range-label').textContent = 'All time';
+      document.getElementById('range-pill-label').textContent = 'All Time';
+    } else if (applied) {
+      const sameYear = applied.from.getFullYear() === applied.to.getFullYear();
+      const yearTxt = sameYear && applied.from.getFullYear() === new Date().getFullYear() ? '' : ', ' + applied.from.getFullYear();
+      const lbl = sameDay(applied.from, applied.to)
+        ? `${fmtShort(applied.from)}${yearTxt}`
+        : `${fmtShort(applied.from)} – ${fmtShort(applied.to)}${yearTxt}`;
+      document.getElementById('range-label').textContent = applied.label + ' · ' + lbl;
+      document.getElementById('range-pill-label').textContent = activeQuickId ? 'Custom' : applied.label;
+    }
+
+    const entries = filterEntries();
+    const totalMins = entries.reduce((acc, e) => acc + (e.intervalMinutes || 15), 0);
+
+    document.getElementById('stats').innerHTML = `
+      <div class="stat">
+        <div class="label">Entries</div>
+        <div class="big">${entries.length}</div>
+        <div class="sub">15-min check-ins logged</div>
+      </div>
+      <div class="stat">
+        <div class="label">Time tracked</div>
+        <div class="big">${fmtDuration(totalMins)}</div>
+        <div class="sub">${totalMins} minutes total</div>
+      </div>
+    `;
+
+    const entriesEl = document.getElementById('entries');
+    if (!entries.length) {
+      entriesEl.innerHTML = `<div class="empty">No entries in this range.</div>`;
+    } else {
+      const sorted = [...entries].sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+      entriesEl.innerHTML = sorted.map((e) => {
+        const d = new Date(e.timestamp);
+        const isToday = sameDay(d, new Date());
+        const ts = isToday
+          ? d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          : `${MONTHS[d.getMonth()]} ${d.getDate()} ${d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+        return `
+          <div class="entry">
+            <div class="ts">${ts}</div>
+            <div class="text">${escapeHTML(e.text)}</div>
+            <button class="del" data-id="${e.id}" title="Delete">×</button>
+          </div>
+        `;
+      }).join('');
+
+      entriesEl.querySelectorAll('.del').forEach((btn) => {
+        btn.addEventListener('click', async (ev) => {
+          const id = parseInt(ev.currentTarget.dataset.id, 10);
+          if (confirm('Delete this entry?')) await ipcRenderer.invoke('delete-entry', id);
+        });
+      });
+    }
+  }
+
+  // ───── quick pills ─────
+  document.querySelectorAll('.pill[data-quick]').forEach((p) => {
+    p.addEventListener('click', () => {
+      const id = p.dataset.quick;
+      applyRange(presetRange(id), id, null);
+    });
+  });
+
+  // ───── picker ─────
+  const picker = document.getElementById('picker');
+  const rangePill = document.getElementById('range-pill');
+
+  rangePill.addEventListener('click', (e) => {
+    e.stopPropagation();
+    openPicker();
+  });
+
+  document.addEventListener('click', (e) => {
+    if (picker.classList.contains('show') && !picker.contains(e.target)) {
+      closePicker();
+    }
+  });
+
+  function openPicker() {
+    // Seed selection from applied (if any range)
+    if (applied && !applied.isAll) {
+      pendingFrom = startOfDay(applied.from);
+      pendingTo = startOfDay(applied.to);
+      viewMonth = startOfMonth(pendingFrom);
+    } else {
+      pendingFrom = null;
+      pendingTo = null;
+      viewMonth = startOfMonth(new Date());
+    }
+    renderPicker();
+    picker.classList.add('show');
+  }
+  function closePicker() {
+    picker.classList.remove('show');
+  }
+
+  function buildMonthCells(year, month) {
+    const first = new Date(year, month, 1);
+    const firstDay = first.getDay(); // 0..6 Sun..Sat
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const cells = [];
+    for (let i = 0; i < firstDay; i++) cells.push(null);
+    for (let d = 1; d <= daysInMonth; d++) cells.push(new Date(year, month, d));
+    return cells;
+  }
+
+  function isInRange(d, from, to) {
+    if (!from || !to) return false;
+    return d > from && d < to;
+  }
+
+  function renderMonth(elId, year, month, titleId) {
+    const cells = buildMonthCells(year, month);
+    const todayMid = startOfDay(new Date());
+    const fromMid = pendingFrom ? startOfDay(pendingFrom) : null;
+    const toMid = pendingTo ? startOfDay(pendingTo) : null;
+    let actualFrom = fromMid;
+    let actualTo = toMid;
+    if (fromMid && toMid && fromMid > toMid) {
+      actualFrom = toMid;
+      actualTo = fromMid;
+    }
+
+    document.getElementById(titleId).textContent = `${MONTHS_LONG[month]} ${year}`;
+
+    const html = cells.map((d) => {
+      if (!d) return `<div class="day empty"></div>`;
+      const dMid = startOfDay(d);
+      const classes = ['day', 'in-month'];
+
+      let isSingle = false, isStart = false, isEnd = false, isMid = false;
+      if (actualFrom && actualTo) {
+        if (sameDay(actualFrom, actualTo) && sameDay(dMid, actualFrom)) isSingle = true;
+        else if (sameDay(dMid, actualFrom)) isStart = true;
+        else if (sameDay(dMid, actualTo)) isEnd = true;
+        else if (isInRange(dMid, actualFrom, actualTo)) isMid = true;
+      } else if (actualFrom && sameDay(dMid, actualFrom)) {
+        isSingle = true;
+      }
+
+      if (isSingle) classes.push('range-single');
+      else if (isStart) classes.push('range-start');
+      else if (isEnd) classes.push('range-end');
+      else if (isMid) classes.push('in-range');
+
+      if (sameDay(dMid, todayMid)) classes.push('today');
+
+      const iso = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+      return `<div class="${classes.join(' ')}" data-date="${iso}">${d.getDate()}</div>`;
+    }).join('');
+
+    document.getElementById(elId).innerHTML = html;
+  }
+
+  function renderPicker() {
+    const ly = viewMonth.getFullYear();
+    const lm = viewMonth.getMonth();
+    const right = new Date(ly, lm + 1, 1);
+
+    renderMonth('left-days', ly, lm, 'left-title');
+    renderMonth('right-days', right.getFullYear(), right.getMonth(), 'right-title');
+
+    // Update month/year selects
+    const monthSel = document.getElementById('month-select');
+    const yearSel = document.getElementById('year-select');
+    monthSel.innerHTML = MONTHS_LONG.map((m, i) => `<option value="${i}" ${i === lm ? 'selected' : ''}>${m}</option>`).join('');
+    const curYear = new Date().getFullYear();
+    const years = [];
+    for (let y = curYear - 10; y <= curYear + 1; y++) years.push(y);
+    yearSel.innerHTML = years.map((y) => `<option value="${y}" ${y === ly ? 'selected' : ''}>${y}</option>`).join('');
+
+    // Highlight active preset
+    document.querySelectorAll('.preset').forEach((el) => {
+      el.classList.toggle('active', el.dataset.preset === activePresetId);
+    });
+
+    // Wire day clicks
+    document.querySelectorAll('#picker .day').forEach((el) => {
+      el.addEventListener('click', () => {
+        const iso = el.dataset.date;
+        if (!iso) return;
+        const [y, m, d] = iso.split('-').map(Number);
+        const date = new Date(y, m, d);
+        onDayClick(date);
+      });
+    });
+  }
+
+  function onDayClick(date) {
+    if (!pendingFrom || (pendingFrom && pendingTo)) {
+      pendingFrom = date;
+      pendingTo = null;
+    } else {
+      pendingTo = date;
+      if (pendingFrom > pendingTo) {
+        const tmp = pendingFrom;
+        pendingFrom = pendingTo;
+        pendingTo = tmp;
+      }
+    }
+    activePresetId = null;
+    renderPicker();
+  }
+
+  // Preset clicks
+  document.querySelectorAll('.preset').forEach((el) => {
+    el.addEventListener('click', () => {
+      const id = el.dataset.preset;
+      activePresetId = id;
+      const r = presetRange(id);
+      if (r.isAll) {
+        pendingFrom = null;
+        pendingTo = null;
+      } else {
+        pendingFrom = startOfDay(r.from);
+        pendingTo = startOfDay(r.to);
+        viewMonth = startOfMonth(pendingFrom);
+      }
+      renderPicker();
+    });
+  });
+
+  // Month/year selects
+  document.getElementById('month-select').addEventListener('change', (e) => {
+    viewMonth = new Date(viewMonth.getFullYear(), parseInt(e.target.value, 10), 1);
+    renderPicker();
+  });
+  document.getElementById('year-select').addEventListener('change', (e) => {
+    viewMonth = new Date(parseInt(e.target.value, 10), viewMonth.getMonth(), 1);
+    renderPicker();
+  });
+
+  document.getElementById('prev-month').addEventListener('click', () => {
+    viewMonth = new Date(viewMonth.getFullYear(), viewMonth.getMonth() - 1, 1);
+    renderPicker();
+  });
+  document.getElementById('next-month').addEventListener('click', () => {
+    viewMonth = new Date(viewMonth.getFullYear(), viewMonth.getMonth() + 1, 1);
+    renderPicker();
+  });
+
+  // Apply / Cancel
+  document.getElementById('cancel').addEventListener('click', closePicker);
+  document.getElementById('apply').addEventListener('click', () => {
+    if (activePresetId) {
+      const r = presetRange(activePresetId);
+      applyRange(r, null, activePresetId);
+    } else if (pendingFrom) {
+      const from = startOfDay(pendingFrom);
+      const to = endOfDay(pendingTo || pendingFrom);
+      applyRange({ from, to, label: fmtPill(from, to) }, null, null);
+    }
+    closePicker();
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && picker.classList.contains('show')) closePicker();
+  });
+
+  // ───── export ─────
+  document.getElementById('export-csv').addEventListener('click', () => {
+    ipcRenderer.invoke('export-csv');
+  });
+
+  // ───── boot ─────
+  async function refresh() {
+    state = await ipcRenderer.invoke('get-state');
+    if (!applied) applyRange(presetRange('today'), 'today', null);
+    else render();
+  }
+  ipcRenderer.on('entries-updated', refresh);
+  refresh();
+</script>
+</body>
+</html>

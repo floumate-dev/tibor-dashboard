@@ -1,0 +1,29 @@
+# This dir is a catch-all; only the root Next.js app should deploy.
+# Top-level-only excludes are anchored with a leading slash so they don't
+# accidentally match nested paths (e.g. src/lib/supabase).
+
+# any level
+node_modules
+.next
+.DS_Store
+
+# top-level sibling projects (own repos / own Vercel deployments)
+/aleksa-forma
+/edumena-forma
+/hormozi-timer
+/internet-intranet-prezentacija
+/kraba-clone
+/nauci-dizajnu-giveaway
+/nauci-dizajnu-referral
+/nutribox-mangrowe
+/quiz
+/setter-tracker
+/teodora-forma
+/watchtime-agency
+
+# top-level loose files / folders not part of the app
+/.claude
+/scripts
+/supabase
+/*.html
+/stripe-ghl-invoice-blueprint.json

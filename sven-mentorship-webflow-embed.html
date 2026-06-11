@@ -1,0 +1,852 @@
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+    .sv-wrapper *, .sv-wrapper *::before, .sv-wrapper *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    .sv-wrapper {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        min-height: 100vh;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        padding: 60px 20px 20px;
+        color: #F9F9F9;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        position: relative;
+        overflow-x: hidden;
+    }
+
+    .sv-page-wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        max-width: 620px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .sv-logo-wrapper {
+        text-align: center;
+        margin-bottom: 32px;
+    }
+
+    .sv-logo-text {
+        font-size: 14px;
+        font-weight: 800;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        color: #F2B738;
+    }
+
+    .sv-quiz-container {
+        background: #181818;
+        border-radius: 8px;
+        border: 1px solid rgba(242, 183, 56, 0.12);
+        box-shadow: 0 4px 40px rgba(0, 0, 0, 0.3);
+        max-width: 620px;
+        width: 100%;
+        padding: 48px 40px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .sv-progress-bar-wrapper {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: rgba(242, 183, 56, 0.1);
+    }
+
+    .sv-progress-bar-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #F2B738, #E5A020);
+        border-radius: 0 2px 2px 0;
+        transition: width 0.4s ease;
+        width: 0%;
+    }
+
+    .sv-step {
+        display: none;
+        animation: svFadeIn 0.35s ease;
+    }
+
+    .sv-step.sv-active {
+        display: block;
+    }
+
+    @keyframes svFadeIn {
+        from { opacity: 0; transform: translateY(12px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .sv-step-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 20px;
+    }
+
+    .sv-step-counter {
+        font-size: 12px;
+        font-weight: 700;
+        color: #F2B738;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+    }
+
+    .sv-step-percent {
+        font-size: 13px;
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.4);
+    }
+
+    .sv-question-title {
+        font-size: 20px;
+        font-weight: 700;
+        color: #ffffff;
+        margin-bottom: 8px;
+        line-height: 1.4;
+    }
+
+    .sv-question-subtitle {
+        font-size: 14px;
+        color: rgba(255, 255, 255, 0.5);
+        margin-bottom: 28px;
+        line-height: 1.5;
+    }
+
+    .sv-input-field {
+        width: 100%;
+        padding: 16px 20px;
+        border: 1px solid rgba(242, 183, 56, 0.16);
+        border-radius: 6px;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 16px;
+        font-weight: 500;
+        color: #F9F9F9;
+        background: rgba(242, 183, 56, 0.05);
+        outline: none;
+        transition: border-color 0.2s ease, background 0.2s ease;
+    }
+
+    .sv-input-field:focus {
+        border-color: #F2B738;
+        background: rgba(242, 183, 56, 0.08);
+    }
+
+    .sv-input-field::placeholder {
+        color: rgba(255, 255, 255, 0.25);
+        font-weight: 400;
+    }
+
+    .sv-input-field.sv-error {
+        border-color: #E54848;
+    }
+
+    textarea.sv-input-field {
+        resize: none;
+        min-height: 110px;
+    }
+
+    .sv-radio-group {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .sv-radio-option {
+        display: flex;
+        align-items: center;
+        padding: 16px 20px;
+        border: 1px solid rgba(242, 183, 56, 0.16);
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        user-select: none;
+        background: rgba(242, 183, 56, 0.03);
+    }
+
+    .sv-radio-option:hover {
+        border-color: rgba(242, 183, 56, 0.35);
+        background: rgba(242, 183, 56, 0.06);
+    }
+
+    .sv-radio-option.sv-selected {
+        border-color: #F2B738;
+        background: rgba(242, 183, 56, 0.1);
+    }
+
+    .sv-radio-option input[type="radio"] {
+        display: none;
+    }
+
+    .sv-radio-circle {
+        width: 22px;
+        height: 22px;
+        min-width: 22px;
+        border: 2px solid rgba(242, 183, 56, 0.55);
+        border-radius: 50%;
+        margin-right: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+    }
+
+    .sv-radio-circle::after {
+        content: '';
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: #F2B738;
+        transform: scale(0);
+        transition: transform 0.2s ease;
+    }
+
+    .sv-radio-option.sv-selected .sv-radio-circle {
+        border-color: #F2B738;
+    }
+
+    .sv-radio-option.sv-selected .sv-radio-circle::after {
+        transform: scale(1);
+    }
+
+    .sv-radio-label {
+        font-size: 15px;
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.85);
+        line-height: 1.4;
+    }
+
+    .sv-validation-msg {
+        font-size: 13px;
+        color: #E54848;
+        margin-top: 10px;
+        display: none;
+        font-weight: 500;
+    }
+
+    .sv-validation-msg.sv-visible {
+        display: block;
+    }
+
+    .sv-nav-buttons {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 36px;
+    }
+
+    .sv-btn-back {
+        padding: 14px 24px;
+        border-radius: 6px;
+        border: 1px solid rgba(242, 183, 56, 0.16);
+        background: transparent;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 14px;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.5);
+        transition: all 0.2s ease;
+        white-space: nowrap;
+    }
+
+    .sv-btn-back:hover {
+        border-color: rgba(242, 183, 56, 0.35);
+        background: rgba(242, 183, 56, 0.06);
+        color: rgba(255, 255, 255, 0.7);
+    }
+
+    .sv-btn-back svg {
+        width: 16px;
+        height: 16px;
+    }
+
+    .sv-btn-next {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 16px 32px;
+        background: #F2B738;
+        color: #0F0F0F;
+        border: none;
+        border-radius: 6px;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 15px;
+        font-weight: 900;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        flex: 1;
+        margin-left: 12px;
+    }
+
+    .sv-btn-next:hover {
+        background: #E5A020;
+    }
+
+    .sv-btn-next svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    .sv-btn-submit {
+        background: #F2B738;
+        padding: 16px 32px;
+        font-size: 15px;
+    }
+
+    .sv-btn-submit:hover {
+        background: #E5A020;
+    }
+
+    .sv-intro-title {
+        font-size: 24px;
+        font-weight: 700;
+        margin-bottom: 12px;
+        line-height: 1.3;
+        color: #ffffff;
+    }
+
+    .sv-intro-text {
+        font-size: 15px;
+        color: rgba(255, 255, 255, 0.5);
+        line-height: 1.7;
+        margin-bottom: 32px;
+    }
+
+    .sv-btn-start {
+        width: 100%;
+        justify-content: center;
+        padding: 16px;
+        font-size: 16px;
+        margin-left: 0;
+    }
+
+    .sv-thank-you {
+        text-align: center;
+        padding: 20px 0;
+    }
+
+    .sv-thank-you .sv-check-icon {
+        width: 72px;
+        height: 72px;
+        border-radius: 50%;
+        background: rgba(242, 183, 56, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 24px;
+    }
+
+    .sv-thank-you .sv-check-icon svg {
+        width: 36px;
+        height: 36px;
+        color: #F2B738;
+    }
+
+    .sv-thank-you h2 {
+        font-size: 24px;
+        font-weight: 700;
+        margin-bottom: 12px;
+        color: #ffffff;
+    }
+
+    .sv-thank-you p {
+        font-size: 15px;
+        color: rgba(255, 255, 255, 0.5);
+        line-height: 1.7;
+    }
+
+    @media (max-width: 640px) {
+        .sv-wrapper {
+            padding: 40px 16px 20px;
+        }
+        .sv-quiz-container {
+            padding: 40px 24px;
+            border-color: rgba(242, 183, 56, 0.08);
+        }
+        .sv-question-title {
+            font-size: 18px;
+        }
+        .sv-radio-label {
+            font-size: 14px;
+        }
+        .sv-intro-title {
+            font-size: 20px;
+        }
+    }
+</style>
+
+<div class="sv-wrapper">
+    <div class="sv-page-wrapper">
+        <div class="sv-logo-wrapper">
+            <span class="sv-logo-text">Business of Fitness</span>
+        </div>
+        <div class="sv-quiz-container">
+            <div class="sv-progress-bar-wrapper">
+                <div class="sv-progress-bar-fill" id="svProgressBar"></div>
+            </div>
+
+            <div class="sv-step sv-active" data-sv-step="0">
+                <h1 class="sv-intro-title">Mentorship Program - Prijava</h1>
+                <p class="sv-intro-text">
+                    Popuni ovaj kratki upitnik kako bismo se upoznali s tvojom situacijom i pripremili konzultacijski poziv.<br><br>
+                    Prijave za mentorship programe nisu moguće bez da se prethodno odradi konzultacijski poziv.<br><br>
+                    Traje samo 2 minute. Svi podaci su povjerljivi.
+                </p>
+                <button class="sv-btn-next sv-btn-start" onclick="svNextStep()">
+                    Započni
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5L15.75 12l-7.5 7.5"/></svg>
+                </button>
+            </div>
+
+            <div class="sv-step" data-sv-step="1">
+                <div class="sv-step-header"><span class="sv-step-counter">Korak 1 od 12</span><span class="sv-step-percent">8%</span></div>
+                <h2 class="sv-question-title">Ime i prezime</h2>
+                <p class="sv-question-subtitle">Upiši svoje puno ime i prezime.</p>
+                <input type="text" class="sv-input-field" id="svFullName" placeholder="Vaš odgovor" autocomplete="name">
+                <div class="sv-validation-msg" id="sv-val-fullName">Ovo polje je obavezno.</div>
+                <div class="sv-nav-buttons">
+                    <button class="sv-btn-back" onclick="svPrevStep()"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5"/></svg> Nazad</button>
+                    <button class="sv-btn-next" onclick="svNextStep()">Nastavi <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5L15.75 12l-7.5 7.5"/></svg></button>
+                </div>
+            </div>
+
+            <div class="sv-step" data-sv-step="2">
+                <div class="sv-step-header"><span class="sv-step-counter">Korak 2 od 12</span><span class="sv-step-percent">17%</span></div>
+                <h2 class="sv-question-title">Korisničko ime Instagram profila</h2>
+                <p class="sv-question-subtitle">Npr. @vaseprofil</p>
+                <input type="text" class="sv-input-field" id="svInstagram" placeholder="Vaš odgovor">
+                <div class="sv-validation-msg" id="sv-val-instagram">Ovo polje je obavezno.</div>
+                <div class="sv-nav-buttons">
+                    <button class="sv-btn-back" onclick="svPrevStep()"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5"/></svg> Nazad</button>
+                    <button class="sv-btn-next" onclick="svNextStep()">Nastavi <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5L15.75 12l-7.5 7.5"/></svg></button>
+                </div>
+            </div>
+
+            <div class="sv-step" data-sv-step="3">
+                <div class="sv-step-header"><span class="sv-step-counter">Korak 3 od 12</span><span class="sv-step-percent">25%</span></div>
+                <h2 class="sv-question-title">E-mail adresa za kontakt</h2>
+                <p class="sv-question-subtitle">Na ovu adresu ćemo te kontaktirati.</p>
+                <input type="email" class="sv-input-field" id="svEmail" placeholder="Vaš odgovor" autocomplete="email">
+                <div class="sv-validation-msg" id="sv-val-email">Unesi ispravnu email adresu.</div>
+                <div class="sv-nav-buttons">
+                    <button class="sv-btn-back" onclick="svPrevStep()"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5"/></svg> Nazad</button>
+                    <button class="sv-btn-next" onclick="svNextStep()">Nastavi <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5L15.75 12l-7.5 7.5"/></svg></button>
+                </div>
+            </div>
+
+            <div class="sv-step" data-sv-step="4">
+                <div class="sv-step-header"><span class="sv-step-counter">Korak 4 od 12</span><span class="sv-step-percent">33%</span></div>
+                <h2 class="sv-question-title">Koliko dugo se aktivno baviš fitnessom?</h2>
+                <p class="sv-question-subtitle">Upiši broj mjeseci ili godina.</p>
+                <input type="text" class="sv-input-field" id="svFitnessDuration" placeholder="Vaš odgovor">
+                <div class="sv-validation-msg" id="sv-val-fitnessDuration">Ovo polje je obavezno.</div>
+                <div class="sv-nav-buttons">
+                    <button class="sv-btn-back" onclick="svPrevStep()"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5"/></svg> Nazad</button>
+                    <button class="sv-btn-next" onclick="svNextStep()">Nastavi <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5L15.75 12l-7.5 7.5"/></svg></button>
+                </div>
+            </div>
+
+            <div class="sv-step" data-sv-step="5">
+                <div class="sv-step-header"><span class="sv-step-counter">Korak 5 od 12</span><span class="sv-step-percent">42%</span></div>
+                <h2 class="sv-question-title">Da li imaš neke fitness certifikate ili kvalifikacije?</h2>
+                <p class="sv-question-subtitle">Odaberi opciju.</p>
+                <div class="sv-radio-group" data-name="hasCertificates">
+                    <label class="sv-radio-option" onclick="svSelectRadioCert(this, true)">
+                        <input type="radio" name="svHasCertificates" value="Da">
+                        <div class="sv-radio-circle"></div>
+                        <span class="sv-radio-label">Da</span>
+                    </label>
+                    <label class="sv-radio-option" onclick="svSelectRadioCert(this, false)">
+                        <input type="radio" name="svHasCertificates" value="Ne">
+                        <div class="sv-radio-circle"></div>
+                        <span class="sv-radio-label">Ne</span>
+                    </label>
+                </div>
+                <input type="text" class="sv-input-field" id="svCertificatesDetail" placeholder="Navedi koje..." style="display:none; margin-top: 12px;">
+                <div class="sv-validation-msg" id="sv-val-certificates">Molimo izaberi jednu opciju.</div>
+                <div class="sv-nav-buttons">
+                    <button class="sv-btn-back" onclick="svPrevStep()"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5"/></svg> Nazad</button>
+                    <button class="sv-btn-next" onclick="svNextStep()">Nastavi <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5L15.75 12l-7.5 7.5"/></svg></button>
+                </div>
+            </div>
+
+            <div class="sv-step" data-sv-step="6">
+                <div class="sv-step-header"><span class="sv-step-counter">Korak 6 od 12</span><span class="sv-step-percent">50%</span></div>
+                <h2 class="sv-question-title">Kakvo iskustvo imaš u treniranju drugih osoba ili grupa?</h2>
+                <p class="sv-question-subtitle">Opiši svoje dosadašnje iskustvo.</p>
+                <textarea class="sv-input-field" id="svTrainingExp" placeholder="Vaš odgovor" rows="4"></textarea>
+                <div class="sv-validation-msg" id="sv-val-trainingExp">Ovo polje je obavezno.</div>
+                <div class="sv-nav-buttons">
+                    <button class="sv-btn-back" onclick="svPrevStep()"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5"/></svg> Nazad</button>
+                    <button class="sv-btn-next" onclick="svNextStep()">Nastavi <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5L15.75 12l-7.5 7.5"/></svg></button>
+                </div>
+            </div>
+
+            <div class="sv-step" data-sv-step="7">
+                <div class="sv-step-header"><span class="sv-step-counter">Korak 7 od 12</span><span class="sv-step-percent">58%</span></div>
+                <h2 class="sv-question-title">Zašto želiš pretvoriti svoju strast prema fitnessu u posao?</h2>
+                <p class="sv-question-subtitle">Napiši svoje motivacije i razloge.</p>
+                <textarea class="sv-input-field" id="svMotivation" placeholder="Vaš odgovor" rows="4"></textarea>
+                <div class="sv-validation-msg" id="sv-val-motivation">Ovo polje je obavezno.</div>
+                <div class="sv-nav-buttons">
+                    <button class="sv-btn-back" onclick="svPrevStep()"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5"/></svg> Nazad</button>
+                    <button class="sv-btn-next" onclick="svNextStep()">Nastavi <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5L15.75 12l-7.5 7.5"/></svg></button>
+                </div>
+            </div>
+
+            <div class="sv-step" data-sv-step="8">
+                <div class="sv-step-header"><span class="sv-step-counter">Korak 8 od 12</span><span class="sv-step-percent">67%</span></div>
+                <h2 class="sv-question-title">Da li si ranije pokušao/la započeti fitness posao?</h2>
+                <p class="sv-question-subtitle">Da/Ne. Ako da, opiši svoje iskustvo, što je funkcioniralo, a što nije?</p>
+                <textarea class="sv-input-field" id="svPreviousAttempt" placeholder="Vaš odgovor" rows="4"></textarea>
+                <div class="sv-validation-msg" id="sv-val-previousAttempt">Ovo polje je obavezno.</div>
+                <div class="sv-nav-buttons">
+                    <button class="sv-btn-back" onclick="svPrevStep()"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5"/></svg> Nazad</button>
+                    <button class="sv-btn-next" onclick="svNextStep()">Nastavi <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5L15.75 12l-7.5 7.5"/></svg></button>
+                </div>
+            </div>
+
+            <div class="sv-step" data-sv-step="9">
+                <div class="sv-step-header"><span class="sv-step-counter">Korak 9 od 12</span><span class="sv-step-percent">75%</span></div>
+                <h2 class="sv-question-title">Koja je tvoja vizija ili ideja za budući fitness posao?</h2>
+                <p class="sv-question-subtitle">Ukratko opiši svoje želje i planove.</p>
+                <textarea class="sv-input-field" id="svVision" placeholder="Vaš odgovor" rows="4"></textarea>
+                <div class="sv-validation-msg" id="sv-val-vision">Ovo polje je obavezno.</div>
+                <div class="sv-nav-buttons">
+                    <button class="sv-btn-back" onclick="svPrevStep()"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5"/></svg> Nazad</button>
+                    <button class="sv-btn-next" onclick="svNextStep()">Nastavi <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5L15.75 12l-7.5 7.5"/></svg></button>
+                </div>
+            </div>
+
+            <div class="sv-step" data-sv-step="10">
+                <div class="sv-step-header"><span class="sv-step-counter">Korak 10 od 12</span><span class="sv-step-percent">83%</span></div>
+                <h2 class="sv-question-title">Imate li nekih posebnih izazova ili prepreka za koje se nadate da ćete riješiti kroz ovaj program?</h2>
+                <p class="sv-question-subtitle">Opišite svoje trenutne izazove.</p>
+                <textarea class="sv-input-field" id="svChallenges" placeholder="Vaš odgovor" rows="4"></textarea>
+                <div class="sv-validation-msg" id="sv-val-challenges">Ovo polje je obavezno.</div>
+                <div class="sv-nav-buttons">
+                    <button class="sv-btn-back" onclick="svPrevStep()"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5"/></svg> Nazad</button>
+                    <button class="sv-btn-next" onclick="svNextStep()">Nastavi <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5L15.75 12l-7.5 7.5"/></svg></button>
+                </div>
+            </div>
+
+            <div class="sv-step" data-sv-step="11">
+                <div class="sv-step-header"><span class="sv-step-counter">Korak 11 od 12</span><span class="sv-step-percent">92%</span></div>
+                <h2 class="sv-question-title">Koje vještine ili znanja se nadaš steći kroz ovaj program?</h2>
+                <p class="sv-question-subtitle">Napišite svoja očekivanja.</p>
+                <textarea class="sv-input-field" id="svExpectations" placeholder="Vaš odgovor" rows="4"></textarea>
+                <div class="sv-validation-msg" id="sv-val-expectations">Ovo polje je obavezno.</div>
+                <div class="sv-nav-buttons">
+                    <button class="sv-btn-back" onclick="svPrevStep()"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5"/></svg> Nazad</button>
+                    <button class="sv-btn-next" onclick="svNextStep()">Nastavi <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5L15.75 12l-7.5 7.5"/></svg></button>
+                </div>
+            </div>
+
+            <div class="sv-step" data-sv-step="12">
+                <div class="sv-step-header"><span class="sv-step-counter">Korak 12 od 12</span><span class="sv-step-percent">99%</span></div>
+                <h2 class="sv-question-title">Kako si saznao/la za ovaj Mentorship program?</h2>
+                <p class="sv-question-subtitle">Odaberi jednu opciju.</p>
+                <div class="sv-radio-group" data-name="source">
+                    <label class="sv-radio-option" onclick="svSelectRadio(this)">
+                        <input type="radio" name="svSource" value="Preporuka">
+                        <div class="sv-radio-circle"></div>
+                        <span class="sv-radio-label">Preporuka</span>
+                    </label>
+                    <label class="sv-radio-option" onclick="svSelectRadio(this)">
+                        <input type="radio" name="svSource" value="Društvene mreže">
+                        <div class="sv-radio-circle"></div>
+                        <span class="sv-radio-label">Društvene mreže</span>
+                    </label>
+                    <label class="sv-radio-option" onclick="svSelectRadio(this)">
+                        <input type="radio" name="svSource" value="Google pretraga">
+                        <div class="sv-radio-circle"></div>
+                        <span class="sv-radio-label">Google pretraga</span>
+                    </label>
+                    <label class="sv-radio-option" onclick="svSelectRadio(this)">
+                        <input type="radio" name="svSource" value="Ostalo">
+                        <div class="sv-radio-circle"></div>
+                        <span class="sv-radio-label">Ostalo</span>
+                    </label>
+                </div>
+                <div class="sv-validation-msg" id="sv-val-source">Molimo izaberi jednu opciju.</div>
+                <div class="sv-nav-buttons">
+                    <button class="sv-btn-back" onclick="svPrevStep()"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5"/></svg> Nazad</button>
+                    <button class="sv-btn-next sv-btn-submit" onclick="svSubmitForm()">Pošalji prijavu <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5L15.75 12l-7.5 7.5"/></svg></button>
+                </div>
+            </div>
+
+            <div class="sv-step" data-sv-step="13">
+                <div class="sv-thank-you">
+                    <div class="sv-check-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+                    </div>
+                    <h2>Prijava je uspješno poslana!</h2>
+                    <p>Hvala ti što si izdvojio/la vrijeme za popunjavanje upitnika. Kontaktirat ćemo te u najkraćem mogućem roku kako bismo dogovorili konzultacijski poziv.<br><br>Vidimo se uskoro!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+(function() {
+    let svCurrentStep = 0;
+    const svTotalSteps = 13;
+    const svQuestionSteps = 12;
+    let svFormSubmitted = false;
+    let svAbandonSent = false;
+    let svAbandonTimer = null;
+
+    function svUpdateProgress() {
+        const progress = svCurrentStep === 0 ? 0 : (svCurrentStep / svQuestionSteps) * 100;
+        document.getElementById('svProgressBar').style.width = Math.min(progress, 100) + '%';
+    }
+
+    function svShowStep(step) {
+        svHideAllValidation();
+        document.querySelectorAll('.sv-step').forEach(s => s.classList.remove('sv-active'));
+        const target = document.querySelector(`.sv-step[data-sv-step="${step}"]`);
+        if (target) {
+            target.classList.add('sv-active');
+            setTimeout(() => {
+                const input = target.querySelector('input:not([type="radio"]), textarea');
+                if (input) input.focus();
+            }, 100);
+        }
+        svUpdateProgress();
+    }
+
+    function svHideAllValidation() {
+        document.querySelectorAll('.sv-validation-msg').forEach(v => v.classList.remove('sv-visible'));
+        document.querySelectorAll('.sv-input-field').forEach(i => i.classList.remove('sv-error'));
+    }
+
+    function svValidateStep(step) {
+        svHideAllValidation();
+
+        const fieldMap = {
+            1: { id: 'svFullName', valId: 'sv-val-fullName' },
+            2: { id: 'svInstagram', valId: 'sv-val-instagram' },
+            3: { id: 'svEmail', valId: 'sv-val-email', type: 'email' },
+            4: { id: 'svFitnessDuration', valId: 'sv-val-fitnessDuration' },
+            5: { id: null, valId: 'sv-val-certificates', radio: 'svHasCertificates' },
+            6: { id: 'svTrainingExp', valId: 'sv-val-trainingExp' },
+            7: { id: 'svMotivation', valId: 'sv-val-motivation' },
+            8: { id: 'svPreviousAttempt', valId: 'sv-val-previousAttempt' },
+            9: { id: 'svVision', valId: 'sv-val-vision' },
+            10: { id: 'svChallenges', valId: 'sv-val-challenges' },
+            11: { id: 'svExpectations', valId: 'sv-val-expectations' },
+        };
+
+        if (step === 12) {
+            const checked = document.querySelector('input[name="svSource"]:checked');
+            if (!checked) {
+                document.getElementById('sv-val-source').classList.add('sv-visible');
+                return false;
+            }
+            return true;
+        }
+
+        const field = fieldMap[step];
+        if (!field) return true;
+
+        if (field.radio) {
+            const checked = document.querySelector(`input[name="${field.radio}"]:checked`);
+            if (!checked) {
+                document.getElementById(field.valId).classList.add('sv-visible');
+                return false;
+            }
+            if (checked.value === 'Da') {
+                const detail = document.getElementById('svCertificatesDetail');
+                if (!detail.value.trim()) {
+                    document.getElementById(field.valId).textContent = 'Molimo navedi koje certifikate imaš.';
+                    document.getElementById(field.valId).classList.add('sv-visible');
+                    detail.classList.add('sv-error');
+                    detail.focus();
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        const el = document.getElementById(field.id);
+        const val = el.value.trim();
+
+        if (!val) {
+            document.getElementById(field.valId).classList.add('sv-visible');
+            el.classList.add('sv-error');
+            return false;
+        }
+
+        if (field.type === 'email') {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(val)) {
+                document.getElementById(field.valId).classList.add('sv-visible');
+                el.classList.add('sv-error');
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    window.svNextStep = function() {
+        if (svCurrentStep > 0 && !svValidateStep(svCurrentStep)) return;
+        if (svCurrentStep === 0) svStartAbandonTimer();
+        if (svCurrentStep < svTotalSteps) {
+            svCurrentStep++;
+            svShowStep(svCurrentStep);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    };
+
+    window.svPrevStep = function() {
+        svHideAllValidation();
+        if (svCurrentStep > 0) {
+            svCurrentStep--;
+            svShowStep(svCurrentStep);
+        }
+    };
+
+    window.svSelectRadio = function(el) {
+        svHideAllValidation();
+        const group = el.closest('.sv-radio-group');
+        group.querySelectorAll('.sv-radio-option').forEach(o => o.classList.remove('sv-selected'));
+        el.classList.add('sv-selected');
+        el.querySelector('input[type="radio"]').checked = true;
+    };
+
+    window.svSelectRadioCert = function(el, showDetail) {
+        svHideAllValidation();
+        const group = el.closest('.sv-radio-group');
+        group.querySelectorAll('.sv-radio-option').forEach(o => o.classList.remove('sv-selected'));
+        el.classList.add('sv-selected');
+        el.querySelector('input[type="radio"]').checked = true;
+        const detailInput = document.getElementById('svCertificatesDetail');
+        if (showDetail) {
+            detailInput.style.display = 'block';
+            detailInput.focus();
+        } else {
+            detailInput.style.display = 'none';
+            detailInput.value = '';
+        }
+    };
+
+    window.svSubmitForm = function() {
+        if (!svValidateStep(12)) return;
+
+        const formData = {
+            'Ime i prezime': document.getElementById('svFullName').value.trim(),
+            'Instagram': document.getElementById('svInstagram').value.trim(),
+            'Email adresa': document.getElementById('svEmail').value.trim(),
+            'Koliko dugo se bavi fitnessom': document.getElementById('svFitnessDuration').value.trim(),
+            'Ima certifikate': document.querySelector('input[name="svHasCertificates"]:checked')?.value,
+            'Certifikati - koji': document.getElementById('svCertificatesDetail').value.trim() || '',
+            'Iskustvo u treniranju': document.getElementById('svTrainingExp').value.trim(),
+            'Motivacija za fitness posao': document.getElementById('svMotivation').value.trim(),
+            'Raniji pokusaj fitness posla': document.getElementById('svPreviousAttempt').value.trim(),
+            'Vizija za buduci posao': document.getElementById('svVision').value.trim(),
+            'Izazovi i prepreke': document.getElementById('svChallenges').value.trim(),
+            'Ocekivanja od programa': document.getElementById('svExpectations').value.trim(),
+            'Kako je saznao za program': document.querySelector('input[name="svSource"]:checked')?.value,
+        };
+
+        svFormSubmitted = true;
+        if (svAbandonTimer) clearTimeout(svAbandonTimer);
+
+        fetch('https://hook.eu1.make.com/71olvi2uga32a5pqfbhxupyehpabpxdb', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData)
+        }).catch(err => console.error('Webhook error:', err));
+
+        svCurrentStep = 13;
+        svShowStep(13);
+    };
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && svCurrentStep > 0 && svCurrentStep < 13) {
+            const activeStep = document.querySelector('.sv-step.sv-active');
+            const textarea = activeStep?.querySelector('textarea:focus');
+            if (textarea) return;
+            e.preventDefault();
+            if (svCurrentStep === 12) {
+                svSubmitForm();
+            } else {
+                svNextStep();
+            }
+        }
+    });
+
+    function svGetAbandonData(trigger) {
+        return {
+            'Trigger': trigger,
+            'Napusteno na koraku': svCurrentStep,
+            'Ime i prezime': document.getElementById('svFullName')?.value.trim() || '',
+            'Instagram': document.getElementById('svInstagram')?.value.trim() || '',
+            'Email adresa': document.getElementById('svEmail')?.value.trim() || '',
+            'Koliko dugo se bavi fitnessom': document.getElementById('svFitnessDuration')?.value.trim() || '',
+            'Ima certifikate': document.querySelector('input[name="svHasCertificates"]:checked')?.value || '',
+            'Certifikati - koji': document.getElementById('svCertificatesDetail')?.value.trim() || '',
+            'Iskustvo u treniranju': document.getElementById('svTrainingExp')?.value.trim() || '',
+            'Motivacija za fitness posao': document.getElementById('svMotivation')?.value.trim() || '',
+            'Raniji pokusaj fitness posla': document.getElementById('svPreviousAttempt')?.value.trim() || '',
+            'Vizija za buduci posao': document.getElementById('svVision')?.value.trim() || '',
+            'Izazovi i prepreke': document.getElementById('svChallenges')?.value.trim() || '',
+            'Ocekivanja od programa': document.getElementById('svExpectations')?.value.trim() || '',
+            'Kako je saznao za program': document.querySelector('input[name="svSource"]:checked')?.value || '',
+        };
+    }
+
+    function svSendAbandon(trigger) {
+        if (svFormSubmitted || svAbandonSent || svCurrentStep === 0 || svCurrentStep === 13) return;
+        svAbandonSent = true;
+        const data = svGetAbandonData(trigger);
+        fetch('https://hook.eu1.make.com/ff5xxiqikxc2ud3rnkqxrrn8412a35de', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data),
+            keepalive: true
+        }).catch(err => console.error('Abandon webhook error:', err));
+    }
+
+    window.addEventListener('beforeunload', function() {
+        svSendAbandon('page_leave');
+    });
+
+    window.addEventListener('pagehide', function() {
+        svSendAbandon('page_hide');
+    });
+
+    function svStartAbandonTimer() {
+        if (!svAbandonTimer) {
+            svAbandonTimer = setTimeout(() => {
+                svSendAbandon('timeout_10min');
+            }, 10 * 60 * 1000);
+        }
+    }
+
+    document.querySelectorAll('.sv-input-field').forEach(input => {
+        input.addEventListener('focus', svHideAllValidation);
+        input.addEventListener('input', svHideAllValidation);
+    });
+
+    svUpdateProgress();
+})();
+</script>

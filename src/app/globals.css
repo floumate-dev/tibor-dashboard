@@ -1,0 +1,67 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+@layer base {
+  body {
+    @apply bg-q-bg text-q-tx font-sans antialiased;
+  }
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: #0b0b14; }
+  ::-webkit-scrollbar-thumb { @apply bg-q-txD rounded-full; }
+  ::-webkit-scrollbar-thumb:hover { @apply bg-q-txM; }
+}
+
+@layer components {
+  .qcard {
+    background: linear-gradient(145deg, rgba(17,17,25,0.9), rgba(14,14,20,0.95));
+    border: 1px solid rgba(30,30,46,0.6);
+    border-radius: 16px;
+    backdrop-filter: blur(12px);
+  }
+  .qcard-glow {
+    background: linear-gradient(145deg, rgba(17,17,25,0.9), rgba(14,14,20,0.95));
+    border: 1px solid rgba(139,92,246,0.15);
+    border-radius: 16px;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 0 30px rgba(139,92,246,0.04), inset 0 1px 0 rgba(255,255,255,0.03);
+  }
+  .qcard-hover {
+    background: linear-gradient(145deg, rgba(17,17,25,0.9), rgba(14,14,20,0.95));
+    border: 1px solid rgba(30,30,46,0.6);
+    border-radius: 16px;
+    backdrop-filter: blur(12px);
+    transition: all 0.25s ease;
+  }
+  .qcard-hover:hover {
+    border-color: rgba(139,92,246,0.25);
+    box-shadow: 0 4px 40px rgba(139,92,246,0.08), inset 0 1px 0 rgba(255,255,255,0.04);
+    transform: translateY(-2px);
+  }
+  .qbadge {
+    @apply inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold tracking-wide;
+  }
+  .qinput {
+    @apply w-full px-4 py-3 rounded-2xl text-sm transition-all duration-200;
+    background: rgba(14,14,24,0.8);
+    border: 1px solid rgba(30,30,46,0.6);
+    color: #e8e8f0;
+  }
+  .qinput::placeholder { color: #3a3a4e; }
+  .qinput:focus {
+    @apply outline-none;
+    border-color: rgba(139,92,246,0.5);
+    box-shadow: 0 0 0 3px rgba(139,92,246,0.1), 0 0 20px rgba(139,92,246,0.05);
+  }
+  .qbtn {
+    @apply px-5 py-2.5 rounded-2xl text-sm font-semibold text-white transition-all duration-200;
+    background: linear-gradient(135deg, #7c3aed, #8b5cf6);
+  }
+  .qbtn:hover {
+    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+    box-shadow: 0 0 24px rgba(139,92,246,0.3);
+  }
+  .qbtn:disabled { opacity: 0.5; }
+}

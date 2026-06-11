@@ -1,0 +1,1389 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>28 dana. 6kg manje. Bez kuvanja. — Mangrowe × Nutribox</title>
+<meta name="description" content="Mangrowe protokol + Nutribox dostava. 28 dana, 6kg manje — ili ti vraćamo novac. Beograd. Start 25. maja." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* Premium wellness palette */
+    --ink: #0E1814;
+    --ink-soft: rgba(14, 24, 20, 0.72);
+    --ink-faded: rgba(14, 24, 20, 0.5);
+    --cream: #F6F1E8;
+    --cream-deep: #EDE5D4;
+    --paper: #FBF8F1;
+    --forest: #1F4D2C;
+    --forest-deep: #0F2A18;
+    --forest-soft: #2C6B3F;
+    --coral: #E8543B;
+    --coral-soft: #F2A491;
+    --gold: #C99848;
+    --line: rgba(14, 24, 20, 0.10);
+    --line-strong: rgba(14, 24, 20, 0.18);
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Instrument Sans', system-ui, -apple-system, sans-serif;
+    font-size: 17px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  img { display: block; max-width: 100%; height: auto; }
+  a { color: inherit; }
+
+  /* === Layout === */
+  .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+  .narrow { max-width: 760px; margin: 0 auto; padding: 0 24px; }
+  section { padding: 120px 0; position: relative; }
+  section.compact { padding: 80px 0; }
+  @media (max-width: 768px) {
+    section { padding: 80px 0; }
+  }
+
+  /* === Typography === */
+  h1, h2, h3, h4 {
+    font-family: 'Instrument Sans', sans-serif;
+    margin: 0 0 20px;
+    color: var(--ink);
+    text-wrap: balance;
+    letter-spacing: -0.02em;
+  }
+  h1 { font-size: clamp(40px, 6vw, 84px); line-height: 1.02; font-weight: 600; letter-spacing: -0.035em; }
+  h2 { font-size: clamp(32px, 4vw, 56px); line-height: 1.06; font-weight: 600; letter-spacing: -0.025em; }
+  h3 { font-size: clamp(20px, 1.8vw, 26px); line-height: 1.2; font-weight: 600; }
+  h4 { font-size: 18px; line-height: 1.3; font-weight: 600; }
+  .display {
+    font-family: 'Instrument Serif', Georgia, serif;
+    font-style: italic;
+    font-weight: 400;
+    color: var(--forest);
+  }
+  p { margin: 0 0 16px; color: var(--ink-soft); text-wrap: pretty; }
+  .lead { font-size: clamp(18px, 1.5vw, 22px); line-height: 1.5; color: var(--ink-soft); text-wrap: balance; }
+  .micro { font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-faded); font-weight: 500; }
+
+  /* === Buttons === */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: var(--forest);
+    color: #fff !important;
+    text-decoration: none;
+    font-weight: 600;
+    font-family: 'Instrument Sans', sans-serif;
+    padding: 18px 36px;
+    border-radius: 999px;
+    border: none;
+    cursor: pointer;
+    transition: all .25s cubic-bezier(0.4, 0, 0.2, 1);
+    font-size: 16px;
+    box-shadow: 0 4px 16px -6px rgba(31,77,44,0.5);
+    position: relative;
+    overflow: hidden;
+  }
+  .btn::before {
+    content: ""; position: absolute; inset: 0;
+    background: var(--forest-soft);
+    transform: scaleX(0); transform-origin: left;
+    transition: transform .35s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .btn:hover::before { transform: scaleX(1); }
+  .btn span { position: relative; z-index: 1; display: inline-flex; gap: 10px; align-items: center; }
+  .btn.lg { padding: 22px 44px; font-size: 17px; }
+  .btn.coral { background: var(--coral); box-shadow: 0 4px 16px -6px rgba(232,84,59,0.5); }
+  .btn.coral::before { background: #d44425; }
+  .btn.ghost { background: transparent; color: var(--ink) !important; border: 1.5px solid var(--line-strong); box-shadow: none; }
+  .btn.ghost::before { background: var(--ink); }
+  .btn.ghost:hover { color: #fff !important; }
+
+  /* === Sticky top bar (countdown + CTA) === */
+  .topbar {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--ink);
+    color: #fff;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .topbar-inner { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  .topbar-left { display: flex; align-items: center; gap: 18px; font-size: 14px; flex-wrap: wrap; }
+  .topbar-left strong { color: var(--coral-soft); font-weight: 600; }
+  .topbar-cta { font-size: 13px; padding: 9px 18px; background: #fff; color: var(--ink) !important; border-radius: 999px; text-decoration: none; font-weight: 600; transition: all .2s; }
+  .topbar-cta:hover { background: var(--coral); color: #fff !important; }
+  .countdown { display: inline-flex; gap: 6px; font-variant-numeric: tabular-nums; font-weight: 600; }
+  .countdown b { background: rgba(255,255,255,0.1); padding: 2px 8px; border-radius: 6px; min-width: 30px; text-align: center; }
+
+  /* === Hero === */
+  .hero {
+    padding: 80px 0 100px;
+    background:
+      radial-gradient(1200px 600px at 50% -100px, rgba(31,77,44,0.06), transparent 60%),
+      var(--paper);
+    position: relative;
+  }
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1.05fr 1fr;
+    gap: 64px;
+    align-items: center;
+  }
+  @media (max-width: 900px) {
+    .hero-grid { grid-template-columns: 1fr; gap: 40px; }
+  }
+
+  .hero-eyebrow {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 8px 16px;
+    background: rgba(31,77,44,0.08);
+    border: 1px solid rgba(31,77,44,0.18);
+    border-radius: 999px;
+    font-size: 13px;
+    color: var(--forest);
+    font-weight: 600;
+    margin-bottom: 28px;
+    letter-spacing: 0.02em;
+  }
+  .hero-eyebrow .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--forest); position: relative; }
+  .hero-eyebrow .dot::after {
+    content: ""; position: absolute; inset: -4px; border-radius: 50%;
+    background: var(--forest); opacity: 0.3;
+    animation: ping 2s infinite ease-out;
+  }
+  @keyframes ping {
+    0% { transform: scale(0.8); opacity: 0.4; }
+    100% { transform: scale(2.2); opacity: 0; }
+  }
+
+  .hero h1 .accent { font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400; color: var(--forest); }
+  .hero h1 .strike { position: relative; display: inline-block; }
+  .hero h1 .strike::after {
+    content: ""; position: absolute;
+    left: -4px; right: -4px; top: 52%;
+    height: 4px;
+    background: var(--coral);
+    transform: rotate(-3deg);
+  }
+
+  .hero-sub { font-size: 19px; line-height: 1.55; margin: 0 0 32px; max-width: 540px; }
+
+  .hero-cta-row { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; margin-bottom: 36px; }
+  .hero-meta-row { display: flex; gap: 28px; flex-wrap: wrap; align-items: center; padding-top: 32px; border-top: 1px solid var(--line); }
+  .hero-meta-row .item { display: flex; gap: 12px; align-items: center; }
+  .hero-meta-row .item .num { font-family: 'Instrument Serif', serif; font-size: 32px; line-height: 1; color: var(--forest); }
+  .hero-meta-row .item .lbl { font-size: 13px; color: var(--ink-soft); max-width: 120px; }
+
+  /* Hero visual */
+  .hero-visual {
+    position: relative;
+    aspect-ratio: 4 / 5;
+    border-radius: 200px 12px 200px 12px;
+    overflow: hidden;
+    background: var(--cream-deep);
+    border: 1px solid var(--line);
+    display: flex; align-items: center; justify-content: center;
+  }
+  @media (max-width: 900px) {
+    .hero-visual { aspect-ratio: 16/10; border-radius: 60px 8px 60px 8px; }
+  }
+  .hero-visual::before {
+    content: ""; position: absolute; inset: 0;
+    background:
+      radial-gradient(circle at 30% 30%, rgba(31,77,44,0.05), transparent 60%),
+      radial-gradient(circle at 70% 70%, rgba(232,84,59,0.04), transparent 60%);
+  }
+  .play-btn {
+    width: 96px; height: 96px;
+    border-radius: 50%;
+    background: #fff;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: transform .3s ease;
+    border: none;
+    box-shadow: 0 12px 40px -8px rgba(14,24,20,0.25), 0 2px 8px rgba(14,24,20,0.08);
+    position: relative;
+    z-index: 2;
+  }
+  .play-btn::after {
+    content: ""; position: absolute; inset: -10px;
+    border-radius: 50%; border: 1.5px solid rgba(255,255,255,0.5);
+    animation: pulseRing 2s infinite ease-out;
+  }
+  @keyframes pulseRing {
+    0% { transform: scale(1); opacity: 0.7; }
+    100% { transform: scale(1.4); opacity: 0; }
+  }
+  .play-btn svg { color: var(--forest); margin-left: 4px; }
+  .play-btn:hover { transform: scale(1.05); }
+
+  .hero-badge {
+    position: absolute; bottom: 24px; left: 24px;
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(8px);
+    padding: 12px 18px;
+    border-radius: 16px;
+    font-size: 13px;
+    color: var(--ink);
+    font-weight: 500;
+    box-shadow: 0 4px 16px -4px rgba(14,24,20,0.15);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .hero-badge .live { width: 8px; height: 8px; border-radius: 50%; background: var(--coral); position: relative; }
+  .hero-badge .live::after { content: ""; position: absolute; inset: -3px; border-radius: 50%; background: var(--coral); opacity: 0.4; animation: ping 1.6s infinite; }
+
+  /* === Trust strip === */
+  .trust-strip {
+    background: var(--cream);
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    padding: 40px 0;
+  }
+  .trust-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 32px;
+    text-align: center;
+  }
+  @media (max-width: 720px) { .trust-grid { grid-template-columns: repeat(2, 1fr); gap: 28px; } }
+  .trust-stat .num {
+    font-family: 'Instrument Serif', serif;
+    font-size: 48px;
+    line-height: 1;
+    color: var(--forest);
+    font-style: italic;
+  }
+  .trust-stat .lbl {
+    font-size: 13px;
+    color: var(--ink-soft);
+    margin-top: 8px;
+    letter-spacing: 0.02em;
+  }
+
+  /* === Problem (PAS framework) === */
+  .problem-section {
+    background: var(--paper);
+    text-align: center;
+  }
+  .problem-section h2 {
+    max-width: 800px;
+    margin: 0 auto 32px;
+  }
+  .problem-section .lead { max-width: 640px; margin: 0 auto 16px; }
+  .problem-quotes {
+    margin-top: 64px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    max-width: 1000px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  @media (max-width: 720px) { .problem-quotes { grid-template-columns: 1fr; } }
+  .problem-quote {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 24px;
+    padding: 28px;
+    text-align: left;
+    transform: rotate(-1deg);
+    transition: transform .3s ease;
+  }
+  .problem-quote:nth-child(2) { transform: rotate(0.5deg); }
+  .problem-quote:nth-child(3) { transform: rotate(-0.5deg); }
+  .problem-quote:hover { transform: rotate(0); }
+  .problem-quote .label { font-size: 12px; color: var(--ink-faded); margin-bottom: 8px; letter-spacing: 0.08em; text-transform: uppercase; }
+  .problem-quote .text { font-family: 'Instrument Serif', serif; font-size: 19px; line-height: 1.4; color: var(--ink); font-style: italic; margin: 0; }
+
+  /* === How it works (3 steps) === */
+  .how-section { background: var(--cream); }
+  .how-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-top: 64px;
+  }
+  @media (max-width: 720px) { .how-grid { grid-template-columns: 1fr; } }
+  .how-step {
+    background: var(--paper);
+    border-radius: 28px;
+    padding: 36px 32px;
+    border: 1px solid var(--line);
+    position: relative;
+  }
+  .how-step .num {
+    font-family: 'Instrument Serif', serif;
+    font-size: 64px;
+    line-height: 1;
+    color: var(--forest);
+    font-style: italic;
+    position: absolute;
+    top: 24px; right: 32px;
+    opacity: 0.4;
+  }
+  .how-step .icon {
+    width: 56px; height: 56px;
+    border-radius: 16px;
+    background: var(--forest);
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 24px;
+  }
+  .how-step .icon svg { width: 26px; height: 26px; }
+  .how-step h3 { margin-bottom: 12px; }
+  .how-step p { font-size: 15px; line-height: 1.5; }
+
+  /* === Day-by-day timeline === */
+  .timeline-section { background: var(--paper); }
+  .timeline {
+    margin-top: 56px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+  @media (max-width: 720px) { .timeline { grid-template-columns: 1fr 1fr; } }
+  .week {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    padding: 28px 22px;
+    position: relative;
+  }
+  .week::before {
+    content: "";
+    position: absolute;
+    top: 28px; right: 22px;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--coral);
+  }
+  .week .label { font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-faded); margin-bottom: 8px; }
+  .week .num { font-family: 'Instrument Serif', serif; font-size: 36px; font-style: italic; line-height: 1; color: var(--forest); margin-bottom: 14px; }
+  .week h4 { font-size: 16px; margin-bottom: 8px; }
+  .week p { font-size: 14px; margin: 0; }
+
+  /* === Comparison table === */
+  .compare-section { background: var(--ink); color: #fff; }
+  .compare-section h2 { color: #fff; }
+  .compare-section .lead { color: rgba(255,255,255,0.7); }
+  .compare-table {
+    margin-top: 56px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 28px;
+    overflow: hidden;
+  }
+  .compare-row {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .compare-row:last-child { border-bottom: 0; }
+  .compare-cell {
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 15px;
+  }
+  .compare-cell.head {
+    background: rgba(255,255,255,0.05);
+    font-weight: 600;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: rgba(255,255,255,0.7);
+  }
+  .compare-cell.us { background: rgba(31,77,44,0.25); color: #fff; }
+  .compare-cell .check { width: 22px; height: 22px; border-radius: 50%; background: var(--forest-soft); color: #fff; display: flex; align-items: center; justify-content: center; flex: 0 0 22px; }
+  .compare-cell .x { width: 22px; height: 22px; border-radius: 50%; background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.4); display: flex; align-items: center; justify-content: center; flex: 0 0 22px; }
+  @media (max-width: 720px) {
+    .compare-row { grid-template-columns: 1fr 1fr; }
+    .compare-row > .compare-cell:first-child { grid-column: 1/-1; padding-bottom: 6px; }
+  }
+
+  /* === Benefits (icon cards) === */
+  .benefits-section { background: var(--paper); }
+  .benefits-grid {
+    margin-top: 56px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+  @media (max-width: 720px) { .benefits-grid { grid-template-columns: 1fr; } }
+  .benefit-tile {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 24px;
+    padding: 32px 28px;
+    transition: all .3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .benefit-tile:hover { transform: translateY(-4px); box-shadow: 0 24px 48px -28px rgba(14,24,20,0.18); border-color: rgba(31,77,44,0.3); }
+  .benefit-tile .icon-wrap {
+    width: 52px; height: 52px;
+    border-radius: 14px;
+    background: rgba(31,77,44,0.08);
+    color: var(--forest);
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 20px;
+  }
+  .benefit-tile h4 { font-size: 18px; margin-bottom: 8px; }
+  .benefit-tile p { font-size: 15px; margin: 0; line-height: 1.5; }
+  .benefit-tile.feature {
+    background: linear-gradient(160deg, var(--forest), var(--forest-deep));
+    color: #fff;
+    border: none;
+  }
+  .benefit-tile.feature h4, .benefit-tile.feature p { color: #fff; }
+  .benefit-tile.feature p { color: rgba(255,255,255,0.8); }
+  .benefit-tile.feature .icon-wrap { background: rgba(255,255,255,0.12); color: #fff; }
+  .benefit-tile.feature .stat {
+    font-family: 'Instrument Serif', serif;
+    font-size: 56px;
+    font-style: italic;
+    line-height: 1;
+    margin-bottom: 14px;
+  }
+
+  /* === Meals === */
+  .meals-section { background: var(--cream); }
+  .meals-grid {
+    margin-top: 56px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+  }
+  @media (max-width: 720px) { .meals-grid { grid-template-columns: 1fr 1fr; } }
+  .meal-tile {
+    aspect-ratio: 4/5;
+    border-radius: 24px;
+    background: var(--cream-deep);
+    border: 1px solid var(--line);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .meal-tile::before {
+    content: "";
+    width: 56px; height: 56px;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231F4D2C' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='3' width='18' height='18' rx='2' ry='2'/><circle cx='8.5' cy='8.5' r='1.5'/><polyline points='21 15 16 10 5 21'/></svg>");
+    background-position: center; background-repeat: no-repeat; background-size: contain;
+    opacity: 0.35;
+  }
+  .meal-tile .label {
+    position: absolute; bottom: 16px; left: 16px;
+    background: rgba(255,255,255,0.92);
+    padding: 7px 14px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .meal-tile .tag {
+    position: absolute; top: 16px; right: 16px;
+    background: var(--forest);
+    color: #fff;
+    padding: 5px 11px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  /* === Transformations === */
+  .transformations-section { background: var(--paper); }
+  .transform-grid {
+    margin-top: 56px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+  @media (max-width: 720px) { .transform-grid { grid-template-columns: 1fr 1fr; } }
+  .transform-card {
+    border-radius: 20px;
+    overflow: hidden;
+    background: #fff;
+    border: 1px solid var(--line);
+    transition: all .3s ease;
+  }
+  .transform-card:hover { transform: translateY(-4px); box-shadow: 0 24px 48px -28px rgba(14,24,20,0.2); }
+  .transform-card .photo {
+    aspect-ratio: 1;
+    overflow: hidden;
+    position: relative;
+  }
+  .transform-card .photo img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s ease; }
+  .transform-card:hover .photo img { transform: scale(1.06); }
+  .transform-card .badge {
+    position: absolute; top: 12px; left: 12px;
+    background: var(--coral);
+    color: #fff;
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    box-shadow: 0 4px 12px -4px rgba(232,84,59,0.5);
+  }
+  .transform-card .info { padding: 14px 16px; text-align: center; }
+  .transform-card .name { font-weight: 600; font-size: 14px; }
+  .transform-card .meta { font-size: 12px; color: var(--ink-faded); margin-top: 2px; }
+
+  /* === Testimonials === */
+  .testimonials-section { background: var(--cream); }
+  .testimonials-masonry {
+    margin-top: 56px;
+    columns: 2;
+    column-gap: 24px;
+    max-width: 880px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .testimonials-masonry img {
+    width: 100%; border-radius: 16px; margin-bottom: 24px;
+    break-inside: avoid; -webkit-column-break-inside: avoid;
+    box-shadow: 0 8px 24px -16px rgba(14,24,20,0.15);
+  }
+  @media (max-width: 720px) { .testimonials-masonry { columns: 1; } }
+
+  /* === Offer === */
+  .offer-section {
+    background: linear-gradient(180deg, var(--paper) 0%, var(--cream) 100%);
+  }
+  .offer-grid {
+    margin-top: 56px;
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 40px;
+    align-items: stretch;
+    max-width: 1080px;
+    margin-left: auto; margin-right: auto;
+  }
+  @media (max-width: 820px) {
+    .offer-grid { grid-template-columns: 1fr; }
+  }
+  .offer-features {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 28px;
+    padding: 36px;
+  }
+  .offer-features h3 { font-size: 22px; margin-bottom: 24px; }
+  .offer-features ul { list-style: none; padding: 0; margin: 0; }
+  .offer-features li { display: flex; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--line); font-size: 16px; color: var(--ink); }
+  .offer-features li:last-child { border-bottom: 0; }
+  .offer-features .check {
+    width: 24px; height: 24px; border-radius: 50%;
+    background: var(--forest); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    flex: 0 0 24px; margin-top: 1px;
+  }
+
+  .offer-card {
+    background: linear-gradient(160deg, var(--ink) 0%, #1A2620 100%);
+    color: #fff;
+    border-radius: 28px;
+    padding: 40px 36px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .offer-card::before {
+    content: ""; position: absolute;
+    top: -120px; right: -80px; width: 280px; height: 280px;
+    background: radial-gradient(circle, rgba(31,77,44,0.5), transparent 70%);
+    pointer-events: none;
+  }
+  .offer-card .ribbon {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--coral);
+    color: #fff;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    align-self: flex-start;
+  }
+  .offer-card .label-text {
+    font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.6); font-weight: 600; margin-bottom: 8px;
+  }
+  .offer-card .price {
+    font-family: 'Instrument Serif', serif;
+    font-size: 80px;
+    line-height: 1;
+    font-style: italic;
+    margin-bottom: 4px;
+  }
+  .offer-card .currency { font-size: 38px; vertical-align: super; }
+  .offer-card .pricenote { color: rgba(255,255,255,0.65); font-size: 14px; margin-bottom: 28px; }
+  .offer-card p { color: rgba(255,255,255,0.78); font-size: 15px; }
+  .offer-card .btn { width: 100%; background: #fff; color: var(--ink) !important; }
+  .offer-card .btn::before { background: var(--coral); }
+  .offer-card .btn:hover { color: #fff !important; }
+
+  .offer-card .spots {
+    margin-top: 24px;
+    padding: 16px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 14px;
+    text-align: center;
+    font-size: 14px;
+  }
+  .offer-card .spots strong { color: var(--coral-soft); }
+
+  /* === Guarantee === */
+  .guarantee-section { background: var(--cream); }
+  .guarantee-grid {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 64px;
+    align-items: center;
+  }
+  @media (max-width: 720px) { .guarantee-grid { grid-template-columns: 1fr; gap: 40px; text-align: center; } }
+  .seal {
+    width: 280px; height: 280px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, var(--forest-soft), var(--forest));
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    text-align: center;
+    box-shadow: 0 24px 60px -16px rgba(31,77,44,0.4);
+    position: relative;
+    margin: 0 auto;
+  }
+  .seal::before {
+    content: ""; position: absolute; inset: 14px;
+    border: 1px dashed rgba(255,255,255,0.4); border-radius: 50%;
+  }
+  .seal::after {
+    content: "100% GARANCIJA · 100% GARANCIJA · 100% GARANCIJA · ";
+    position: absolute; inset: -20px;
+    font-size: 11px; letter-spacing: 0.2em;
+    color: var(--ink-soft);
+    animation: spin 30s linear infinite;
+    pointer-events: none;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .seal .inner { z-index: 2; }
+  .seal .big { font-family: 'Instrument Serif', serif; font-size: 64px; font-style: italic; line-height: 1; }
+  .seal .sm { font-size: 13px; opacity: 0.95; margin-top: 6px; max-width: 160px; }
+
+  /* === Scarcity countdown === */
+  .scarcity-section { background: var(--ink); color: #fff; text-align: center; }
+  .scarcity-section h2 { color: #fff; }
+  .scarcity-section .lead { color: rgba(255,255,255,0.7); max-width: 600px; margin: 0 auto 40px; }
+  .countdown-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  .countdown-cell {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 18px;
+    padding: 22px 16px;
+  }
+  .countdown-cell .num {
+    font-family: 'Instrument Serif', serif;
+    font-size: 56px;
+    line-height: 1;
+    font-style: italic;
+    font-variant-numeric: tabular-nums;
+  }
+  .countdown-cell .lbl { font-size: 12px; color: rgba(255,255,255,0.6); margin-top: 8px; letter-spacing: 0.12em; text-transform: uppercase; }
+  .spots-progress {
+    margin: 40px auto 0;
+    max-width: 480px;
+    text-align: center;
+  }
+  .progress-bar {
+    height: 10px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    width: 73%;
+    background: linear-gradient(90deg, var(--coral), #ff8e7a);
+    border-radius: 999px;
+    box-shadow: 0 0 20px rgba(232,84,59,0.4);
+  }
+  .progress-text { font-size: 14px; color: rgba(255,255,255,0.8); margin-top: 12px; }
+
+  /* === FAQ === */
+  .faq-section { background: var(--paper); }
+  .faq-list { margin-top: 48px; }
+  details {
+    background: var(--cream);
+    border-radius: 18px;
+    padding: 22px 28px;
+    margin-bottom: 12px;
+    border: 1px solid var(--line);
+    transition: all .2s;
+  }
+  details[open] { background: #fff; border-color: rgba(31,77,44,0.25); }
+  summary { cursor: pointer; font-weight: 600; font-size: 17px; color: var(--ink); list-style: none; display: flex; justify-content: space-between; align-items: center; gap: 14px; }
+  summary::-webkit-details-marker { display: none; }
+  summary::after {
+    content: "+";
+    font-family: 'Instrument Serif', serif;
+    font-size: 26px;
+    color: var(--forest);
+    font-style: italic;
+    line-height: 1;
+    transition: transform .25s;
+    flex: 0 0 auto;
+  }
+  details[open] summary::after { transform: rotate(45deg); }
+  details p { margin-top: 14px; font-size: 15px; line-height: 1.6; color: var(--ink-soft); }
+
+  /* === Final CTA === */
+  .final-section {
+    background:
+      radial-gradient(ellipse 800px 400px at 50% 0%, rgba(31,77,44,0.08), transparent),
+      var(--paper);
+    text-align: center;
+    padding: 140px 0;
+  }
+  .final-section h2 { max-width: 800px; margin: 0 auto 24px; }
+  .final-section .lead { max-width: 560px; margin: 0 auto 40px; }
+
+  /* === Sticky bottom CTA (mobile-friendly) === */
+  .stickbar {
+    position: fixed; bottom: 16px; left: 16px; right: 16px;
+    background: var(--ink);
+    color: #fff;
+    border-radius: 999px;
+    padding: 8px 8px 8px 24px;
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 12px 40px -8px rgba(14,24,20,0.3);
+    z-index: 90;
+    font-size: 14px;
+    gap: 14px;
+  }
+  .stickbar a { background: var(--coral); padding: 12px 22px; border-radius: 999px; color: #fff !important; text-decoration: none; font-weight: 600; font-size: 14px; }
+  @media (max-width: 720px) { .stickbar { display: flex; } }
+
+  /* === Footer === */
+  footer {
+    background: var(--ink);
+    color: rgba(255,255,255,0.6);
+    padding: 48px 0 32px;
+    text-align: center;
+    font-size: 13px;
+  }
+  footer .brand-row { color: #fff; font-family: 'Instrument Serif', serif; font-size: 22px; margin-bottom: 14px; font-style: italic; }
+
+  /* utility */
+  .center { text-align: center; }
+  .heading-block { max-width: 760px; margin: 0 auto 0; text-align: center; }
+  .heading-block.left { text-align: left; margin: 0; }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR with countdown + CTA -->
+<div class="topbar">
+  <div class="container topbar-inner">
+    <div class="topbar-left">
+      <span>🚀 <strong>Start: 25. maj.</strong></span>
+      <span class="countdown" id="topCountdown">
+        <b>19</b>d <b>14</b>h <b>22</b>m do zatvaranja prijava
+      </span>
+    </div>
+    <a href="forma.html" class="topbar-cta">Rezerviši mesto →</a>
+  </div>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-grid">
+      <div>
+        <div class="hero-eyebrow">
+          <span class="dot"></span>
+          Mangrowe × Nutribox · 28-dnevni izazov
+        </div>
+        <h1>
+          <span class="strike">Mršaviš sam.</span><br/>
+          <span>Skidaš <span class="accent">6kg za 28 dana</span>—</span><br/>
+          <span>bez kuvanja.</span>
+        </h1>
+        <p class="hero-sub">
+          Mangrowe protokol koji je <strong>preko 100.000 ljudi</strong> sproveo do rezultata —
+          a Nutribox ti dostavlja svaki obrok pred vrata. Tvoj jedini posao je da <em>jedeš</em>.
+        </p>
+        <div class="hero-cta-row">
+          <a href="forma.html" class="btn lg"><span>Rezerviši svoje mesto <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span></a>
+          <a href="#how" class="btn ghost"><span>Kako funkcioniše</span></a>
+        </div>
+        <div class="hero-meta-row">
+          <div class="item">
+            <span class="num">100k+</span>
+            <span class="lbl">studenata sa rezultatima</span>
+          </div>
+          <div class="item">
+            <span class="num">6kg</span>
+            <span class="lbl">garantovano za 28 dana</span>
+          </div>
+          <div class="item">
+            <span class="num">100%</span>
+            <span class="lbl">povraćaj ako ne uspe</span>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="hero-visual">
+          <button class="play-btn" aria-label="Pusti video">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20 6 4"/></svg>
+          </button>
+          <div class="hero-badge">
+            <span class="live"></span>
+            73 / 100 mesta već zauzeto
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TRUST STRIP -->
+<div class="trust-strip">
+  <div class="container">
+    <div class="trust-grid">
+      <div class="trust-stat">
+        <div class="num">100,000+</div>
+        <div class="lbl">studenata Mangrowe</div>
+      </div>
+      <div class="trust-stat">
+        <div class="num">28</div>
+        <div class="lbl">dana — sve uključeno</div>
+      </div>
+      <div class="trust-stat">
+        <div class="num">6kg</div>
+        <div class="lbl">minimum, garantovano</div>
+      </div>
+      <div class="trust-stat">
+        <div class="num">0</div>
+        <div class="lbl">obroka koji ti spremaš</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PROBLEM (PAS — agitate) -->
+<section class="problem-section">
+  <div class="narrow">
+    <span class="micro">Iskreno</span>
+    <h2 style="margin-top:14px;">Već si pokušao samostalno.<br/>Znaš tačno kako se završava.</h2>
+    <p class="lead">Tri dana motivacije. Onda rođendan, posao, deca. Pa „od ponedeljka". Tri meseca kasnije — ista kilaža, ista frustracija.</p>
+    <p class="lead"><strong>Problem nikad nije bio u tebi.</strong> Problem je što je samostalno mršavljenje skoro deo posla — smišljanje obroka, nabavka, kuvanje, sudovi — uz sve ostalo što već imaš.</p>
+  </div>
+
+  <div class="container">
+    <div class="problem-quotes">
+      <div class="problem-quote">
+        <div class="label">Ponedeljak ujutru</div>
+        <p class="text">„Šta ću da jedem danas? Nemam ništa u frižideru. Idem u prodavnicu posle posla."</p>
+      </div>
+      <div class="problem-quote">
+        <div class="label">Sreda uveče</div>
+        <p class="text">„Umoran sam da kuvam. Naručiću nešto. Sutra se vraćam dijeti."</p>
+      </div>
+      <div class="problem-quote">
+        <div class="label">Subota</div>
+        <p class="text">„Rođendan kod prijatelja. Od ponedeljka opet krećem. Stvarno."</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how-section" id="how">
+  <div class="container">
+    <div class="heading-block">
+      <span class="micro">Kako funkcioniše</span>
+      <h2 style="margin-top:14px;">Tri koraka — a prvi nije „idi u prodavnicu"</h2>
+      <p class="lead" style="margin: 0 auto;">Sve što treba da uradiš svodi se na: <em>otvoriš app, pogledaš lekciju, jedeš ono što ti je stiglo</em>.</p>
+    </div>
+
+    <div class="how-grid">
+      <div class="how-step">
+        <div class="num">01</div>
+        <div class="icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        </div>
+        <h3>Pogledaš dnevnu lekciju</h3>
+        <p>Mangrowe ti svakog dana pušta video koji objašnjava šta tačno radiš tog dana — i zašto.</p>
+      </div>
+      <div class="how-step">
+        <div class="num">02</div>
+        <div class="icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="13" rx="2"/><path d="M3 8L7 3h10l4 5"/><line x1="9" y1="14" x2="15" y2="14"/></svg>
+        </div>
+        <h3>Hrana te čeka pred vratima</h3>
+        <p>Nutribox dostavlja sve obroke za taj dan, već pripremljene po protokolu — između 7 i 10h.</p>
+      </div>
+      <div class="how-step">
+        <div class="num">03</div>
+        <div class="icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+        </div>
+        <h3>Skidaš minimum 6kg</h3>
+        <p>Kilogram po kilogram, pratiš napredak u tabeli. Na kraju 28 dana — bar 6kg manje.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DAY BY DAY TIMELINE -->
+<section class="timeline-section">
+  <div class="container">
+    <div class="heading-block">
+      <span class="micro">Day by day</span>
+      <h2 style="margin-top:14px;">Šta tačno radiš svake nedelje</h2>
+      <p class="lead" style="margin: 0 auto;">28 dana je strukturirano u 4 nedelje, svaka sa svojim fokusom.</p>
+    </div>
+
+    <div class="timeline">
+      <div class="week">
+        <div class="label">1. nedelja</div>
+        <div class="num">01</div>
+        <h4>Reset</h4>
+        <p>Telo prelazi sa šećera na masti. Energija raste. Osećaš lakoću.</p>
+      </div>
+      <div class="week">
+        <div class="label">2. nedelja</div>
+        <div class="num">02</div>
+        <h4>Sagorevanje</h4>
+        <p>Vaga ide u tvoju korist. Prvi vidljivi rezultati u ogledalu.</p>
+      </div>
+      <div class="week">
+        <div class="label">3. nedelja</div>
+        <div class="num">03</div>
+        <h4>Stabilizacija</h4>
+        <p>Navika je formirana. Ne razmišljaš više o hrani — samo jedeš ono što stigne.</p>
+      </div>
+      <div class="week">
+        <div class="label">4. nedelja</div>
+        <div class="num">04</div>
+        <h4>Cilj</h4>
+        <p>Skidaš poslednjih 1–2kg. Kraj: 6kg manje, lepša koža, više energije.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMPARISON: DIY vs With Us -->
+<section class="compare-section">
+  <div class="container">
+    <div class="heading-block">
+      <span class="micro" style="color: rgba(255,255,255,0.6);">Razlika</span>
+      <h2 style="margin-top:14px;">DIY mršavljenje vs. Mangrowe × Nutribox</h2>
+    </div>
+
+    <div class="compare-table">
+      <div class="compare-row">
+        <div class="compare-cell head">Tipičan dan</div>
+        <div class="compare-cell head">Sam/a</div>
+        <div class="compare-cell head us">Sa nama</div>
+      </div>
+      <div class="compare-row">
+        <div class="compare-cell">Smišljanje obroka</div>
+        <div class="compare-cell"><span class="x">✕</span> 30–45 min</div>
+        <div class="compare-cell us"><span class="check">✓</span> 0 min</div>
+      </div>
+      <div class="compare-row">
+        <div class="compare-cell">Nabavka u prodavnici</div>
+        <div class="compare-cell"><span class="x">✕</span> 60+ min, 2× nedeljno</div>
+        <div class="compare-cell us"><span class="check">✓</span> 0 min</div>
+      </div>
+      <div class="compare-row">
+        <div class="compare-cell">Spremanje obroka</div>
+        <div class="compare-cell"><span class="x">✕</span> 60–90 min dnevno</div>
+        <div class="compare-cell us"><span class="check">✓</span> 0 min</div>
+      </div>
+      <div class="compare-row">
+        <div class="compare-cell">Pranje sudova</div>
+        <div class="compare-cell"><span class="x">✕</span> Konstantno</div>
+        <div class="compare-cell us"><span class="check">✓</span> 0 sudova</div>
+      </div>
+      <div class="compare-row">
+        <div class="compare-cell">Garancija rezultata</div>
+        <div class="compare-cell"><span class="x">✕</span> Nikakva</div>
+        <div class="compare-cell us"><span class="check">✓</span> 6kg ili novac nazad</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BENEFITS -->
+<section class="benefits-section">
+  <div class="container">
+    <div class="heading-block">
+      <span class="micro">Šta dobijaš</span>
+      <h2 style="margin-top:14px;">Više od kilograma — vraćaš sebi vreme</h2>
+    </div>
+
+    <div class="benefits-grid">
+      <div class="benefit-tile feature">
+        <div class="stat">−6kg</div>
+        <h4>Minimum, garantovano</h4>
+        <p>Ako ne skineš 6kg za 28 dana, vraćamo ti ceo iznos. Bez pitanja.</p>
+      </div>
+      <div class="benefit-tile">
+        <div class="icon-wrap">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <h4>2–3 sata dnevno nazad</h4>
+        <p>Vreme koje sad gubiš na hranu — koristi za sebe, decu, posao, sport.</p>
+      </div>
+      <div class="benefit-tile">
+        <div class="icon-wrap">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+        </div>
+        <h4>Bez odlučivanja</h4>
+        <p>Ne razmišljaš „šta ću danas". Doručak, ručak, večera — već su tu.</p>
+      </div>
+      <div class="benefit-tile">
+        <div class="icon-wrap">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"/><line x1="3" y1="3" x2="21" y2="21"/></svg>
+        </div>
+        <h4>Bez nabavke i sudova</h4>
+        <p>Zaboravljaš prodavnicu, šerpe, sudove. Otpad sami nosimo.</p>
+      </div>
+      <div class="benefit-tile">
+        <div class="icon-wrap">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.7 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+        </div>
+        <h4>Lepša koža</h4>
+        <p>Pravilna ishrana se vidi za par nedelja — ten postaje čistiji i sjajniji.</p>
+      </div>
+      <div class="benefit-tile">
+        <div class="icon-wrap">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        </div>
+        <h4>Više energije</h4>
+        <p>Bez pada šećera, bez popodnevne malaksalosti. Radni dan bez kafa.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MEALS -->
+<section class="meals-section">
+  <div class="container">
+    <div class="heading-block">
+      <span class="micro">Tvoji obroci</span>
+      <h2 style="margin-top:14px;">Kako će izgledati tvoj dan</h2>
+      <p class="lead" style="margin: 0 auto;">Tri obroka + užina, svakog dana, prilagođeno tvom meniju (vegetarijanski, meso ili riba).</p>
+    </div>
+
+    <div class="meals-grid">
+      <div class="meal-tile">
+        <span class="tag">Doručak</span>
+        <span class="label">Granola sa voćem</span>
+      </div>
+      <div class="meal-tile">
+        <span class="tag">Ručak</span>
+        <span class="label">Quinoa bowl</span>
+      </div>
+      <div class="meal-tile">
+        <span class="tag">Užina</span>
+        <span class="label">Voće + orašasti</span>
+      </div>
+      <div class="meal-tile">
+        <span class="tag">Večera</span>
+        <span class="label">Riba + povrće</span>
+      </div>
+      <div class="meal-tile">
+        <span class="tag">Vege</span>
+        <span class="label">Vegetarijanski meni</span>
+      </div>
+      <div class="meal-tile">
+        <span class="tag">Meso</span>
+        <span class="label">Piletina + povrće</span>
+      </div>
+    </div>
+    <p class="micro center" style="margin-top: 32px;">Slike obroka stižu pre lansiranja — ovo su placeholder-i</p>
+  </div>
+</section>
+
+<!-- TRANSFORMATIONS -->
+<section class="transformations-section">
+  <div class="container">
+    <div class="heading-block">
+      <span class="micro">Dokaz</span>
+      <h2 style="margin-top:14px;">Ovo su ljudi koji su sami kuvali — i opet uspeli</h2>
+      <p class="lead" style="margin: 0 auto;">Ti pratiš isti protokol kao oni, samo mi spremamo hranu umesto tebe.</p>
+    </div>
+
+    <div class="transform-grid">
+      <div class="transform-card">
+        <div class="photo">
+          <span class="badge">−6 kg</span>
+          <img src="https://mangrowe.com/wp-content/uploads/2025/02/sanjamarkovic.webp" alt="Sanja" loading="lazy" />
+        </div>
+        <div class="info"><div class="name">Sanja</div><div class="meta">28-dnevni izazov</div></div>
+      </div>
+      <div class="transform-card">
+        <div class="photo">
+          <span class="badge">−6,2 kg</span>
+          <img src="https://mangrowe.com/wp-content/uploads/2026/01/marija.webp" alt="Marija" loading="lazy" />
+        </div>
+        <div class="info"><div class="name">Marija</div><div class="meta">28-dnevni izazov</div></div>
+      </div>
+      <div class="transform-card">
+        <div class="photo">
+          <span class="badge">−11 kg</span>
+          <img src="https://mangrowe.com/wp-content/uploads/2026/02/sonjatestimonial.webp" alt="Sonja" loading="lazy" />
+        </div>
+        <div class="info"><div class="name">Sonja</div><div class="meta">2 izazova</div></div>
+      </div>
+      <div class="transform-card">
+        <div class="photo">
+          <span class="badge">−15 kg</span>
+          <img src="https://mangrowe.com/wp-content/uploads/2026/02/draganatestimonial.webp" alt="Dragana" loading="lazy" />
+        </div>
+        <div class="info"><div class="name">Dragana</div><div class="meta">2 izazova</div></div>
+      </div>
+      <div class="transform-card">
+        <div class="photo">
+          <span class="badge">−6 kg</span>
+          <img src="https://mangrowe.com/wp-content/uploads/2026/02/tijanapohvala.webp" alt="Tijana" loading="lazy" />
+        </div>
+        <div class="info"><div class="name">Tijana</div><div class="meta">28-dnevni izazov</div></div>
+      </div>
+      <div class="transform-card">
+        <div class="photo">
+          <span class="badge">−6 kg</span>
+          <img src="https://mangrowe.com/wp-content/uploads/2026/02/jelenamomcilovic.webp" alt="Jelena" loading="lazy" />
+        </div>
+        <div class="info"><div class="name">Jelena</div><div class="meta">januarski izazov</div></div>
+      </div>
+      <div class="transform-card">
+        <div class="photo">
+          <span class="badge">−13 kg</span>
+          <img src="https://mangrowe.com/wp-content/uploads/2026/01/ilija.webp" alt="Ilija" loading="lazy" />
+        </div>
+        <div class="info"><div class="name">Ilija</div><div class="meta">28-dnevni izazov</div></div>
+      </div>
+      <div class="transform-card">
+        <div class="photo">
+          <span class="badge">−10 kg</span>
+          <img src="https://mangrowe.com/wp-content/uploads/2026/01/lazarmitrovic.webp" alt="Lazar" loading="lazy" />
+        </div>
+        <div class="info"><div class="name">Lazar</div><div class="meta">28-dnevni izazov</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS (WhatsApp screenshots) -->
+<section class="testimonials-section">
+  <div class="container">
+    <div class="heading-block">
+      <span class="micro">Reči studenata</span>
+      <h2 style="margin-top:14px;">Šta pišu kad završe</h2>
+    </div>
+
+    <div class="testimonials-masonry">
+      <img src="https://cdn.prod.website-files.com/6832f4a4b6dd1e8c7358d601/694541efaf96b7ab0e7c1829_image%2020.png" alt="" loading="lazy" />
+      <img src="https://cdn.prod.website-files.com/6832f4a4b6dd1e8c7358d601/694541ef9960847d6f5d9335_image%2027.png" alt="" loading="lazy" />
+      <img src="https://cdn.prod.website-files.com/6832f4a4b6dd1e8c7358d601/694541ef8357e1edcf9565e1_image%2022.png" alt="" loading="lazy" />
+      <img src="https://cdn.prod.website-files.com/6832f4a4b6dd1e8c7358d601/694541effa6b1d96f534f6b1_image%2026%20(1).png" alt="" loading="lazy" />
+      <img src="https://cdn.prod.website-files.com/6832f4a4b6dd1e8c7358d601/694541efa96311eccf161427_image%2014%20(1).png" alt="" loading="lazy" />
+      <img src="https://cdn.prod.website-files.com/6832f4a4b6dd1e8c7358d601/694541eeba5f62ca41585ca6_image%2030.png" alt="" loading="lazy" />
+      <img src="https://cdn.prod.website-files.com/6832f4a4b6dd1e8c7358d601/694541efb0d489c5355c3954_image%2021.png" alt="" loading="lazy" />
+      <img src="https://cdn.prod.website-files.com/6832f4a4b6dd1e8c7358d601/694541eec0cb24428e5aec28_image%2029.png" alt="" loading="lazy" />
+    </div>
+  </div>
+</section>
+
+<!-- OFFER -->
+<section class="offer-section" id="offer">
+  <div class="container">
+    <div class="heading-block">
+      <span class="micro">Šta je u paketu</span>
+      <h2 style="margin-top:14px;">28 dana, sve uključeno</h2>
+    </div>
+
+    <div class="offer-grid">
+      <div class="offer-features">
+        <h3>Dobijaš:</h3>
+        <ul>
+          <li><span class="check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><div><strong>28 dana Mangrowe protokol</strong> — video lekcija svakog dana</div></li>
+          <li><span class="check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><div><strong>Sve obroke za 28 dana</strong> — Nutribox dostavlja na vrata</div></li>
+          <li><span class="check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><div><strong>Tvoj izbor menija</strong> — vegetarijanski / meso / riba</div></li>
+          <li><span class="check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><div><strong>Izbacujemo alergene</strong> — samo nam javiš</div></li>
+          <li><span class="check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><div><strong>Tabela za praćenje napretka</strong></div></li>
+          <li><span class="check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><div><strong>Asistenti</strong> dostupni kroz ceo proces</div></li>
+        </ul>
+      </div>
+
+      <div class="offer-card">
+        <div class="ribbon">⚡ Ostalo 27 mesta</div>
+        <div class="label-text">Cena za 28 dana</div>
+        <div class="price">1.200<span class="currency">€</span></div>
+        <div class="pricenote">Jednokratno · sve uključeno</div>
+        <p>Mangrowe protokol + 84 obroka dostavljena pred vrata + asistencija + garancija povraćaja.</p>
+        <a href="forma.html" class="btn lg" style="margin-top: 28px;"><span>Rezerviši svoje mesto</span></a>
+        <div class="spots">Grupa kreće <strong>25. maja</strong> · Prijave do 23. maja</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GUARANTEE -->
+<section class="guarantee-section">
+  <div class="container">
+    <div class="guarantee-grid">
+      <div>
+        <div class="seal">
+          <div class="inner">
+            <div class="big">6kg</div>
+            <div class="sm">ili ti vraćamo<br/>ceo iznos</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <span class="micro">Naš deal sa tobom</span>
+        <h2 style="margin-top:14px;">Skidaš <span class="display">6kg</span> ili dobijaš sve nazad</h2>
+        <p class="lead">Ako ispratiš lekcije, jedeš ono što ti dostavljamo i uzmeš suplemente — <strong>garantujemo da ćeš smršati minimum 6kg</strong>. Ne uspeš li, vraćamo ti ceo iznos.</p>
+        <p>Kako smemo da damo ovakvu garanciju? <strong>Zato što mršavljenje na ovom programu nije sreća — nego biologija.</strong> Preko 100.000 ljudi je već uspešno prošlo kroz protokol.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SCARCITY + COUNTDOWN -->
+<section class="scarcity-section">
+  <div class="container">
+    <span class="micro" style="color: rgba(255,255,255,0.6);">Ograničena grupa</span>
+    <h2 style="margin-top:14px;">Samo 100 mesta. Zatvaramo prijave 23. maja.</h2>
+    <p class="lead">Hrana se priprema sveža za svakog studenta. Da bismo zadržali kvalitet, držimo grupu malu. Posle 23. maja — nema naknadnih prijava.</p>
+
+    <div class="countdown-grid" id="countdown">
+      <div class="countdown-cell"><div class="num">19</div><div class="lbl">dana</div></div>
+      <div class="countdown-cell"><div class="num">14</div><div class="lbl">sati</div></div>
+      <div class="countdown-cell"><div class="num">22</div><div class="lbl">minuta</div></div>
+      <div class="countdown-cell"><div class="num">08</div><div class="lbl">sekundi</div></div>
+    </div>
+
+    <div class="spots-progress">
+      <div class="progress-bar"><div class="progress-fill"></div></div>
+      <div class="progress-text"><strong style="color:#fff;">73 / 100</strong> mesta zauzeto · ostalo <strong style="color: var(--coral-soft);">27 mesta</strong></div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq-section">
+  <div class="narrow">
+    <div class="heading-block">
+      <span class="micro">Odgovori na pitanja</span>
+      <h2 style="margin-top:14px;">FAQs</h2>
+    </div>
+    <div class="faq-list">
+      <details>
+        <summary>Šta ako idem na put / preskočim dan?</summary>
+        <p>Nije problem ako preskočiš dan ili dva — javiš nam, ne stigne ti hrana, ispoštuješ suplemente. Ako planiraš duže putovanje u ovom periodu, bolje je da uđeš u sledeću grupu.</p>
+      </details>
+      <details>
+        <summary>Šta ako sam alergičan na nešto?</summary>
+        <p>Pri prijavi navedeš alergene — izbacujemo iz tvog menija. Standardno: gluten, laktoza, jaja, orašasti plodovi, soja, riba, školjke. Specifične alergene javiš pre 25. maja.</p>
+      </details>
+      <details>
+        <summary>Da li radi za žene i muškarce isto?</summary>
+        <p>Da. Protokol je standardizovan, ali porcije i kalorije se prilagođavaju (pri prijavi unosiš pol, težinu, visinu).</p>
+      </details>
+      <details>
+        <summary>Kada stiže box i mogu li da biram vreme dostave?</summary>
+        <p>Hrana stiže ujutru između 7 i 10h. Nutribox optimizuje rute. Postoji opcija doplate za prioritetnu dostavu.</p>
+      </details>
+      <details>
+        <summary>Imam 50+ godina, mogu li da krenem?</summary>
+        <p>Da. Imali smo desetine hiljada uspešnih studenata svih starosnih grupa. Ako imaš zdravstvenih problema (dijabetes, srce, štitna), konsultuj se sa lekarom — kao i pre svake promene ishrane.</p>
+      </details>
+      <details>
+        <summary>Šta ako mi se ne sviđa hrana?</summary>
+        <p>Imaš 3 menija (vege/meso/riba) i možeš tražiti zamenu obroka pre nego što krene grupa. Tokom 28 dana ako ti nešto ne odgovara — javiš asistentu i menjamo za sledeći box.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final-section">
+  <div class="container">
+    <span class="micro">Tvoj sledeći korak</span>
+    <h2 style="margin-top:14px;">Prijavi se za izazov dok ima slobodnih mesta</h2>
+    <p class="lead">Ostalo je <strong style="color: var(--coral);">27 od 100 mesta</strong>. Grupa kreće <strong>25. maja</strong>.</p>
+    <a href="forma.html" class="btn lg coral"><span>Rezerviši mesto sada <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span></a>
+  </div>
+</section>
+
+<!-- STICKY MOBILE BAR -->
+<div class="stickbar">
+  <span>27 mesta · do 23. maja</span>
+  <a href="forma.html">Rezerviši</a>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="brand-row">Mangrowe × Nutribox</div>
+    <p>28-dnevni izazov · Beograd · Start 25. maja 2026.</p>
+  </div>
+</footer>
+
+<script>
+  // Live countdown — counts down to May 23 2026 23:59
+  (function() {
+    const target = new Date('2026-05-23T23:59:00').getTime();
+    const cells = document.querySelectorAll('#countdown .countdown-cell .num');
+    if (!cells.length) return;
+    function tick() {
+      const now = Date.now();
+      const diff = target - now;
+      if (diff <= 0) return;
+      const d = Math.floor(diff / 86400000);
+      const h = Math.floor((diff % 86400000) / 3600000);
+      const m = Math.floor((diff % 3600000) / 60000);
+      const s = Math.floor((diff % 60000) / 1000);
+      cells[0].textContent = String(d).padStart(2, '0');
+      cells[1].textContent = String(h).padStart(2, '0');
+      cells[2].textContent = String(m).padStart(2, '0');
+      cells[3].textContent = String(s).padStart(2, '0');
+    }
+    tick();
+    setInterval(tick, 1000);
+  })();
+</script>
+
+</body>
+</html>

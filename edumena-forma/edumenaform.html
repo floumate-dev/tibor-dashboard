@@ -1,0 +1,1348 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edumena Program - Prijava</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #0C0B0E;
+            min-height: 100vh;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 60px 20px 20px;
+            color: #f0ecf9;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            background-image: url('https://cdn.prod.website-files.com/6645d452c3b8226e2b13d10d/69ca0fdfae88762f834f758e_edumena-bg.webp');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.35;
+        }
+
+        .page-wrapper {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            width: 100% !important;
+            max-width: 620px !important;
+            position: relative !important;
+            z-index: 1 !important;
+        }
+
+        .logo-wrapper {
+            text-align: center;
+            margin-bottom: 32px;
+            padding-top: 16px;
+        }
+
+        .logo {
+            height: 28px;
+            width: auto;
+            max-width: 160px;
+            opacity: 0.85;
+        }
+
+        .quiz-container {
+            background: #14121a !important;
+            border-radius: 8px !important;
+            border: 1px solid rgba(191, 172, 250, 0.12) !important;
+            box-shadow: 0 4px 40px rgba(0, 0, 0, 0.3) !important;
+            width: 620px !important;
+            max-width: 100% !important;
+            min-width: 0 !important;
+            padding: 48px 40px !important;
+            position: relative !important;
+            overflow: hidden !important;
+            box-sizing: border-box !important;
+        }
+
+        /* Progress Bar */
+        .progress-bar-wrapper {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: rgba(191, 172, 250, 0.1);
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #BFACFA, #9b7cf7);
+            border-radius: 0 2px 2px 0;
+            transition: width 0.4s ease;
+            width: 10%;
+        }
+
+        /* Step */
+        .step {
+            display: none;
+            animation: fadeIn 0.35s ease;
+        }
+
+        .step.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Step counter */
+        .step-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .step-counter {
+            font-size: 12px;
+            font-weight: 700;
+            color: #BFACFA;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        .step-percent {
+            font-size: 13px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        /* Question */
+        .question-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .question-subtitle {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-bottom: 28px;
+            line-height: 1.5;
+        }
+
+        /* Text Input */
+        .input-field {
+            width: 100% !important;
+            padding: 16px 20px !important;
+            border: 1px solid rgba(191, 172, 250, 0.16) !important;
+            border-radius: 6px !important;
+            font-family: 'Plus Jakarta Sans', sans-serif !important;
+            font-size: 16px !important;
+            font-weight: 500 !important;
+            color: #f0ecf9 !important;
+            background: rgba(191, 172, 250, 0.05) !important;
+            outline: none !important;
+            box-shadow: none !important;
+            transition: border-color 0.2s ease, background 0.2s ease !important;
+            -webkit-text-fill-color: #f0ecf9 !important;
+        }
+
+        .input-field:focus {
+            border-color: #BFACFA !important;
+            background: rgba(191, 172, 250, 0.08) !important;
+        }
+
+        .input-field::placeholder {
+            color: rgba(255, 255, 255, 0.25) !important;
+            font-weight: 400 !important;
+            -webkit-text-fill-color: rgba(255, 255, 255, 0.25) !important;
+        }
+
+        .input-field.error {
+            border-color: #E54848 !important;
+        }
+
+        .input-field:-webkit-autofill,
+        .input-field:-webkit-autofill:hover,
+        .input-field:-webkit-autofill:focus {
+            -webkit-box-shadow: 0 0 0px 1000px #1a1625 inset !important;
+            -webkit-text-fill-color: #f0ecf9 !important;
+            caret-color: #f0ecf9 !important;
+            border-color: rgba(191, 172, 250, 0.16) !important;
+        }
+
+        textarea.input-field {
+            resize: none !important;
+            min-height: 110px !important;
+        }
+
+        /* Phone Input */
+        .phone-wrapper {
+            display: flex;
+            gap: 10px;
+        }
+
+        .phone-prefix-btn {
+            width: 110px !important;
+            min-width: 110px !important;
+            padding: 16px 10px !important;
+            border: 1px solid rgba(191, 172, 250, 0.16) !important;
+            border-radius: 6px !important;
+            font-family: 'Plus Jakarta Sans', sans-serif !important;
+            font-size: 15px !important;
+            font-weight: 500 !important;
+            color: #f0ecf9 !important;
+            background: rgba(191, 172, 250, 0.05) !important;
+            outline: none !important;
+            box-shadow: none !important;
+            cursor: pointer !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            gap: 4px !important;
+            position: relative !important;
+            user-select: none !important;
+        }
+
+        .phone-prefix-btn:hover {
+            border-color: rgba(191, 172, 250, 0.35) !important;
+        }
+
+        .phone-prefix-btn .flag-emoji {
+            font-size: 18px;
+            line-height: 1;
+        }
+
+        .phone-prefix-btn .dial-code {
+            font-size: 14px;
+            color: #f0ecf9;
+            flex: 1;
+            text-align: center;
+        }
+
+        .phone-prefix-btn .chevron {
+            width: 10px;
+            height: 10px;
+            opacity: 0.5;
+            flex-shrink: 0;
+        }
+
+        .phone-dropdown {
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            width: 220px;
+            max-height: 240px;
+            overflow-y: auto;
+            background: #1e1828;
+            border: 1px solid rgba(191, 172, 250, 0.2);
+            border-radius: 8px;
+            z-index: 9999;
+            display: none;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+        }
+
+        .phone-dropdown.open {
+            display: block;
+        }
+
+        .phone-dropdown-item {
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #f0ecf9;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            transition: background 0.15s;
+        }
+
+        .phone-dropdown-item:hover {
+            background: rgba(191, 172, 250, 0.1);
+        }
+
+        .phone-dropdown-item .flag-emoji {
+            font-size: 18px;
+        }
+
+        .phone-dropdown-item .country-code {
+            color: rgba(255,255,255,0.5);
+            font-size: 13px;
+            margin-left: auto;
+        }
+
+        /* Hidden native select kept for JS compat */
+        .phone-select-hidden {
+            display: none !important;
+        }
+
+        /* Radio Options */
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            padding: 16px 20px;
+            border: 1px solid rgba(191, 172, 250, 0.16);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+            background: rgba(191, 172, 250, 0.03);
+        }
+
+        .radio-option:hover {
+            border-color: rgba(191, 172, 250, 0.35);
+            background: rgba(191, 172, 250, 0.06);
+        }
+
+        .radio-option.selected {
+            border-color: #BFACFA;
+            background: rgba(191, 172, 250, 0.1);
+        }
+
+        .radio-option input[type="radio"] {
+            display: none;
+        }
+
+        .radio-circle {
+            width: 22px;
+            height: 22px;
+            min-width: 22px;
+            border: 2px solid rgba(191, 172, 250, 0.55);
+            border-radius: 50%;
+            margin-right: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .radio-circle::after {
+            content: '';
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #C3ABFF;
+            transform: scale(0);
+            transition: transform 0.2s ease;
+        }
+
+        .radio-option.selected .radio-circle {
+            border-color: #BFACFA;
+        }
+
+        .radio-option.selected .radio-circle::after {
+            transform: scale(1);
+        }
+
+        .radio-label {
+            font-size: 15px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.85);
+            line-height: 1.4;
+        }
+
+        /* Validation */
+        .validation-msg {
+            font-size: 13px;
+            color: #E54848;
+            margin-top: 10px;
+            display: none;
+            font-weight: 500;
+        }
+
+        .validation-msg.visible {
+            display: block;
+        }
+
+        /* Navigation */
+        .nav-buttons {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 36px;
+        }
+
+        .btn-back {
+            padding: 16px 24px !important;
+            border-radius: 6px !important;
+            border: 1px solid rgba(191, 172, 250, 0.16) !important;
+            background: transparent !important;
+            cursor: pointer !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 8px !important;
+            font-family: 'Plus Jakarta Sans', sans-serif !important;
+            font-size: 14px !important;
+            font-weight: 600 !important;
+            color: rgba(255, 255, 255, 0.5) !important;
+            transition: all 0.2s ease !important;
+            white-space: nowrap !important;
+            box-shadow: none !important;
+            outline: none !important;
+        }
+
+        .btn-back:hover {
+            border-color: rgba(191, 172, 250, 0.35) !important;
+            background: rgba(191, 172, 250, 0.06) !important;
+            color: rgba(255, 255, 255, 0.7) !important;
+        }
+
+        .btn-back svg {
+            width: 16px !important;
+            height: 16px !important;
+        }
+
+        .btn-back.hidden {
+            visibility: hidden;
+        }
+
+        .btn-next {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 6px !important;
+            padding: 16px 32px !important;
+            background: #C3ABFF !important;
+            color: #0C0B0E !important;
+            border: none !important;
+            border-radius: 6px !important;
+            font-family: 'Plus Jakarta Sans', sans-serif !important;
+            font-size: 16px !important;
+            font-weight: 900 !important;
+            letter-spacing: 1px !important;
+            text-transform: uppercase !important;
+            cursor: pointer !important;
+            transition: all 0.25s ease !important;
+            flex: 1 !important;
+            margin-left: 12px !important;
+            box-shadow: none !important;
+            outline: none !important;
+        }
+
+        .btn-next:hover {
+            background: #AD94EF !important;
+        }
+
+        .btn-next svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .btn-submit {
+            background: #C3ABFF !important;
+            padding: 16px 32px !important;
+            font-size: 16px !important;
+            border: none !important;
+            border-radius: 6px !important;
+        }
+
+        .btn-submit:hover {
+            background: #AD94EF !important;
+        }
+
+        /* Intro & Thank You screens */
+        .intro-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            margin-top: -16px;
+        }
+
+        .intro-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            line-height: 1.3;
+        }
+
+        .intro-text {
+            font-size: 15px;
+            color: rgba(255, 255, 255, 0.5);
+            line-height: 1.7;
+            margin-bottom: 32px;
+        }
+
+        .btn-start {
+            width: 100% !important;
+            justify-content: center !important;
+            padding: 18px !important;
+            font-size: 16px !important;
+            margin-left: 0 !important;
+            margin-top: 28px !important;
+            display: flex !important;
+        }
+
+        /* Thank you */
+        .thank-you {
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .thank-you .check-icon {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: rgba(191, 172, 250, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+        }
+
+        .thank-you .check-icon svg {
+            width: 36px;
+            height: 36px;
+            color: #BFACFA;
+        }
+
+        .thank-you h2 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: #ffffff;
+        }
+
+        .thank-you p {
+            font-size: 15px;
+            color: rgba(255, 255, 255, 0.5);
+            line-height: 1.7;
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            body {
+                padding: 20px 16px !important;
+                background-color: #0C0B0E;
+                box-sizing: border-box !important;
+            }
+
+            .page-wrapper {
+                max-width: 100% !important;
+                width: 100% !important;
+                padding: 0 !important;
+                box-sizing: border-box !important;
+            }
+
+            .logo {
+                height: 20px !important;
+                max-width: 120px !important;
+            }
+
+            .quiz-container {
+                width: 100% !important;
+                padding: 32px 20px !important;
+                border-color: rgba(191, 172, 250, 0.08) !important;
+                box-sizing: border-box !important;
+            }
+
+            .question-title {
+                font-size: 18px !important;
+            }
+
+            .intro-title {
+                font-size: 20px !important;
+            }
+
+            .radio-label {
+                font-size: 14px !important;
+            }
+
+            .nav-buttons {
+                gap: 8px !important;
+            }
+
+            .btn-back {
+                padding: 12px 16px !important;
+                font-size: 13px !important;
+            }
+
+            .btn-next {
+                padding: 14px 20px !important;
+                font-size: 14px !important;
+            }
+
+            .phone-wrapper {
+                flex-direction: row !important;
+            }
+
+            .phone-prefix-btn {
+                width: 90px !important;
+                min-width: 90px !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-wrapper">
+    <div class="logo-wrapper">
+        <img src="https://cdn.prod.website-files.com/6645d452c3b8226e2b13d10d/69ca0f97f3444ceca5be6c87_Edumena-logo-white-1.svg" alt="Edumena" class="logo">
+    </div>
+    <div class="quiz-container">
+        <div class="progress-bar-wrapper">
+            <div class="progress-bar-fill" id="progressBar"></div>
+        </div>
+
+        <!-- Step 0: Intro -->
+        <div class="step active" data-step="0">
+            <div class="intro-icon">👋</div>
+            <h1 class="intro-title">Hvala na interesovanju za Edumena Program!</h1>
+            <p class="intro-text">
+                U ovom upitniku ćemo ti postaviti nekoliko važnih pitanja, da bismo znali na kom nivou je tvoj biznis, i tako ponudili najbolje moguće rešenje.<br><br>
+                Sve što podeliš biće tretirano poverljivo.<br><br>
+                Popunjavanje traje samo 1 minut.<br><br>
+                Vidimo se na video pozivu. 🙌🏻
+            </p>
+            <button class="btn-next btn-start" onclick="nextStep()">
+                Započni
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5L15.75 12l-7.5 7.5" /></svg>
+            </button>
+        </div>
+
+        <!-- Step 1: Ime i prezime -->
+        <div class="step" data-step="1">
+            <div class="step-header"><span class="step-counter">Korak 1 od 10</span><span class="step-percent">10% završeno</span></div>
+            <h2 class="question-title">Unesi svoje ime i prezime</h2>
+            <input type="text" class="input-field" id="fullName" placeholder="Ime i prezime" autocomplete="name">
+            <div class="validation-msg" id="val-fullName">Ovo polje je obavezno.</div>
+            <div class="nav-buttons">
+                <button class="btn-back" onclick="prevStep()">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
+                    Nazad
+                </button>
+                <button class="btn-next" onclick="nextStep()">
+                    Nastavi
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5L15.75 12l-7.5 7.5" /></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Step 2: Email -->
+        <div class="step" data-step="2">
+            <div class="step-header"><span class="step-counter">Korak 2 od 10</span><span class="step-percent">20% završeno</span></div>
+            <h2 class="question-title">Koja je tvoja email adresa?</h2>
+            <p class="question-subtitle">Na ovu adresu ćemo ti poslati potvrdu.</p>
+            <input type="email" class="input-field" id="email" placeholder="email@primer.com" autocomplete="email">
+            <div class="validation-msg" id="val-email">Unesi validnu email adresu.</div>
+            <div class="nav-buttons">
+                <button class="btn-back" onclick="prevStep()">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
+                    Nazad
+                </button>
+                <button class="btn-next" onclick="nextStep()">
+                    Nastavi
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5L15.75 12l-7.5 7.5" /></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Step 3: Link do biznisa -->
+        <div class="step" data-step="3">
+            <div class="step-header"><span class="step-counter">Korak 3 od 10</span><span class="step-percent">30% završeno</span></div>
+            <h2 class="question-title">Koji je link do tvog biznisa?</h2>
+            <p class="question-subtitle">Website, Instagram, ili neki drugi link.</p>
+            <input type="url" class="input-field" id="bizLink" placeholder="https://">
+            <div class="validation-msg" id="val-bizLink">Ovo polje je obavezno.</div>
+            <div class="nav-buttons">
+                <button class="btn-back" onclick="prevStep()">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
+                    Nazad
+                </button>
+                <button class="btn-next" onclick="nextStep()">
+                    Nastavi
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5L15.75 12l-7.5 7.5" /></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Step 4: Broj telefona -->
+        <div class="step" data-step="4">
+            <div class="step-header"><span class="step-counter">Korak 4 od 10</span><span class="step-percent">40% završeno</span></div>
+            <h2 class="question-title">Koji je tvoj broj telefona?</h2>
+            <p class="question-subtitle">Sa pozivnim brojem, npr. +381 60 1234567</p>
+            <div class="phone-wrapper" style="position:relative;">
+                <input type="hidden" id="phonePrefix" value="+381">
+                <button type="button" class="phone-prefix-btn" id="phonePrefixBtn" onclick="togglePhoneDropdown()">
+                    <span class="flag-emoji" id="phoneFlagDisplay">🇷🇸</span>
+                    <span class="dial-code" id="phoneDialDisplay">+381</span>
+                    <svg class="chevron" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+                </button>
+                <div class="phone-dropdown" id="phoneDropdown">
+                    <div class="phone-dropdown-item" onclick="selectPhonePrefix('🇷🇸','+381','Serbia')"><span class="flag-emoji">🇷🇸</span> Serbia <span class="country-code">+381</span></div>
+                    <div class="phone-dropdown-item" onclick="selectPhonePrefix('🇭🇷','+385','Croatia')"><span class="flag-emoji">🇭🇷</span> Croatia <span class="country-code">+385</span></div>
+                    <div class="phone-dropdown-item" onclick="selectPhonePrefix('🇧🇦','+387','Bosnia')"><span class="flag-emoji">🇧🇦</span> Bosnia <span class="country-code">+387</span></div>
+                    <div class="phone-dropdown-item" onclick="selectPhonePrefix('🇲🇪','+382','Montenegro')"><span class="flag-emoji">🇲🇪</span> Montenegro <span class="country-code">+382</span></div>
+                    <div class="phone-dropdown-item" onclick="selectPhonePrefix('🇲🇰','+389','Macedonia')"><span class="flag-emoji">🇲🇰</span> Macedonia <span class="country-code">+389</span></div>
+                    <div class="phone-dropdown-item" onclick="selectPhonePrefix('🇸🇮','+386','Slovenia')"><span class="flag-emoji">🇸🇮</span> Slovenia <span class="country-code">+386</span></div>
+                    <div class="phone-dropdown-item" onclick="selectPhonePrefix('🇦🇹','+43','Austria')"><span class="flag-emoji">🇦🇹</span> Austria <span class="country-code">+43</span></div>
+                    <div class="phone-dropdown-item" onclick="selectPhonePrefix('🇩🇪','+49','Germany')"><span class="flag-emoji">🇩🇪</span> Germany <span class="country-code">+49</span></div>
+                    <div class="phone-dropdown-item" onclick="selectPhonePrefix('🇨🇭','+41','Switzerland')"><span class="flag-emoji">🇨🇭</span> Switzerland <span class="country-code">+41</span></div>
+                    <div class="phone-dropdown-item" onclick="selectPhonePrefix('🇬🇧','+44','UK')"><span class="flag-emoji">🇬🇧</span> UK <span class="country-code">+44</span></div>
+                    <div class="phone-dropdown-item" onclick="selectPhonePrefix('🇺🇸','+1','USA')"><span class="flag-emoji">🇺🇸</span> USA <span class="country-code">+1</span></div>
+                    <div class="phone-dropdown-item" onclick="selectPhonePrefix('🇫🇷','+33','France')"><span class="flag-emoji">🇫🇷</span> France <span class="country-code">+33</span></div>
+                    <div class="phone-dropdown-item" onclick="selectPhonePrefix('🇮🇹','+39','Italy')"><span class="flag-emoji">🇮🇹</span> Italy <span class="country-code">+39</span></div>
+                    <div class="phone-dropdown-item" onclick="selectPhonePrefix('🇪🇸','+34','Spain')"><span class="flag-emoji">🇪🇸</span> Spain <span class="country-code">+34</span></div>
+                    <div class="phone-dropdown-item" onclick="selectPhonePrefix('🇳🇱','+31','Netherlands')"><span class="flag-emoji">🇳🇱</span> Netherlands <span class="country-code">+31</span></div>
+                    <div class="phone-dropdown-item" onclick="selectPhonePrefix('🇸🇪','+46','Sweden')"><span class="flag-emoji">🇸🇪</span> Sweden <span class="country-code">+46</span></div>
+                    <div class="phone-dropdown-item" onclick="selectPhonePrefix('🇳🇴','+47','Norway')"><span class="flag-emoji">🇳🇴</span> Norway <span class="country-code">+47</span></div>
+                    <div class="phone-dropdown-item" onclick="selectPhonePrefix('🇹🇷','+90','Turkey')"><span class="flag-emoji">🇹🇷</span> Turkey <span class="country-code">+90</span></div>
+                    <div class="phone-dropdown-item" onclick="selectPhonePrefix('🇬🇷','+30','Greece')"><span class="flag-emoji">🇬🇷</span> Greece <span class="country-code">+30</span></div>
+                    <div class="phone-dropdown-item" onclick="selectPhonePrefix('🇷🇴','+40','Romania')"><span class="flag-emoji">🇷🇴</span> Romania <span class="country-code">+40</span></div>
+                    <div class="phone-dropdown-item" onclick="selectPhonePrefix('🇭🇺','+36','Hungary')"><span class="flag-emoji">🇭🇺</span> Hungary <span class="country-code">+36</span></div>
+                    <div class="phone-dropdown-item" onclick="selectPhonePrefix('🇵🇱','+48','Poland')"><span class="flag-emoji">🇵🇱</span> Poland <span class="country-code">+48</span></div>
+                    <div class="phone-dropdown-item" onclick="selectPhonePrefix('🇨🇿','+420','Czech Republic')"><span class="flag-emoji">🇨🇿</span> Czech Republic <span class="country-code">+420</span></div>
+                    <div class="phone-dropdown-item" onclick="selectPhonePrefix('🇸🇰','+421','Slovakia')"><span class="flag-emoji">🇸🇰</span> Slovakia <span class="country-code">+421</span></div>
+                    <div class="phone-dropdown-item" onclick="selectPhonePrefix('🇧🇬','+359','Bulgaria')"><span class="flag-emoji">🇧🇬</span> Bulgaria <span class="country-code">+359</span></div>
+                    <div class="phone-dropdown-item" onclick="selectPhonePrefix('🇦🇱','+355','Albania')"><span class="flag-emoji">🇦🇱</span> Albania <span class="country-code">+355</span></div>
+                    <div class="phone-dropdown-item" onclick="selectPhonePrefix('🇽🇰','+383','Kosovo')"><span class="flag-emoji">🇽🇰</span> Kosovo <span class="country-code">+383</span></div>
+                    <div class="phone-dropdown-item" onclick="selectPhonePrefix('🇦🇺','+61','Australia')"><span class="flag-emoji">🇦🇺</span> Australia <span class="country-code">+61</span></div>
+                    <div class="phone-dropdown-item" onclick="selectPhonePrefix('🇦🇪','+971','UAE')"><span class="flag-emoji">🇦🇪</span> UAE <span class="country-code">+971</span></div>
+                </div>
+                <input type="tel" class="input-field" id="phone" placeholder="60 1234567" style="flex:1;">
+            </div>
+            <div class="validation-msg" id="val-phone">Ovo polje je obavezno.</div>
+            <div class="nav-buttons">
+                <button class="btn-back" onclick="prevStep()">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
+                    Nazad
+                </button>
+                <button class="btn-next" onclick="nextStep()">
+                    Nastavi
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5L15.75 12l-7.5 7.5" /></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Step 5: Vrsta proizvoda/usluga -->
+        <div class="step" data-step="5">
+            <div class="step-header"><span class="step-counter">Korak 5 od 10</span><span class="step-percent">50% završeno</span></div>
+            <h2 class="question-title">Koje vrste proizvoda ili usluga nudiš?</h2>
+            <p class="question-subtitle">Izaberi opciju koja najbolje opisuje tvoj biznis.</p>
+            <div class="radio-group" data-name="productType">
+                <label class="radio-option" onclick="selectRadio(this)">
+                    <input type="radio" name="productType" value="Digitalni proizvodi (kursevi, radionice, e-knjige)">
+                    <div class="radio-circle"></div>
+                    <span class="radio-label">Digitalni proizvodi (kursevi, radionice, e-knjige)</span>
+                </label>
+                <label class="radio-option" onclick="selectRadio(this)">
+                    <input type="radio" name="productType" value="Fizički proizvodi">
+                    <div class="radio-circle"></div>
+                    <span class="radio-label">Fizički proizvodi</span>
+                </label>
+                <label class="radio-option" onclick="selectRadio(this)">
+                    <input type="radio" name="productType" value="Usluge">
+                    <div class="radio-circle"></div>
+                    <span class="radio-label">Usluge</span>
+                </label>
+                <label class="radio-option" onclick="selectRadio(this, true)">
+                    <input type="radio" name="productType" value="Drugo">
+                    <div class="radio-circle"></div>
+                    <span class="radio-label">Drugo</span>
+                </label>
+            </div>
+            <input type="text" class="input-field other-input" id="productTypeOther" placeholder="Opiši šta nudiš..." style="display:none; margin-top: 12px;">
+            <div class="validation-msg" id="val-productType">Molimo izaberi jednu opciju.</div>
+            <div class="nav-buttons">
+                <button class="btn-back" onclick="prevStep()">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
+                    Nazad
+                </button>
+                <button class="btn-next" onclick="nextStep()">
+                    Nastavi
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5L15.75 12l-7.5 7.5" /></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Step 6: Mesečni prihodi -->
+        <div class="step" data-step="6">
+            <div class="step-header"><span class="step-counter">Korak 6 od 10</span><span class="step-percent">60% završeno</span></div>
+            <h2 class="question-title">Koliki su mesečni prihodi tvog biznisa?</h2>
+            <p class="question-subtitle">Izaberi opseg koji najbolje opisuje trenutno stanje.</p>
+            <div class="radio-group" data-name="revenue">
+                <label class="radio-option" onclick="selectRadio(this)">
+                    <input type="radio" name="revenue" value="Manje od 2,000€">
+                    <div class="radio-circle"></div>
+                    <span class="radio-label">Manje od 2,000€</span>
+                </label>
+                <label class="radio-option" onclick="selectRadio(this)">
+                    <input type="radio" name="revenue" value="Između 2,000€ i 5,000€">
+                    <div class="radio-circle"></div>
+                    <span class="radio-label">Između 2,000€ i 5,000€</span>
+                </label>
+                <label class="radio-option" onclick="selectRadio(this)">
+                    <input type="radio" name="revenue" value="Između 5,000€ i 20,000€">
+                    <div class="radio-circle"></div>
+                    <span class="radio-label">Između 5,000€ i 20,000€</span>
+                </label>
+                <label class="radio-option" onclick="selectRadio(this)">
+                    <input type="radio" name="revenue" value="Između 20,000€ i 50,000€">
+                    <div class="radio-circle"></div>
+                    <span class="radio-label">Između 20,000€ i 50,000€</span>
+                </label>
+                <label class="radio-option" onclick="selectRadio(this)">
+                    <input type="radio" name="revenue" value="Između 50,000€ i 100,000€">
+                    <div class="radio-circle"></div>
+                    <span class="radio-label">Između 50,000€ i 100,000€</span>
+                </label>
+                <label class="radio-option" onclick="selectRadio(this)">
+                    <input type="radio" name="revenue" value="Više od 100,000€">
+                    <div class="radio-circle"></div>
+                    <span class="radio-label">Više od 100,000€</span>
+                </label>
+            </div>
+            <div class="validation-msg" id="val-revenue">Molimo izaberi jednu opciju.</div>
+            <div class="nav-buttons">
+                <button class="btn-back" onclick="prevStep()">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
+                    Nazad
+                </button>
+                <button class="btn-next" onclick="nextStep()">
+                    Nastavi
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5L15.75 12l-7.5 7.5" /></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Step 7: Najveći izazov -->
+        <div class="step" data-step="7">
+            <div class="step-header"><span class="step-counter">Korak 7 od 10</span><span class="step-percent">70% završeno</span></div>
+            <h2 class="question-title">Koji je tvoj najveći izazov u poslovanju trenutno?</h2>
+            <p class="question-subtitle">Izaberi ono što te najviše koči.</p>
+            <div class="radio-group" data-name="challenge">
+                <label class="radio-option" onclick="selectRadio(this)">
+                    <input type="radio" name="challenge" value="Pronalazak klijenata">
+                    <div class="radio-circle"></div>
+                    <span class="radio-label">Pronalazak klijenata</span>
+                </label>
+                <label class="radio-option" onclick="selectRadio(this)">
+                    <input type="radio" name="challenge" value="Poboljšanje trenutnih operacija">
+                    <div class="radio-circle"></div>
+                    <span class="radio-label">Poboljšanje trenutnih operacija</span>
+                </label>
+                <label class="radio-option" onclick="selectRadio(this)">
+                    <input type="radio" name="challenge" value="Skaliranje biznisa">
+                    <div class="radio-circle"></div>
+                    <span class="radio-label">Skaliranje biznisa</span>
+                </label>
+                <label class="radio-option" onclick="selectRadio(this)">
+                    <input type="radio" name="challenge" value="Upravljanje timom">
+                    <div class="radio-circle"></div>
+                    <span class="radio-label">Upravljanje timom</span>
+                </label>
+            </div>
+            <div class="validation-msg" id="val-challenge">Molimo izaberi jednu opciju.</div>
+            <div class="nav-buttons">
+                <button class="btn-back" onclick="prevStep()">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
+                    Nazad
+                </button>
+                <button class="btn-next" onclick="nextStep()">
+                    Nastavi
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5L15.75 12l-7.5 7.5" /></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Step 8: Ciljevi 3 meseca -->
+        <div class="step" data-step="8">
+            <div class="step-header"><span class="step-counter">Korak 8 od 10</span><span class="step-percent">80% završeno</span></div>
+            <h2 class="question-title">Koji je tvoj glavni cilj za naredna 3 meseca?</h2>
+            <p class="question-subtitle">Opiši ukratko šta želiš da postigneš.</p>
+            <textarea class="input-field" id="goal3" placeholder="Npr. Želim da duplam broj klijenata..." rows="4"></textarea>
+            <div class="validation-msg" id="val-goal3">Ovo polje je obavezno.</div>
+            <div class="nav-buttons">
+                <button class="btn-back" onclick="prevStep()">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
+                    Nazad
+                </button>
+                <button class="btn-next" onclick="nextStep()">
+                    Nastavi
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5L15.75 12l-7.5 7.5" /></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Step 9: Ciljevi 6 meseci -->
+        <div class="step" data-step="9">
+            <div class="step-header"><span class="step-counter">Korak 9 od 10</span><span class="step-percent">90% završeno</span></div>
+            <h2 class="question-title">Koji je tvoj glavni cilj za narednih 6 meseci?</h2>
+            <p class="question-subtitle">Gde vidiš sebe i svoj biznis za pola godine?</p>
+            <textarea class="input-field" id="goal6" placeholder="Npr. Želim da dostignem 10,000€ mesečno..." rows="4"></textarea>
+            <div class="validation-msg" id="val-goal6">Ovo polje je obavezno.</div>
+            <div class="nav-buttons">
+                <button class="btn-back" onclick="prevStep()">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
+                    Nazad
+                </button>
+                <button class="btn-next" onclick="nextStep()">
+                    Nastavi
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5L15.75 12l-7.5 7.5" /></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Step 10: Poslovne odluke + Submit -->
+        <div class="step" data-step="10">
+            <div class="step-header"><span class="step-counter">Korak 10 od 10</span><span class="step-percent">99% završeno</span></div>
+            <h2 class="question-title">Da li možeš samostalno da donosiš poslovne odluke?</h2>
+            <p class="question-subtitle">Ovo nam pomaže da razumemo tvoju poziciju u biznisu.</p>
+            <div class="radio-group" data-name="decisions">
+                <label class="radio-option" onclick="selectRadio(this)">
+                    <input type="radio" name="decisions" value="Da">
+                    <div class="radio-circle"></div>
+                    <span class="radio-label">Da</span>
+                </label>
+                <label class="radio-option" onclick="selectRadio(this)">
+                    <input type="radio" name="decisions" value="Ne">
+                    <div class="radio-circle"></div>
+                    <span class="radio-label">Ne</span>
+                </label>
+            </div>
+            <div class="validation-msg" id="val-decisions">Molimo izaberi jednu opciju.</div>
+            <div class="nav-buttons">
+                <button class="btn-back" onclick="prevStep()">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
+                    Nazad
+                </button>
+                <button class="btn-next btn-submit" onclick="submitForm()">
+                    Prijavi se
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5L15.75 12l-7.5 7.5" /></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Thank You -->
+        <div class="step" data-step="11">
+            <div class="thank-you">
+                <div class="check-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
+                </div>
+                <h2>Prijava je uspešno poslata!</h2>
+                <p>Hvala ti što si izdvojio/la vreme da popuniš upitnik. Naš tim će pregledati tvoje odgovore i javiti ti se u najkraćem roku za zakazivanje video poziva.<br><br>Vidimo se uskoro! 🎉</p>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <script>
+        let currentStep = 0;
+        const totalSteps = 11;
+        const questionSteps = 10;
+        let advancePending = false;
+
+        // Capture UTM params + click IDs + referrer on page load
+        // Saved to sessionStorage so they survive page interactions
+        const trackingParams = (function() {
+            const params = new URLSearchParams(window.location.search);
+            const keys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term',
+                          'fbclid', 'gclid', 'ttclid', 'msclkid'];
+            const captured = {};
+            keys.forEach(k => {
+                const v = params.get(k);
+                if (v) captured[k] = v;
+            });
+            // Persist in sessionStorage (in case user navigates away and back)
+            try {
+                const stored = JSON.parse(sessionStorage.getItem('edumena_tracking') || '{}');
+                // Newly captured overrides stored
+                const merged = Object.assign({}, stored, captured);
+                if (Object.keys(merged).length > 0) {
+                    sessionStorage.setItem('edumena_tracking', JSON.stringify(merged));
+                }
+                return merged;
+            } catch (e) {
+                return captured;
+            }
+        })();
+
+        function getTrackingData() {
+            return {
+                'utm_source': trackingParams.utm_source || '',
+                'utm_medium': trackingParams.utm_medium || '',
+                'utm_campaign': trackingParams.utm_campaign || '',
+                'utm_content': trackingParams.utm_content || '',
+                'utm_term': trackingParams.utm_term || '',
+                'fbclid': trackingParams.fbclid || '',
+                'gclid': trackingParams.gclid || '',
+                'ttclid': trackingParams.ttclid || '',
+                'referrer': document.referrer || '',
+                'landing_url': window.location.href
+            };
+        }
+
+        function updateProgress() {
+            const progress = currentStep === 0 ? 0 : (currentStep / questionSteps) * 100;
+            document.getElementById('progressBar').style.width = Math.min(progress, 100) + '%';
+        }
+
+        function showStep(step) {
+            hideAllValidation();
+            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+            const target = document.querySelector(`.step[data-step="${step}"]`);
+            if (target) {
+                target.classList.add('active');
+            }
+            updateProgress();
+        }
+
+        function hideAllValidation() {
+            document.querySelectorAll('.validation-msg').forEach(v => v.classList.remove('visible'));
+            document.querySelectorAll('.input-field').forEach(i => i.classList.remove('error'));
+        }
+
+        function validateStep(step) {
+            hideAllValidation();
+
+            switch(step) {
+                case 1: {
+                    const val = document.getElementById('fullName').value.trim();
+                    if (!val) {
+                        document.getElementById('val-fullName').classList.add('visible');
+                        document.getElementById('fullName').classList.add('error');
+                        return false;
+                    }
+                    return true;
+                }
+                case 2: {
+                    const val = document.getElementById('email').value.trim();
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!val || !emailRegex.test(val)) {
+                        document.getElementById('val-email').classList.add('visible');
+                        document.getElementById('email').classList.add('error');
+                        return false;
+                    }
+                    return true;
+                }
+                case 3: {
+                    const val = document.getElementById('bizLink').value.trim();
+                    if (!val) {
+                        document.getElementById('val-bizLink').classList.add('visible');
+                        document.getElementById('bizLink').classList.add('error');
+                        return false;
+                    }
+                    return true;
+                }
+                case 4: {
+                    const val = document.getElementById('phone').value.trim();
+                    if (!val) {
+                        document.getElementById('val-phone').classList.add('visible');
+                        document.getElementById('phone').classList.add('error');
+                        return false;
+                    }
+                    return true;
+                }
+                case 5: {
+                    const checked = document.querySelector('input[name="productType"]:checked');
+                    if (!checked) {
+                        document.getElementById('val-productType').classList.add('visible');
+                        return false;
+                    }
+                    return true;
+                }
+                case 6: {
+                    const checked = document.querySelector('input[name="revenue"]:checked');
+                    if (!checked) {
+                        document.getElementById('val-revenue').classList.add('visible');
+                        return false;
+                    }
+                    return true;
+                }
+                case 7: {
+                    const checked = document.querySelector('input[name="challenge"]:checked');
+                    if (!checked) {
+                        document.getElementById('val-challenge').classList.add('visible');
+                        return false;
+                    }
+                    return true;
+                }
+                case 8: {
+                    const val = document.getElementById('goal3').value.trim();
+                    if (!val) {
+                        document.getElementById('val-goal3').classList.add('visible');
+                        document.getElementById('goal3').classList.add('error');
+                        return false;
+                    }
+                    return true;
+                }
+                case 9: {
+                    const goal6 = document.getElementById('goal6').value.trim();
+                    if (!goal6) {
+                        document.getElementById('val-goal6').classList.add('visible');
+                        document.getElementById('goal6').classList.add('error');
+                        return false;
+                    }
+                    return true;
+                }
+                case 10: {
+                    const decisions = document.querySelector('input[name="decisions"]:checked');
+                    if (!decisions) {
+                        document.getElementById('val-decisions').classList.add('visible');
+                        return false;
+                    }
+                    return true;
+                }
+                default:
+                    return true;
+            }
+        }
+
+        function nextStep() {
+            if (currentStep > 0 && !validateStep(currentStep)) return;
+            if (currentStep === 0) startAbandonTimer();
+            if (currentStep < totalSteps) {
+                currentStep++;
+                showStep(currentStep);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        function prevStep() {
+            hideAllValidation();
+            if (currentStep > 0) {
+                currentStep--;
+                showStep(currentStep);
+            }
+        }
+
+        function selectRadio(el, isDrugo) {
+            hideAllValidation();
+            const group = el.closest('.radio-group');
+            group.querySelectorAll('.radio-option').forEach(o => o.classList.remove('selected'));
+            el.classList.add('selected');
+            el.querySelector('input[type="radio"]').checked = true;
+
+            // Handle "Drugo" other input
+            const step = el.closest('.step');
+            const otherInput = step.querySelector('.other-input');
+            if (otherInput) {
+                if (isDrugo) {
+                    otherInput.style.display = 'block';
+                    otherInput.focus();
+                    return; // Don't auto-advance
+                } else {
+                    otherInput.style.display = 'none';
+                    otherInput.value = '';
+                }
+            }
+
+            // Auto-advance after short delay for visual feedback
+            if (advancePending) return;
+            advancePending = true;
+            setTimeout(() => {
+                advancePending = false;
+                if (currentStep === 10) {
+                    return; // Don't auto-advance on last step, user must click submit
+                } else if (currentStep < totalSteps) {
+                    currentStep++;
+                    showStep(currentStep);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            }, 400);
+        }
+
+        function submitForm() {
+            if (!validateStep(10)) return;
+
+            const formData = Object.assign({
+                'Ime i prezime': document.getElementById('fullName').value.trim(),
+                'Email adresa': document.getElementById('email').value.trim(),
+                'Link do biznisa': document.getElementById('bizLink').value.trim(),
+                'Broj telefona': document.getElementById('phonePrefix').value + document.getElementById('phone').value.trim(),
+                'Vrsta proizvoda ili usluga': document.querySelector('input[name="productType"]:checked')?.value,
+                'Mesecni prihodi': document.querySelector('input[name="revenue"]:checked')?.value,
+                'Najveci izazov': document.querySelector('input[name="challenge"]:checked')?.value,
+                'Cilj za 3 meseca': document.getElementById('goal3').value.trim(),
+                'Cilj za 6 meseci': document.getElementById('goal6').value.trim(),
+                'Moze samostalno da donosi odluke': document.querySelector('input[name="decisions"]:checked')?.value,
+            }, getTrackingData());
+
+            formSubmitted = true;
+            if (abandonTimer) clearTimeout(abandonTimer);
+            fetch('https://hook.eu1.make.com/71olvi2uga32a5pqfbhxupyehpabpxdb', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            }).catch(err => console.error('Webhook error:', err));
+
+            if (typeof fbq === 'function') {
+                fbq('track', 'Lead');
+            }
+
+            currentStep = 11;
+            showStep(11);
+        }
+
+        // Allow Enter key to proceed
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && currentStep > 0 && currentStep < 11) {
+                const activeStep = document.querySelector('.step.active');
+                const textarea = activeStep?.querySelector('textarea:focus');
+                if (textarea) return; // Allow newlines in textareas
+                e.preventDefault();
+                if (currentStep === 10) {
+                    submitForm();
+                } else {
+                    nextStep();
+                }
+            }
+        });
+
+        // Abandon form tracking
+        let formSubmitted = false;
+        let abandonSent = false;
+
+        function getAbandonData(trigger) {
+            return Object.assign({
+                'Trigger': trigger,
+                'Napusteno na koraku': currentStep,
+                'Ime i prezime': document.getElementById('fullName')?.value.trim() || '',
+                'Email adresa': document.getElementById('email')?.value.trim() || '',
+                'Link do biznisa': document.getElementById('bizLink')?.value.trim() || '',
+                'Broj telefona': document.getElementById('phone')?.value.trim() ? document.getElementById('phonePrefix').value + document.getElementById('phone').value.trim() : '',
+                'Vrsta proizvoda ili usluga': document.querySelector('input[name="productType"]:checked')?.value || '',
+                'Mesecni prihodi': document.querySelector('input[name="revenue"]:checked')?.value || '',
+                'Najveci izazov': document.querySelector('input[name="challenge"]:checked')?.value || '',
+                'Cilj za 3 meseca': document.getElementById('goal3')?.value.trim() || '',
+                'Cilj za 6 meseci': document.getElementById('goal6')?.value.trim() || '',
+                'Moze samostalno da donosi odluke': document.querySelector('input[name="decisions"]:checked')?.value || '',
+            }, getTrackingData());
+        }
+
+        function sendAbandon(trigger) {
+            if (formSubmitted || abandonSent || currentStep === 0 || currentStep === 11) return;
+            abandonSent = true;
+            const data = getAbandonData(trigger);
+            fetch('https://hook.eu1.make.com/ff5xxiqikxc2ud3rnkqxrrn8412a35de', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data),
+                keepalive: true
+            }).catch(err => console.error('Abandon webhook error:', err));
+        }
+
+        // Abandon on page leave
+        window.addEventListener('beforeunload', function() {
+            sendAbandon('page_leave');
+        });
+
+        // Abandon on page hide (iOS Safari fallback)
+        window.addEventListener('pagehide', function(e) {
+            if (!e.persisted) {
+                sendAbandon('page_hide');
+            }
+        });
+
+        // Abandon on visibility change - 2 min delay (catches mobile app switching)
+        let visibilityTimer = null;
+        document.addEventListener('visibilitychange', function() {
+            if (document.visibilityState === 'hidden') {
+                visibilityTimer = setTimeout(function() {
+                    sendAbandon('visibility_hidden_2min');
+                }, 2 * 60 * 1000);
+            } else {
+                if (visibilityTimer) {
+                    clearTimeout(visibilityTimer);
+                    visibilityTimer = null;
+                }
+            }
+        });
+
+        // Abandon timer - 10 min after starting form
+        let abandonTimer = null;
+        const originalNextStep = nextStep;
+        function startAbandonTimer() {
+            if (!abandonTimer) {
+                abandonTimer = setTimeout(() => {
+                    sendAbandon('timeout_10min');
+                }, 10 * 60 * 1000);
+            }
+        }
+
+        // Hide validation when user starts typing
+        document.querySelectorAll('.input-field').forEach(input => {
+            input.addEventListener('focus', hideAllValidation);
+            input.addEventListener('input', hideAllValidation);
+        });
+
+        // Custom phone dropdown
+        window.togglePhoneDropdown = function() {
+            const dd = document.getElementById('phoneDropdown');
+            dd.classList.toggle('open');
+        };
+
+        window.selectPhonePrefix = function(flag, dial, country) {
+            document.getElementById('phonePrefix').value = dial;
+            document.getElementById('phoneFlagDisplay').textContent = flag;
+            document.getElementById('phoneDialDisplay').textContent = dial;
+            document.getElementById('phoneDropdown').classList.remove('open');
+        };
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            const btn = document.getElementById('phonePrefixBtn');
+            const dd = document.getElementById('phoneDropdown');
+            if (dd && btn && !btn.contains(e.target) && !dd.contains(e.target)) {
+                dd.classList.remove('open');
+            }
+        });
+
+        // Auto-detect country from IP
+        const countryToDial = {
+            'RS': {dial:'+381', flag:'🇷🇸'}, 'HR': {dial:'+385', flag:'🇭🇷'},
+            'BA': {dial:'+387', flag:'🇧🇦'}, 'ME': {dial:'+382', flag:'🇲🇪'},
+            'MK': {dial:'+389', flag:'🇲🇰'}, 'SI': {dial:'+386', flag:'🇸🇮'},
+            'AT': {dial:'+43',  flag:'🇦🇹'}, 'DE': {dial:'+49',  flag:'🇩🇪'},
+            'CH': {dial:'+41',  flag:'🇨🇭'}, 'GB': {dial:'+44',  flag:'🇬🇧'},
+            'US': {dial:'+1',   flag:'🇺🇸'}, 'FR': {dial:'+33',  flag:'🇫🇷'},
+            'IT': {dial:'+39',  flag:'🇮🇹'}, 'ES': {dial:'+34',  flag:'🇪🇸'},
+            'NL': {dial:'+31',  flag:'🇳🇱'}, 'SE': {dial:'+46',  flag:'🇸🇪'},
+            'NO': {dial:'+47',  flag:'🇳🇴'}, 'TR': {dial:'+90',  flag:'🇹🇷'},
+            'GR': {dial:'+30',  flag:'🇬🇷'}, 'RO': {dial:'+40',  flag:'🇷🇴'},
+            'HU': {dial:'+36',  flag:'🇭🇺'}, 'PL': {dial:'+48',  flag:'🇵🇱'},
+            'CZ': {dial:'+420', flag:'🇨🇿'}, 'SK': {dial:'+421', flag:'🇸🇰'},
+            'BG': {dial:'+359', flag:'🇧🇬'}, 'AL': {dial:'+355', flag:'🇦🇱'},
+            'XK': {dial:'+383', flag:'🇽🇰'}, 'AU': {dial:'+61',  flag:'🇦🇺'},
+            'AE': {dial:'+971', flag:'🇦🇪'}
+        };
+        fetch('https://ipapi.co/json/')
+            .then(r => r.json())
+            .then(data => {
+                if (data.country_code && countryToDial[data.country_code]) {
+                    const c = countryToDial[data.country_code];
+                    selectPhonePrefix(c.flag, c.dial, data.country_code);
+                }
+            })
+            .catch(() => {});
+
+        updateProgress();
+    </script>
+</body>
+</html>

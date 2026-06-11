@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Nutribox × Mangrowe — Wireframe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #317039;
+    --primary-hover: #388041;
+    --dark: #101a24;
+    --text: #101a24cc;
+    --background: #ffffff;
+    --secondary: #f8f8f8;
+    --line: #e5e7e6;
+    --accent: #f23849;
+    --accent-deep: #b80003;
+    --placeholder: #eef0ef;
+    --placeholder-stroke: #cfd4d2;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--secondary);
+    color: var(--dark);
+    font-family: 'Poppins', system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 24px 20px 80px; }
+
+  .section {
+    background: var(--background);
+    border-radius: 24px;
+    padding: 56px 56px 64px;
+    margin-bottom: 16px;
+  }
+  .section.tinted { background: var(--secondary); border: 1px solid var(--line); }
+  .section.dark { background: var(--dark); color: #fff; }
+  .section.danger { background: #2a0a0a; color: #f5e6e6; }
+  @media (max-width: 720px) {
+    .section { padding: 36px 22px 44px; border-radius: 18px; }
+  }
+
+  /* Typography — Instrument Sans for headings */
+  h1, h2, h3, h4 {
+    font-family: 'Instrument Sans', system-ui, sans-serif;
+    font-weight: 600;
+    line-height: 1.1;
+    margin: 0 0 16px;
+    letter-spacing: -0.01em;
+  }
+  h1 { font-size: 52px; line-height: 1.05; letter-spacing: -0.02em; }
+  h2 { font-size: 40px; line-height: 1.1; }
+  h3 { font-size: 22px; }
+  h4 { font-size: 17px; }
+  @media (max-width: 720px) {
+    h1 { font-size: 34px; }
+    h2 { font-size: 28px; }
+  }
+
+  p { margin: 0 0 14px; color: var(--text); }
+  .lead { font-size: 18px; line-height: 1.55; }
+  strong { color: var(--dark); font-weight: 600; }
+  .section.dark p, .section.danger p { color: rgba(255,255,255,0.85); }
+  .section.dark strong, .section.danger strong { color: #fff; }
+
+  .eyebrow {
+    color: var(--accent);
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+
+  .muted { color: var(--text); }
+  .center { text-align: center; }
+
+  /* Buttons — rounded, like Nutribox (border-radius 16px, primary green) */
+  .btn {
+    display: inline-block;
+    background: var(--primary);
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+    font-family: 'Poppins', sans-serif;
+    padding: 16px 44px;
+    border-radius: 16px;
+    border: none;
+    cursor: pointer;
+    transition: background .15s ease;
+    font-size: 16px;
+  }
+  .btn:hover { background: var(--primary-hover); }
+  .btn.lg { padding: 20px 48px; font-size: 17px; }
+  .btn.full { width: 100%; text-align: center; }
+  .btn.dark { background: var(--dark); }
+  .btn.white { background: #fff; color: var(--dark); }
+  .btn.white:hover { background: #f0f0f0; }
+
+  /* Image placeholders */
+  .img-ph {
+    background: var(--placeholder);
+    border: 1px dashed var(--placeholder-stroke);
+    color: #8a948e;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-size: 12px;
+    padding: 14px;
+    aspect-ratio: 4 / 3;
+    font-family: 'Poppins', sans-serif;
+  }
+  .img-ph.tall { aspect-ratio: 3 / 4; }
+  .img-ph.wide { aspect-ratio: 16 / 10; }
+  .img-ph.square { aspect-ratio: 1 / 1; }
+
+  /* Layout */
+  .row { display: grid; gap: 20px; }
+  .row.two { grid-template-columns: 1fr 1fr; }
+  .row.three { grid-template-columns: repeat(3, 1fr); }
+  .row.four { grid-template-columns: repeat(4, 1fr); }
+  .row.hero { grid-template-columns: 1.05fr 0.95fr; align-items: center; gap: 48px; }
+  .row.split-7-5 { grid-template-columns: 1.4fr 1fr; gap: 36px; align-items: start; }
+  @media (max-width: 820px) {
+    .row.two, .row.three, .row.four, .row.hero, .row.split-7-5 {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* Hero meta */
+  .hero-meta {
+    display: flex; gap: 28px; flex-wrap: wrap;
+    margin-top: 24px; font-size: 14px; color: var(--text);
+  }
+  .hero-meta div { display: flex; align-items: center; gap: 8px; }
+
+  /* Step cards */
+  .step {
+    background: var(--secondary);
+    border-radius: 16px;
+    padding: 28px 24px;
+  }
+  .step-num {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Instrument Sans', sans-serif;
+    font-weight: 600;
+    font-size: 17px;
+    margin-bottom: 16px;
+  }
+
+  /* Checks list */
+  .checks { list-style: none; padding: 0; margin: 0; }
+  .checks li {
+    display: flex;
+    gap: 14px;
+    padding: 12px 0;
+    color: var(--dark);
+  }
+  .checks li::before {
+    content: "";
+    flex: 0 0 24px;
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: var(--primary);
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><polyline points='20 6 9 17 4 12'/></svg>");
+    background-size: 14px;
+    background-position: center;
+    background-repeat: no-repeat;
+    margin-top: 2px;
+  }
+  .section.dark .checks li, .section.danger .checks li { color: #fff; }
+
+  /* Offer card */
+  .offer-card {
+    background: var(--dark);
+    color: #fff;
+    border-radius: 24px;
+    padding: 36px 32px;
+  }
+  .offer-card .price {
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 56px;
+    font-weight: 600;
+    margin: 18px 0 4px;
+    line-height: 1;
+  }
+  .offer-card p { color: rgba(255,255,255,0.75); }
+  .offer-card .checks li { color: rgba(255,255,255,0.95); }
+  .offer-card .checks li::before {
+    background: #fff;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23317039' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><polyline points='20 6 9 17 4 12'/></svg>");
+  }
+
+  /* Testimonials */
+  .testimonial {
+    background: var(--secondary);
+    border-radius: 20px;
+    padding: 28px 26px;
+  }
+  .testimonial .quote {
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 18px;
+    line-height: 1.45;
+    color: var(--dark);
+    font-weight: 500;
+    margin-bottom: 18px;
+  }
+  .t-author { display: flex; gap: 12px; align-items: center; }
+  .avatar {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: var(--placeholder);
+    border: 1px dashed var(--placeholder-stroke);
+    flex: 0 0 44px;
+  }
+  .t-author .name { font-weight: 600; font-size: 14px; }
+  .t-author .meta { font-size: 12px; color: var(--text); }
+
+  /* Scarcity / spots */
+  .spots-bar {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 14px;
+    padding: 14px 18px;
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    gap: 14px;
+    flex-wrap: wrap;
+    font-size: 14px;
+  }
+  .spots-bar strong { color: #fff; }
+
+  .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 28px; }
+  @media (max-width: 720px) { .stat-grid { grid-template-columns: 1fr; } }
+  .stat {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 16px;
+    padding: 22px;
+    text-align: center;
+  }
+  .stat .label {
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 8px;
+  }
+  .stat .value {
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 32px;
+    font-weight: 600;
+  }
+
+  /* Guarantee */
+  .seal {
+    width: 220px; height: 220px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Instrument Sans', sans-serif;
+    text-align: center;
+    padding: 20px;
+    line-height: 1.2;
+    margin: 0 auto;
+    font-weight: 600;
+    box-shadow: 0 14px 40px -16px rgba(49,112,57,0.5);
+  }
+  .seal .big { display: block; font-size: 36px; margin-bottom: 4px; }
+  .seal .sm { display: block; font-size: 13px; opacity: 0.95; }
+
+  /* FAQ */
+  details {
+    background: var(--secondary);
+    border-radius: 14px;
+    padding: 18px 22px;
+    margin-bottom: 10px;
+    border: 1px solid var(--line);
+  }
+  details[open] { background: #fff; }
+  summary {
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 16px;
+    color: var(--dark);
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 14px;
+  }
+  summary::after {
+    content: "+";
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 22px;
+    color: var(--primary);
+    flex: 0 0 auto;
+  }
+  details[open] summary::after { content: "−"; }
+  details p { margin-top: 12px; font-size: 15px; }
+
+  /* Wireframe label badges (for review) */
+  .label {
+    display: inline-block;
+    background: var(--dark);
+    color: #fff;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 999px;
+    margin-bottom: 18px;
+    font-weight: 500;
+  }
+  .section.dark .label, .section.danger .label { background: #fff; color: var(--dark); }
+
+  .footnote { text-align: center; color: var(--text); font-size: 12px; margin-top: 28px; }
+
+  /* Pill / tag */
+  .pill {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(49,112,57,0.1);
+    color: var(--primary);
+    border-radius: 999px;
+    padding: 6px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 20px;
+  }
+  .pill .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--primary); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- 01 HERO -->
+  <section class="section">
+    <span class="label">01 · Hero</span>
+    <div class="row hero">
+      <div>
+        <div class="pill"><span class="dot"></span> Mangrowe × Nutribox · 28-dnevni izazov</div>
+        <h1>Smršaj 6kg za 28 dana — bez da spremiš jedan jedini obrok.</h1>
+        <p class="lead">
+          Preko <strong>100.000 ljudi</strong> je sa Mangrowe programom skinulo kilograme — i to dok su sami spremali hranu.
+          Ti to ne moraš. Nutribox ti dostavlja hranu po protokolu na vrata, svakog dana, 28 dana.
+          <strong>Tvoje je samo da jedeš — i smršaćeš 6kg ili ti vraćamo novac.</strong>
+        </p>
+        <a href="#offer" class="btn lg">Rezerviši svoje mesto — ostalo je [X] od 100</a>
+        <div class="hero-meta">
+          <div>🚀 Program kreće 25. maja</div>
+          <div>📍 Dostava u Beogradu</div>
+          <div>💯 Garancija povraćaja novca</div>
+        </div>
+      </div>
+      <div>
+        <div class="img-ph wide">VIDEO / Hero vizual<br/>(transformacija ili Nutribox food shot)</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 PROBLEM -->
+  <section class="section tinted">
+    <span class="label">02 · Problem</span>
+    <h2>Već si pokušao samostalno. Znaš kako se završava.</h2>
+    <p class="lead">Tri dana motivacije, pa onda rođendan, pa „od ponedeljka". Tri meseca kasnije — ista kilaža.</p>
+    <p class="lead"><strong>Problem nikad nije bio u tebi.</strong> Problem je što sam moraš da smisliš, spremiš, odeš u nabavku i opereš sudove. I sve to uz posao i gomilu obaveza.</p>
+  </section>
+
+  <!-- 03 HOW IT WORKS -->
+  <section class="section">
+    <span class="label">03 · Kako funkcioniše</span>
+    <div class="center" style="max-width:680px;margin:0 auto 36px;">
+      <div class="eyebrow">Kako funkcioniše izazov</div>
+      <h2>Tri koraka — a prvi nije „idi u prodavnicu"</h2>
+    </div>
+    <div class="row three">
+      <div class="step">
+        <div class="step-num">1</div>
+        <h3>Video lekcija dnevno</h3>
+        <p>Mangrowe ti svakog dana objašnjava šta tačno treba da radiš tog dana.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h3>Hrana te čeka pred vratima</h3>
+        <p>Nutribox dostavlja sve obroke za taj dan, prati 28-dnevni protokol.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <h3>Skidaš minimum 6kg</h3>
+        <p>Kilogram po kilogram, pratiš napredak. Na kraju: bar 6kg manje.</p>
+      </div>
+    </div>
+    <p class="center" style="margin-top:32px; font-size:18px;"><strong>Nema nabavke. Nema razmišljanja šta sad da jedem.</strong></p>
+  </section>
+
+  <!-- 04 RESULTS -->
+  <section class="section">
+    <span class="label">04 · Rezultati</span>
+    <div style="max-width:680px;">
+      <div class="eyebrow">Rezultati</div>
+      <h2>Rezultati ljudi koji su prošli kroz izazov</h2>
+      <p class="lead">Ovi ljudi su sami morali da spremaju hranu — i opet napravili rezultate. Ti pratiš isti program, samo mi spremamo hranu umesto tebe.</p>
+    </div>
+    <div class="row four" style="margin-top:32px;">
+      <div class="img-ph tall">Pre / Posle 01</div>
+      <div class="img-ph tall">Pre / Posle 02</div>
+      <div class="img-ph tall">Pre / Posle 03</div>
+      <div class="img-ph tall">Pre / Posle 04</div>
+    </div>
+    <div class="row four" style="margin-top:14px;">
+      <div class="img-ph tall">Pre / Posle 05</div>
+      <div class="img-ph tall">Pre / Posle 06</div>
+      <div class="img-ph tall">Pre / Posle 07</div>
+      <div class="img-ph tall">Pre / Posle 08</div>
+    </div>
+  </section>
+
+  <!-- 05 BENEFITS -->
+  <section class="section tinted">
+    <span class="label">05 · Šta dobijaš</span>
+    <div class="row split-7-5">
+      <div>
+        <div class="eyebrow">Benefiti</div>
+        <h2>Šta dobijaš za 28 dana na ovom izazovu</h2>
+        <p class="lead">Više od kilograma — vraćaš sebi vreme, energiju i mentalni prostor.</p>
+      </div>
+      <div>
+        <ul class="checks">
+          <li><div><strong>Skidaš 6kg</strong> (ili ti vraćamo novac)</div></li>
+          <li><div><strong>2–3 sata dnevno nazad</strong> koje trošiš na hranu</div></li>
+          <li><div>Ne smišljaš šta da jedeš svaki dan</div></li>
+          <li><div>Nema nabavke, nema prljavih sudova</div></li>
+          <li><div>Lepša koža</div></li>
+          <li><div>Više energije</div></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 06 MEALS -->
+  <section class="section">
+    <span class="label">06 · Obroci</span>
+    <div class="center" style="max-width:680px;margin:0 auto 36px;">
+      <div class="eyebrow">Tvoji obroci</div>
+      <h2>Kako će izgledati tvoji obroci na ovom izazovu</h2>
+    </div>
+    <div class="row three">
+      <div class="img-ph">Doručak</div>
+      <div class="img-ph">Ručak</div>
+      <div class="img-ph">Užina / večera</div>
+      <div class="img-ph">Riba meni</div>
+      <div class="img-ph">Vegetarijanski meni</div>
+      <div class="img-ph">Meso meni</div>
+    </div>
+  </section>
+
+  <!-- 07 TESTIMONIALS -->
+  <section class="section tinted">
+    <span class="label">07 · Testimoniali</span>
+    <div style="max-width:680px;margin-bottom:32px;">
+      <div class="eyebrow">Šta kažu studenti</div>
+      <h2>Ljudi koji su već skinuli kilograme</h2>
+    </div>
+    <div class="row three">
+      <div class="testimonial">
+        <p class="quote">„Citat sa moćnom rečenicom — potvrđuje priču o uštedi vremena i mršavljenju bez napora."</p>
+        <div class="t-author">
+          <div class="avatar"></div>
+          <div>
+            <div class="name">Ime Prezime</div>
+            <div class="meta">— skinuo/la X kg</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial">
+        <p class="quote">„Citat — fokus na to da nije morao da razmišlja šta će da jede."</p>
+        <div class="t-author">
+          <div class="avatar"></div>
+          <div>
+            <div class="name">Ime Prezime</div>
+            <div class="meta">— skinuo/la X kg</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial">
+        <p class="quote">„Citat — fokus na predvidljivost i da je sistem siguran."</p>
+        <div class="t-author">
+          <div class="avatar"></div>
+          <div>
+            <div class="name">Ime Prezime</div>
+            <div class="meta">— skinuo/la X kg</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 08 OFFER -->
+  <section class="section" id="offer">
+    <span class="label">08 · Offer</span>
+    <div class="row split-7-5">
+      <div>
+        <div class="eyebrow">Šta dobijaš u paketu</div>
+        <h2>28-dnevni izazov, sve uključeno</h2>
+        <ul class="checks" style="margin-top:24px;">
+          <li><div><strong>28 dana Mangrowe protokol</strong> — epizoda svakog dana</div></li>
+          <li><div><strong>Sve obroke za 28 dana</strong> — Nutribox dostava na vrata</div></li>
+          <li><div><strong>Tvoj izbor menija</strong> — vegetarijanski / meso / riba</div></li>
+          <li><div><strong>Izbacujemo alergene</strong> — samo nam javiš šta ne jedeš</div></li>
+          <li><div><strong>Tabela za praćenje napretka</strong></div></li>
+          <li><div><strong>Asistenti</strong> koji te vode kroz ceo proces</div></li>
+        </ul>
+      </div>
+      <div class="offer-card">
+        <div class="eyebrow" style="color:#9adb9f;">Ukupno za 28 dana</div>
+        <div class="price">1.200 €</div>
+        <p>Jednokratno. Sve uključeno: program + ishrana za 28 dana.</p>
+        <a href="#" class="btn white full lg" style="margin-top:24px;">Rezerviši svoje mesto</a>
+        <div class="spots-bar">
+          <span>Preostalo <strong>[X] mesta</strong></span>
+          <span>Grupa kreće <strong>25. maja</strong></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 09 GUARANTEE -->
+  <section class="section tinted">
+    <span class="label">09 · Garancija</span>
+    <div class="row hero">
+      <div>
+        <div class="seal">
+          <div>
+            <span class="big">6kg</span>
+            <span class="sm">ili novac<br/>nazad</span>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="eyebrow">Garancija</div>
+        <h2>Garantovano skidaš 6kg ili ti vraćamo ceo iznos</h2>
+        <p class="lead">Ako ispratiš video lekcije, jedeš samo hranu koju ti dostavljamo i uneseš neophodne suplemente — <strong>garantujemo da ćeš smršati minimum 6kg</strong>. Ako ne uspeš, vraćamo ti ceo iznos.</p>
+        <p>Kako smemo da damo garanciju? Zato što mršavljenje na ovom programu nije sreća — nego biologija. <strong>Preko 100.000 ljudi</strong> je već uspešno skinulo kilograme sa ovim 28-dnevnim protokolom.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10 SCARCITY -->
+  <section class="section dark">
+    <span class="label">10 · Scarcity</span>
+    <div style="max-width:680px;">
+      <div class="eyebrow" style="color:#9adb9f;">Ograničeno mesta</div>
+      <h2 style="color:#fff;">Samo 100 mesta. Zatvaramo prijave 23. maja.</h2>
+      <p class="lead">Da bismo mogli da isporučimo kvalitetnu hranu svima na ovom izazovu, <strong>broj mesta je ograničen na 100</strong>.</p>
+      <p>Prijave zatvaramo <strong>23. maja</strong>, a <strong>25. ujutru izazov kreće</strong>. Nakon toga neće biti naknadnih prijava.</p>
+    </div>
+    <div class="stat-grid">
+      <div class="stat"><div class="label">Prijave do</div><div class="value">23. maj</div></div>
+      <div class="stat"><div class="label">Mesta ukupno</div><div class="value">100</div></div>
+      <div class="stat"><div class="label">Start</div><div class="value">25. maj</div></div>
+    </div>
+  </section>
+
+  <!-- 11 CTA REPEAT -->
+  <section class="section center">
+    <span class="label">11 · CTA repeat</span>
+    <h2 style="max-width:720px;margin:0 auto 28px;">Prijavi se za izazov dok ima slobodnih mesta</h2>
+    <a href="#offer" class="btn lg">Rezerviši mesto sada</a>
+  </section>
+
+  <!-- 12 IF YOU SKIP -->
+  <section class="section danger">
+    <span class="label">12 · Ako propustiš</span>
+    <div style="max-width:760px;">
+      <div class="eyebrow" style="color:#ff8a8a;">Cena neaktivnosti</div>
+      <h2 style="color:#fff;">Ako propustiš ovaj izazov</h2>
+      <ul class="checks">
+        <li><div>Nastavljaš da smišljaš šta ćeš da jedeš svakog dana</div></li>
+        <li><div>Nastavljaš da pereš sudove bez prestanka</div></li>
+        <li><div>Nastavljaš sam da se boriš sa kilogramima</div></li>
+      </ul>
+      <p style="margin-top:18px;">Možeš kao i do sada — pokušavajući da balansiraš ishranu sa poslom, obavezama i porodicom.</p>
+      <p><strong>A možeš lakše i brže uz našu pomoć. 6kg za 28 dana, bez da spremiš jedan jedini obrok.</strong></p>
+      <a href="#offer" class="btn white lg" style="margin-top:18px;">Rezerviši mesto sada</a>
+    </div>
+  </section>
+
+  <!-- 13 FAQ -->
+  <section class="section">
+    <span class="label">13 · FAQ</span>
+    <div class="center" style="max-width:680px;margin:0 auto 36px;">
+      <div class="eyebrow">Pitanja i odgovori</div>
+      <h2>Najčešća pitanja</h2>
+    </div>
+    <div style="max-width:780px;margin:0 auto;">
+      <details>
+        <summary>Šta ako idem na put / preskočim dan?</summary>
+        <p>Nije problem ako preskočiš dan ili dva — samo nam javiš da ti ne stigne hrana, ispoštuješ suplemente i sve će biti okej. Ako planiraš duže putovanje u ovom periodu, bolje je da preskočiš ovu grupu i uđeš u sledeću.</p>
+      </details>
+      <details>
+        <summary>Šta ako sam alergičan na nešto?</summary>
+        <p>Pri prijavi navedeš sve alergene — izbacujemo iz tvog menija. U standardan meni ulaze: gluten, laktoza, jaja, orašasti plodovi, soja, riba, školjke. Ako imaš nešto specifično što treba da se izbaci, javiš nam pre 25. maja.</p>
+      </details>
+      <details>
+        <summary>Da li program radi za žene i muškarce isto?</summary>
+        <p>Da. Protokol je standardizovan, ali porcije i kalorijska struktura se prilagođavaju (pri prijavi unosiš pol, težinu i visinu).</p>
+      </details>
+      <details>
+        <summary>Kada stiže box i mogu li da biram vreme dostave?</summary>
+        <p>Hrana stiže ujutru između 7 i 10h. Nutribox optimizuje rute za sve klijente. Postoji opcija doplate za prioritetnu dostavu. <em>(Napomena: proveriti tačnu opciju doplate pre lansiranja.)</em></p>
+      </details>
+      <details>
+        <summary>Imam 50+ godina — da li mogu da krenem sa izazovom?</summary>
+        <p>Da. Imali smo desetine hiljada uspešnih studenata svih starosnih grupa. Ako imaš zdravstvene probleme (dijabetes, srce, štitna), konsultuj se sa lekarom pre nego što kreneš — kao i pre svake promene ishrane.</p>
+      </details>
+    </div>
+  </section>
+
+  <p class="footnote">Wireframe v1 · prilagođen Nutribox brand sistemu (#317039 · #101a24 · Instrument Sans / Poppins)</p>
+</div>
+</body>
+</html>

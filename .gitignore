@@ -1,0 +1,28 @@
+# dependencies (any level)
+node_modules/
+
+# next.js / build output (any level)
+.next/
+/out/
+/build/
+dist/
+
+# vercel
+.vercel/
+
+# local env files (contain secrets)
+.env
+.env.local
+.env.*.local
+
+# local Claude Code config (may contain local keys)
+.claude/
+
+# misc
+.DS_Store
+*.pem
+npm-debug.log*
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts

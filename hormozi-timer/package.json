@@ -1,0 +1,32 @@
+{
+  "name": "hormozi-timer",
+  "version": "1.0.0",
+  "description": "15-min productivity tracker — Hormozi method, Mac menu bar app",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build:mac": "electron-builder --mac"
+  },
+  "devDependencies": {
+    "electron": "^28.3.3",
+    "electron-builder": "^24.13.3"
+  },
+  "dependencies": {
+    "electron-store": "^8.2.0",
+    "menubar": "^9.4.0"
+  },
+  "build": {
+    "appId": "com.dusan.hormozi-timer",
+    "productName": "Hormozi Timer",
+    "mac": {
+      "category": "public.app-category.productivity",
+      "target": "dmg"
+    },
+    "files": [
+      "main.js",
+      "renderer/**/*",
+      "assets/**/*",
+      "package.json"
+    ]
+  }
+}

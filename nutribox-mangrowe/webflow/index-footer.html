@@ -1,0 +1,25 @@
+<script>
+  (function () {
+    var TARGET = new Date('2026-05-23T23:59:59+02:00').getTime();
+    var cells = document.querySelectorAll('#countdown [data-unit]');
+    if (!cells.length) return;
+    function pad(n) { return String(n).padStart(2, '0'); }
+    function tick() {
+      var diff = TARGET - Date.now();
+      if (diff < 0) diff = 0;
+      var d = Math.floor(diff / 86400000);
+      var h = Math.floor((diff % 86400000) / 3600000);
+      var m = Math.floor((diff % 3600000) / 60000);
+      var s = Math.floor((diff % 60000) / 1000);
+      cells.forEach(function (el) {
+        var u = el.getAttribute('data-unit');
+        if (u === 'days') el.textContent = pad(d);
+        if (u === 'hours') el.textContent = pad(h);
+        if (u === 'minutes') el.textContent = pad(m);
+        if (u === 'seconds') el.textContent = pad(s);
+      });
+    }
+    tick();
+    setInterval(tick, 1000);
+  })();
+</script>

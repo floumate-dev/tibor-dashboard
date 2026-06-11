@@ -1,0 +1,2367 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Setter Tracker — Nauči Dizajn</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        @font-face {
+            font-family: 'Raptor TTF';
+            src: url('https://cdn.prod.website-files.com/6114c0249ef45bc2232a4788/65bd4838ea5e3885f0b9cad3_RaptorText-Regular.ttf') format('truetype');
+            font-weight: 400;
+            font-style: normal;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'Raptor TTF';
+            src: url('https://cdn.prod.website-files.com/6114c0249ef45bc2232a4788/65bd48495f1bb18bfc54cdee_RaptorText-Medium.ttf') format('truetype');
+            font-weight: 500;
+            font-style: normal;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'Raptor TTF';
+            src: url('https://cdn.prod.website-files.com/6114c0249ef45bc2232a4788/65bd485bae2da4cbc7c48d2d_RaptorText-SemiBold.ttf') format('truetype');
+            font-weight: 600;
+            font-style: normal;
+            font-display: swap;
+        }
+
+        :root {
+            --olive-100: #797d73;
+            --olive-200: #3d403c;
+            --olive-300: #313330;
+            --olive-400: #232421;
+            --bg-dark: #232421;
+            --bg-card: #313330;
+            --bg-card-hover: #3d403c;
+            --fluorescent: #DBFF00;
+            --fluorescent-dim: rgba(219, 255, 0, 0.15);
+            --fluorescent-glow: rgba(219, 255, 0, 0.3);
+            --text-primary: #fff;
+            --text-secondary: lightgrey;
+            --text-muted: #797d73;
+            --neutral: #fff;
+            --merino: #f2efe6;
+            --border: rgba(255, 255, 255, 0.08);
+            --border-active: rgba(255, 255, 255, 0.15);
+            --danger: #ff4d4f;
+            --success: #4cb06c;
+            --radius: 12px;
+            --radius-lg: 16px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        ::selection {
+            background: var(--fluorescent);
+            color: var(--olive-400);
+        }
+
+        /* No ambient gradient — flat dark bg like naucidizajn.com */
+
+        /* ── Login Screen ── */
+        .login-screen {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            position: relative;
+            z-index: 1;
+        }
+
+        .login-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 48px 40px;
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+        }
+
+        .login-logo {
+            height: 28px;
+            margin-bottom: 12px;
+        }
+
+        .login-card .logo {
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--fluorescent);
+            margin-bottom: 8px;
+        }
+
+        .login-card h1 {
+            font-family: 'Raptor TTF', 'Plus Jakarta Sans', sans-serif;
+            font-size: 32px;
+            font-weight: 500;
+            margin-bottom: 32px;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .setter-btn {
+            display: block;
+            width: 100%;
+            padding: 16px;
+            margin-bottom: 12px;
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            color: var(--text-primary);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .setter-btn:hover {
+            border-color: var(--fluorescent);
+            background: var(--fluorescent-dim);
+            transform: translateY(-1px);
+        }
+
+        .setter-btn.owner {
+            border-color: var(--fluorescent);
+            background: rgba(219, 255, 0, 0.08);
+        }
+
+        .setter-btn.owner:hover {
+            background: rgba(219, 255, 0, 0.15);
+        }
+
+        .setter-btn .avatar {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--fluorescent);
+            color: var(--bg-dark);
+            font-weight: 800;
+            font-size: 14px;
+            margin-right: 12px;
+            vertical-align: middle;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin: 24px 0;
+            color: var(--text-muted);
+            font-size: 12px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        /* owner-btn removed, using .setter-btn.owner instead */
+
+        /* ── App Layout ── */
+        .app { display: none; position: relative; z-index: 1; }
+        .app.active { display: block; }
+
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 32px;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-card);
+            backdrop-filter: none;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .topbar-logo {
+            height: 22px;
+        }
+
+        .topbar .brand {
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--fluorescent);
+        }
+
+        .topbar-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .topbar-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .topbar .user-info {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .topbar .user-info strong {
+            color: var(--text-primary);
+        }
+
+        .btn-logout {
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px 16px;
+            color: var(--text-secondary);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-logout:hover {
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 32px;
+        }
+
+        /* ── Setter Entry Form ── */
+        .form-header {
+            margin-bottom: 32px;
+        }
+
+        .form-header h2 {
+            font-family: 'Raptor TTF', 'Plus Jakarta Sans', sans-serif;
+            font-size: 36px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-header .date {
+            font-size: 15px;
+            color: var(--text-secondary);
+        }
+
+        .date-picker-row {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-top: 8px;
+        }
+
+        .entry-date-input {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 16px;
+            color: var(--text-primary);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            outline: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .entry-date-input:focus { border-color: var(--fluorescent); }
+        .entry-date-input::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
+
+        .date-display {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .metric-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            transition: all 0.2s;
+        }
+
+        .metric-card:focus-within {
+            border-color: var(--border-active);
+            background: var(--bg-card-hover);
+        }
+
+        .metric-card label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+
+        .metric-card input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 32px;
+            font-weight: 700;
+            outline: none;
+        }
+
+        .metric-card input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .metric-card input[type="number"]::-webkit-inner-spin-button,
+        .metric-card input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+        }
+
+        .metric-card input[type="number"] { -moz-appearance: textfield; }
+
+        .metric-card.auto-calc {
+            border-color: rgba(219, 255, 0, 0.15);
+            background: rgba(219, 255, 0, 0.05);
+        }
+
+        .metric-card.auto-calc .calc-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--fluorescent);
+        }
+
+        .metric-card.auto-calc .calc-value.danger { color: var(--danger); }
+        .metric-card.auto-calc .calc-value.success { color: var(--success); }
+
+        .btn-submit {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 16px 40px;
+            background: var(--fluorescent);
+            border: none;
+            border-radius: var(--radius);
+            color: var(--bg-dark);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-1px);
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .submit-feedback {
+            margin-top: 16px;
+            padding: 12px 20px;
+            border-radius: var(--radius);
+            font-size: 14px;
+            font-weight: 600;
+            display: none;
+        }
+
+        .submit-feedback.success {
+            display: block;
+            background: rgba(77, 255, 136, 0.1);
+            color: var(--success);
+            border: 1px solid rgba(77, 255, 136, 0.2);
+        }
+
+        .submit-feedback.error {
+            display: block;
+            background: rgba(255, 77, 77, 0.1);
+            color: var(--danger);
+            border: 1px solid rgba(255, 77, 77, 0.2);
+        }
+
+        /* ── PIN Modal ── */
+        .pin-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.97);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .pin-overlay.active { display: flex; }
+        .pin-modal {
+            background: var(--bg-card);
+            border: 1px solid var(--accent);
+            border-radius: 16px;
+            padding: 36px 32px;
+            width: 320px;
+            max-width: 90vw;
+            text-align: center;
+            box-shadow: 0 12px 48px rgba(0,0,0,0.6);
+        }
+        .pin-modal h3 {
+            margin-bottom: 20px;
+            color: var(--text);
+            font-size: 1.1rem;
+        }
+        .pin-modal input {
+            width: 100%;
+            padding: 14px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            color: var(--text);
+            font-size: 1.5rem;
+            text-align: center;
+            letter-spacing: 12px;
+            font-family: inherit;
+            outline: none;
+            box-sizing: border-box;
+        }
+        .pin-modal input:focus { border-color: var(--accent); }
+        .pin-error {
+            color: var(--danger);
+            font-size: 0.85rem;
+            margin-top: 8px;
+            min-height: 20px;
+        }
+        .pin-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+        }
+        .pin-cancel, .pin-submit {
+            flex: 1;
+            padding: 12px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            font-family: inherit;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+        .pin-cancel {
+            background: var(--bg-card);
+            color: var(--text-muted);
+        }
+        .pin-submit {
+            background-color: #DBFF00 !important;
+            color: #232421 !important;
+            border-color: #DBFF00 !important;
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+        .pin-submit:hover {
+            opacity: 0.9;
+        }
+
+        /* ── Topbar right group ── */
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* ── Leaderboard Badge (topbar) ── */
+        .lb-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            background: rgba(219, 255, 0, 0.08);
+            border: 1px solid var(--accent);
+            border-radius: 50px;
+            color: var(--accent);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        .lb-badge:hover {
+            background: rgba(219, 255, 0, 0.14);
+        }
+        .lb-badge svg { flex-shrink: 0; }
+        .lb-badge-avatar {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .lb-badge-leader {
+            color: var(--text);
+            font-weight: 600;
+            white-space: nowrap;
+            font-size: 0.82rem;
+        }
+        .lb-badge-leader strong {
+            color: var(--accent);
+        }
+
+        /* ── Leaderboard Modal ── */
+        .lb-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.15s ease;
+        }
+        .lb-modal-overlay.active {
+            display: flex;
+        }
+        .lb-modal {
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            width: 90%;
+            max-width: 480px;
+            padding: 28px;
+            animation: slideUp 0.2s ease;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .lb-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+        .lb-modal-header h3 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+        .lb-modal-close {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: all 0.15s;
+        }
+        .lb-modal-close:hover {
+            color: var(--text);
+            background: var(--bg-card);
+        }
+        .lb-modal-sub {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+        }
+        .lb-modal-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .lb-modal-row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 16px 18px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+        }
+        .lb-modal-row.is-first {
+            border-color: var(--accent);
+            background: rgba(219, 255, 0, 0.05);
+        }
+        .lb-modal-row.is-me {
+            box-shadow: inset 3px 0 0 var(--accent);
+        }
+        .lb-modal-rank {
+            font-size: 1.3rem;
+            font-weight: 800;
+            min-width: 28px;
+            text-align: center;
+        }
+        .lb-modal-rank.rank-1 { color: #FFD700; }
+        .lb-modal-rank.rank-2 { color: #C0C0C0; }
+        .lb-modal-rank.rank-3 { color: #CD7F32; }
+        .lb-modal-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .lb-modal-info { flex: 1; }
+        .lb-modal-name {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--text);
+        }
+        .lb-modal-detail {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+        .lb-modal-value {
+            text-align: right;
+        }
+        .lb-modal-number {
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: var(--text);
+            line-height: 1;
+        }
+        .lb-modal-row.is-first .lb-modal-number {
+            color: var(--accent);
+        }
+        .lb-modal-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* ── Leaderboard (inline) ── */
+        .leaderboard-section {
+            margin-top: 48px;
+            padding-top: 32px;
+            border-top: 1px solid var(--border);
+        }
+        .leaderboard-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 4px;
+        }
+        .leaderboard-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+        }
+        .leaderboard-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .lb-row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 18px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            transition: all 0.2s;
+        }
+        .lb-row.is-me {
+            border-color: var(--accent);
+            background: rgba(219, 255, 0, 0.04);
+        }
+        .lb-rank {
+            font-size: 1.4rem;
+            font-weight: 800;
+            min-width: 32px;
+            text-align: center;
+            color: var(--text-muted);
+        }
+        .lb-row.is-me .lb-rank {
+            color: var(--accent);
+        }
+        .lb-rank-1 { color: #FFD700 !important; }
+        .lb-rank-2 { color: #C0C0C0 !important; }
+        .lb-rank-3 { color: #CD7F32 !important; }
+        .lb-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .lb-info {
+            flex: 1;
+        }
+        .lb-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--text);
+        }
+        .lb-row.is-me .lb-name::after {
+            content: ' (ti)';
+            font-weight: 400;
+            color: var(--accent);
+            font-size: 0.8rem;
+        }
+        .lb-detail {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+        .lb-value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--text);
+            min-width: 48px;
+            text-align: right;
+        }
+        .lb-bar-wrap {
+            flex: 1;
+            max-width: 200px;
+            height: 6px;
+            background: var(--bg-input);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .lb-bar {
+            height: 100%;
+            border-radius: 3px;
+            background: var(--accent);
+            transition: width 0.6s ease;
+        }
+
+        /* ── Owner Dashboard ── */
+        .dashboard-tabs {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 32px;
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 4px;
+            border: 1px solid var(--border);
+            width: fit-content;
+        }
+
+        .tab-btn {
+            padding: 10px 24px;
+            background: transparent;
+            border: none;
+            border-radius: 8px;
+            color: var(--text-secondary);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            background: var(--fluorescent);
+            color: var(--bg-dark);
+        }
+
+        .tab-btn:hover:not(.active) {
+            color: var(--text-primary);
+        }
+
+        /* Overview Cards */
+        .setter-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .setter-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 28px;
+            transition: all 0.2s;
+        }
+
+        .setter-card:hover {
+            border-color: var(--border-active);
+        }
+
+        .setter-card-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 24px;
+        }
+
+        .setter-card-header .avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--fluorescent);
+            color: var(--bg-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 16px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .setter-card-header .avatar img,
+        .setter-btn .avatar img,
+        .topbar .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .setter-card-header .name {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .setter-card-header .status {
+            margin-left: auto;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+
+        .status.submitted {
+            background: rgba(77, 255, 136, 0.1);
+            color: var(--success);
+        }
+
+        .status.pending {
+            background: rgba(255, 200, 50, 0.1);
+            color: #ffc832;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }
+
+        .stat-row:last-child { border-bottom: none; }
+
+        .stat-row .stat-label { color: var(--text-secondary); }
+        .stat-row .stat-value { font-weight: 600; }
+        .stat-row .stat-value.highlight { color: var(--fluorescent); }
+
+        /* Charts */
+        .chart-section {
+            margin-bottom: 40px;
+        }
+
+        .chart-section h3 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .chart-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 28px;
+        }
+
+        .chart-controls {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .chart-select {
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px 16px;
+            color: var(--text-primary);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .chart-select:focus { border-color: var(--fluorescent); }
+
+        canvas { width: 100% !important; }
+
+        /* Comparison Table */
+        .comparison-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 14px 20px;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        .comparison-table th {
+            background: var(--bg-dark);
+            color: var(--text-secondary);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .comparison-table td {
+            border-bottom: 1px solid var(--border);
+        }
+
+        .comparison-table tr:last-child td { border-bottom: none; }
+
+        .comparison-table .best {
+            color: var(--fluorescent);
+            font-weight: 700;
+        }
+
+        /* Tab content */
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* ── Weekly Report Styles ── */
+        .report-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .report-week-nav {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .week-nav-btn {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px 14px;
+            color: var(--text-secondary);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .week-nav-btn:hover { border-color: var(--fluorescent); color: var(--text-primary); }
+
+        .week-label {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            min-width: 240px;
+            text-align: center;
+        }
+
+        .report-setter-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 28px;
+            margin-bottom: 24px;
+        }
+
+        .report-setter-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+
+        .report-setter-header .avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .report-setter-header .avatar img {
+            width: 100%; height: 100%; object-fit: cover;
+        }
+
+        .report-setter-header .name {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .report-setter-header .week-score {
+            margin-left: auto;
+            font-size: 13px;
+            font-weight: 700;
+            padding: 6px 14px;
+            border-radius: 20px;
+        }
+
+        .week-score.good { background: rgba(77, 255, 136, 0.1); color: var(--success); }
+        .week-score.warning { background: rgba(255, 200, 50, 0.1); color: #ffc832; }
+        .week-score.bad { background: rgba(255, 77, 77, 0.1); color: var(--danger); }
+
+        .report-daily-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 6px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .report-daily-grid { grid-template-columns: repeat(4, 1fr); }
+        }
+
+        .report-day-cell {
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px 8px;
+            text-align: center;
+            font-size: 12px;
+        }
+
+        .report-day-cell .day-name {
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 10px;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        .report-day-cell .day-val {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .report-day-cell .day-metric {
+            color: var(--text-muted);
+            font-size: 10px;
+            margin-top: 2px;
+        }
+
+        .report-day-cell.no-data {
+            opacity: 0.4;
+        }
+
+        .report-day-cell.no-data .day-val { color: var(--text-muted); }
+
+        .report-day-cell.highlight-drop {
+            border-color: var(--danger);
+            background: rgba(255, 77, 77, 0.05);
+        }
+
+        .report-day-cell.highlight-spike {
+            border-color: var(--success);
+            background: rgba(77, 255, 136, 0.05);
+        }
+
+        .report-insights {
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+        }
+
+        .report-insights h4 {
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--fluorescent);
+            margin-bottom: 12px;
+        }
+
+        .insight-item {
+            display: flex;
+            gap: 10px;
+            padding: 8px 0;
+            font-size: 14px;
+            line-height: 1.5;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .insight-item:last-child { border-bottom: none; }
+
+        .insight-icon {
+            font-size: 16px;
+            flex-shrink: 0;
+            width: 24px;
+            text-align: center;
+        }
+
+        .report-summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .report-summary-grid.report-4col {
+            grid-template-columns: repeat(4, 1fr);
+        }
+        @media (max-width: 600px) {
+            .report-summary-grid.report-4col {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        .report-team-total {
+            border: 1px solid var(--accent);
+            background: rgba(219, 255, 0, 0.03);
+        }
+
+        .report-summary-stat {
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 14px;
+            text-align: center;
+        }
+
+        .report-summary-stat .stat-num {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .report-summary-stat .stat-lbl {
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .no-report-data {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+            font-size: 15px;
+        }
+
+        /* Date picker for dashboard */
+        .date-range {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .date-range label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .date-range input[type="date"] {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px 14px;
+            color: var(--text-primary);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 13px;
+            outline: none;
+        }
+
+        .date-range input[type="date"]:focus { border-color: var(--fluorescent); }
+        .date-range input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-content { padding: 20px 16px; }
+            .topbar { padding: 12px 16px; }
+            .metrics-grid { grid-template-columns: 1fr 1fr; }
+            .setter-overview { grid-template-columns: 1fr; }
+            .form-header h2 { font-size: 24px; }
+            .login-card { margin: 20px; padding: 32px 24px; }
+            .dashboard-tabs { width: 100%; }
+            .tab-btn { flex: 1; text-align: center; padding: 10px 12px; font-size: 13px; }
+            .comparison-table { font-size: 12px; }
+            .comparison-table th, .comparison-table td { padding: 10px 12px; }
+        }
+
+        @media (max-width: 480px) {
+            .metrics-grid { grid-template-columns: 1fr; }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-in { animation: fadeIn 0.4s ease; }
+    </style>
+</head>
+<body>
+
+<!-- ════════════════ LOGIN SCREEN ════════════════ -->
+<div id="loginScreen" class="login-screen">
+    <div class="login-card animate-in">
+        <img src="assets/logo.svg" alt="Nauči Dizajn" class="login-logo">
+        <h1>Setter Tracker</h1>
+
+        <button class="setter-btn" onclick="showPinPrompt('Lazar')">
+            <span class="avatar"><img src="assets/lazar.jpeg" alt="Lazar"></span> Lazar
+        </button>
+        <button class="setter-btn" onclick="showPinPrompt('Ana')">
+            <span class="avatar"><img src="assets/ana.jpeg" alt="Ana"></span> Ana
+        </button>
+
+        <div class="divider">Admin</div>
+
+        <button class="setter-btn owner" onclick="showPinPrompt('Nikola')">
+            <span class="avatar"><img src="assets/nikola.png" alt="Nikola"></span> Nikola
+        </button>
+
+    </div>
+</div>
+
+<!-- PIN Modal (root level so it's never clipped) -->
+<div class="pin-overlay" id="pinOverlay">
+    <div class="pin-modal">
+        <h3 id="pinTitle">Unesite PIN</h3>
+        <input type="password" id="pinInput" maxlength="4" placeholder="····" inputmode="numeric" autocomplete="off">
+        <div class="pin-error" id="pinError"></div>
+        <div class="pin-actions">
+            <button class="pin-cancel" onclick="closePinPrompt()">Otkaži</button>
+            <button class="pin-submit" onclick="verifyPin()">Prijava</button>
+        </div>
+    </div>
+</div>
+
+<!-- ════════════════ SETTER VIEW ════════════════ -->
+<div id="setterApp" class="app">
+    <div class="topbar">
+        <div class="topbar-left">
+            <img src="assets/logo.svg" alt="Nauči Dizajn" class="topbar-logo">
+            <span class="topbar-avatar" id="topbarAvatar"></span>
+            <span class="user-info">Prijava: <strong id="setterName"></strong></span>
+        </div>
+        <div class="topbar-right">
+            <button class="lb-badge" id="lbBadge" onclick="toggleLeaderboardModal()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm14 3c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1v-1h14v1z"/></svg>
+                <img class="lb-badge-avatar" id="lbBadgeAvatar" src="" alt="">
+                <span class="lb-badge-leader" id="lbBadgeLeader"></span>
+            </button>
+            <button class="btn-logout" onclick="logout()">Odjavi se</button>
+        </div>
+    </div>
+
+    <!-- Leaderboard Modal -->
+    <div class="lb-modal-overlay" id="lbModalOverlay" onclick="closeLeaderboardModal(event)">
+        <div class="lb-modal">
+            <div class="lb-modal-header">
+                <h3>Nedeljni pregled tima</h3>
+                <button class="lb-modal-close" onclick="toggleLeaderboardModal()">&#10005;</button>
+            </div>
+            <p class="lb-modal-sub" id="lbModalSub">Booked calls ove nedelje</p>
+            <div class="lb-modal-list" id="lbModalList"></div>
+        </div>
+    </div>
+
+    <div class="main-content animate-in">
+        <div class="form-header">
+            <h2>Dnevni unos</h2>
+            <div class="date-picker-row">
+                <input type="date" id="entryDate" class="entry-date-input" onchange="onEntryDateChange()">
+                <span class="date-display" id="entryDateDisplay"></span>
+            </div>
+        </div>
+
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <label>Outbound New Followers</label>
+                <input type="number" id="m_outbound_new" min="0" placeholder="0" oninput="calcRate()">
+            </div>
+            <div class="metric-card">
+                <label>Outbound Story Votes</label>
+                <input type="number" id="m_outbound_votes" min="0" placeholder="0" oninput="calcRate()">
+            </div>
+            <div class="metric-card">
+                <label>Follow Ups</label>
+                <input type="number" id="m_follow_ups" min="0" placeholder="0" oninput="calcRate()">
+            </div>
+            <div class="metric-card">
+                <label>Quiz Leads</label>
+                <input type="number" id="m_quiz_leads" min="0" placeholder="0" oninput="calcRate()">
+            </div>
+            <div class="metric-card">
+                <label>Conversations</label>
+                <input type="number" id="m_conversations" min="0" placeholder="0" oninput="calcRate()">
+            </div>
+            <div class="metric-card">
+                <label>Booked Calls</label>
+                <input type="number" id="m_booked_calls" min="0" placeholder="0" oninput="calcRate()">
+            </div>
+            <div class="metric-card auto-calc">
+                <label>Conversation → Booked Call %</label>
+                <div class="calc-value" id="conversionRate">—</div>
+            </div>
+        </div>
+
+        <button class="btn-submit" id="btnSubmit" onclick="submitEntry()">
+            Pošalji izveštaj
+        </button>
+
+        <div class="submit-feedback" id="submitFeedback"></div>
+
+        <!-- Leaderboard -->
+        <div class="leaderboard-section" id="leaderboardSection">
+            <h3 class="leaderboard-title">Nedeljni pregled tima</h3>
+            <p class="leaderboard-subtitle">Booked calls ove nedelje</p>
+            <div class="leaderboard-list" id="leaderboardList"></div>
+        </div>
+    </div>
+</div>
+
+<!-- ════════════════ OWNER DASHBOARD ════════════════ -->
+<div id="ownerApp" class="app">
+    <div class="topbar">
+        <div class="topbar-left">
+            <img src="assets/logo.svg" alt="Nauči Dizajn" class="topbar-logo">
+            <span class="user-info">Admin: <strong>Nikola</strong></span>
+        </div>
+        <button class="btn-logout" onclick="logout()">Odjavi se</button>
+    </div>
+
+    <div class="main-content animate-in">
+        <div class="form-header">
+            <h2>Dashboard</h2>
+        </div>
+
+        <div class="dashboard-tabs">
+            <button class="tab-btn active" onclick="switchTab('overview')">Pregled</button>
+            <button class="tab-btn" onclick="switchTab('charts')">Grafici</button>
+            <button class="tab-btn" onclick="switchTab('comparison')">Poređenje</button>
+            <button class="tab-btn" onclick="switchTab('weekly')">Nedeljni Izveštaj</button>
+        </div>
+
+        <!-- ── Overview Tab ── -->
+        <div id="tab-overview" class="tab-content active">
+            <div class="date-picker-row" style="margin-bottom: 20px;">
+                <input type="date" id="overviewDate" class="entry-date-input" onchange="onOverviewDateChange()">
+                <span class="date-display" id="overviewDateDisplay"></span>
+            </div>
+            <div class="setter-overview" id="overviewCards"></div>
+        </div>
+
+        <!-- ── Charts Tab ── -->
+        <div id="tab-charts" class="tab-content">
+            <div class="chart-controls">
+                <select class="chart-select" id="chartSetter" onchange="updateChart()">
+                    <option value="all">Svi setteri</option>
+                    <option value="Lazar">Lazar</option>
+                    <option value="Ana">Ana</option>
+
+                </select>
+                <select class="chart-select" id="chartMetric" onchange="updateChart()">
+                    <option value="outbound_new">Outbound New Followers</option>
+                    <option value="outbound_votes">Outbound Story Votes</option>
+                    <option value="follow_ups">Follow Ups</option>
+                    <option value="quiz_leads">Quiz Leads</option>
+                    <option value="conversations">Conversations</option>
+                    <option value="booked_calls">Booked Calls</option>
+                    <option value="conversion_rate">Conversion %</option>
+                </select>
+                <select class="chart-select" id="chartRange" onchange="updateChart()">
+                    <option value="7">Poslednjih 7 dana</option>
+                    <option value="14">Poslednjih 14 dana</option>
+                    <option value="30" selected>Poslednjih 30 dana</option>
+                </select>
+            </div>
+            <div class="chart-container">
+                <canvas id="mainChart" height="300"></canvas>
+            </div>
+        </div>
+
+        <!-- ── Comparison Tab ── -->
+        <div id="tab-comparison" class="tab-content">
+            <div class="date-range">
+                <label>Od:</label>
+                <input type="date" id="compFrom" onchange="updateComparison()">
+                <label>Do:</label>
+                <input type="date" id="compTo" onchange="updateComparison()">
+            </div>
+            <table class="comparison-table" id="compTable">
+                <thead>
+                    <tr>
+                        <th>Metrika</th>
+                        <th>Lazar</th>
+                        <th>Ana</th>
+                    </tr>
+                </thead>
+                <tbody id="compBody"></tbody>
+            </table>
+        </div>
+
+        <!-- ── Weekly Report Tab ── -->
+        <div id="tab-weekly" class="tab-content">
+            <div class="report-header">
+                <div class="report-week-nav">
+                    <button class="week-nav-btn" onclick="changeReportWeek(-1)">← Prethodna</button>
+                    <span class="week-label" id="weekLabel"></span>
+                    <button class="week-nav-btn" onclick="changeReportWeek(1)">Sledeća →</button>
+                </div>
+            </div>
+            <div id="weeklyReportContent"></div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+// ════════════════════════════════════════
+// STATE & CONFIG
+// ════════════════════════════════════════
+const SETTERS = ['Lazar', 'Ana'];
+const SETTER_PHOTOS = {
+    Lazar: 'assets/lazar.jpeg',
+    Ana: 'assets/ana.jpeg',
+};
+const METRICS = [
+    { key: 'outbound_new', label: 'Outbound New Followers' },
+    { key: 'outbound_votes', label: 'Outbound Story Votes' },
+    { key: 'follow_ups', label: 'Follow Ups' },
+    { key: 'quiz_leads', label: 'Quiz Leads' },
+    { key: 'conversations', label: 'Conversations' },
+    { key: 'booked_calls', label: 'Booked Calls' },
+    { key: 'conversion_rate', label: 'Conversion %' },
+];
+
+// ── Supabase Config ──
+const SUPABASE_URL = 'https://jtgrlixywcxabellqyxm.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp0Z3JsaXh5d2N4YWJlbGxxeXhtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzNjQwNTgsImV4cCI6MjA4OTk0MDA1OH0.ymv2an4JUwm0H4y_GmaEvwI7q-Yhq2I0GwacYPojnvI';
+
+const SB_HEADERS = {
+    'apikey': SUPABASE_KEY,
+    'Authorization': `Bearer ${SUPABASE_KEY}`,
+    'Content-Type': 'application/json',
+    'Prefer': 'return=representation'
+};
+
+async function sbGet(table, query = '') {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}?${query}`, { headers: SB_HEADERS });
+    if (!res.ok) throw new Error(`Supabase GET error: ${res.status}`);
+    return res.json();
+}
+
+async function sbUpsert(table, data, onConflict = 'user_name,date') {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}?on_conflict=${onConflict}`, {
+        method: 'POST',
+        headers: { ...SB_HEADERS, 'Prefer': 'return=representation,resolution=merge-duplicates' },
+        body: JSON.stringify(data)
+    });
+    if (!res.ok) {
+        const err = await res.text();
+        console.error('Supabase UPSERT error:', res.status, err);
+        throw new Error(`Supabase UPSERT error: ${res.status}`);
+    }
+    return res.json();
+}
+
+let currentUser = null;
+let chartInstance = null;
+
+// ── Database layer (Supabase-backed, with local cache) ──
+let dbCache = null;
+let dbCacheTime = 0;
+const CACHE_TTL = 5000; // 5 seconds
+
+async function loadDBAsync() {
+    const now = Date.now();
+    if (dbCache && (now - dbCacheTime < CACHE_TTL)) return dbCache;
+
+    const entries = await sbGet('daily_entries', 'select=*&order=date.asc');
+    const db = {};
+    SETTERS.forEach(s => { db[s] = []; });
+    entries.forEach(e => {
+        if (db[e.user_name]) db[e.user_name].push(e);
+    });
+    dbCache = db;
+    dbCacheTime = now;
+    return db;
+}
+
+// Synchronous fallback using cache
+function loadDB() {
+    if (dbCache) return dbCache;
+    const db = {};
+    SETTERS.forEach(s => { db[s] = []; });
+    return db;
+}
+
+function invalidateCache() {
+    dbCache = null;
+    dbCacheTime = 0;
+}
+
+let demoData = loadDB();
+
+function formatDate(d) {
+    return d.toISOString().split('T')[0];
+}
+
+function formatDateDisplay(d) {
+    const opts = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+    return (d || new Date()).toLocaleDateString('sr-Latn', opts);
+}
+
+// ════════════════════════════════════════
+// AUTH
+// ════════════════════════════════════════
+let pendingLoginUser = null;
+
+function showPinPrompt(name) {
+    pendingLoginUser = name;
+    document.getElementById('pinTitle').textContent = `PIN za ${name}`;
+    document.getElementById('pinInput').value = '';
+    document.getElementById('pinError').textContent = '';
+    document.getElementById('pinOverlay').classList.add('active');
+    const pinInput = document.getElementById('pinInput');
+    setTimeout(() => pinInput.focus(), 100);
+}
+
+function closePinPrompt() {
+    document.getElementById('pinOverlay').classList.remove('active');
+    pendingLoginUser = null;
+}
+
+async function verifyPin() {
+    const pin = document.getElementById('pinInput').value;
+    if (!pin || !pendingLoginUser) return;
+
+    try {
+        const users = await sbGet('users', `select=pin,role&name=eq.${pendingLoginUser}`);
+        if (users.length === 0 || users[0].pin !== pin) {
+            document.getElementById('pinError').textContent = 'Pogrešan PIN';
+            document.getElementById('pinInput').value = '';
+            document.getElementById('pinInput').focus();
+            return;
+        }
+        const userName = pendingLoginUser;
+        closePinPrompt();
+        await loginAs(userName);
+    } catch (err) {
+        document.getElementById('pinError').textContent = 'Greška u konekciji. Pokušaj ponovo.';
+    }
+}
+
+async function loginAs(name) {
+    if (!name) return;
+    currentUser = name;
+    document.getElementById('loginScreen').style.display = 'none';
+
+    // Pre-load data from Supabase
+    try {
+        await loadDBAsync();
+        demoData = dbCache;
+    } catch (err) {
+        console.error('Failed to load data:', err);
+    }
+
+    if (name === 'Nikola') {
+        showOwnerDashboard();
+    } else {
+        showSetterForm(name);
+    }
+}
+
+function logout() {
+    currentUser = null;
+    document.getElementById('loginScreen').style.display = 'flex';
+    document.getElementById('setterApp').classList.remove('active');
+    document.getElementById('ownerApp').classList.remove('active');
+}
+
+// ════════════════════════════════════════
+// SETTER FORM
+// ════════════════════════════════════════
+function showSetterForm(name) {
+    document.getElementById('ownerApp').classList.remove('active');
+    document.getElementById('loginScreen').style.display = 'none';
+    const app = document.getElementById('setterApp');
+    app.classList.add('active');
+    document.getElementById('setterName').textContent = name;
+    document.getElementById('topbarAvatar').innerHTML = `<img src="${SETTER_PHOTOS[name]}" alt="${name}">`;
+
+    // Set date picker to today
+    const dateInput = document.getElementById('entryDate');
+    dateInput.value = formatDate(new Date());
+    updateDateDisplay();
+
+    clearForm();
+    loadExistingEntry();
+    renderLeaderboard();
+}
+
+function getWeeklyLeaderboardData() {
+    const db = loadDB();
+    const now = new Date();
+    const dow = now.getDay();
+    const diffToMon = dow === 0 ? 6 : dow - 1;
+    const monday = new Date(now);
+    monday.setDate(now.getDate() - diffToMon);
+    monday.setHours(0,0,0,0);
+    const sunday = new Date(monday);
+    sunday.setDate(monday.getDate() + 6);
+    const monStr = formatDate(monday);
+    const sunStr = formatDate(sunday);
+
+    const results = SETTERS.map(setter => {
+        const entries = (db[setter] || []).filter(e => e.date >= monStr && e.date <= sunStr);
+        const booked = entries.reduce((s, e) => s + (e.booked_calls || 0), 0);
+        const convos = entries.reduce((s, e) => s + (e.conversations || 0), 0);
+        const rate = convos > 0 ? Math.round((booked / convos) * 100) : 0;
+        return { name: setter, booked, convos, rate, days: entries.length };
+    });
+    results.sort((a, b) => b.booked - a.booked);
+    return results;
+}
+
+function renderLeaderboard() {
+    const results = getWeeklyLeaderboardData();
+    const maxBooked = Math.max(...results.map(r => r.booked), 1);
+
+    // Update topbar badge
+    const leader = results[0];
+    const badgeLeaderEl = document.getElementById('lbBadgeLeader');
+    const badgeAvatarEl = document.getElementById('lbBadgeAvatar');
+    if (badgeLeaderEl) {
+        badgeLeaderEl.innerHTML = `${leader.name} · ${leader.booked}`;
+    }
+    if (badgeAvatarEl) {
+        badgeAvatarEl.src = SETTER_PHOTOS[leader.name];
+    }
+
+    // Inline leaderboard (bottom of form)
+    const container = document.getElementById('leaderboardList');
+    container.innerHTML = results.map((r, i) => {
+        const rank = i + 1;
+        const isMe = r.name === currentUser;
+        const barWidth = Math.round((r.booked / maxBooked) * 100);
+        const rankClass = rank <= 3 ? `lb-rank-${rank}` : '';
+        return `
+        <div class="lb-row ${isMe ? 'is-me' : ''}">
+            <div class="lb-rank ${rankClass}">${rank}</div>
+            <img src="${SETTER_PHOTOS[r.name]}" alt="${r.name}" class="lb-avatar">
+            <div class="lb-info">
+                <div class="lb-name">${r.name}</div>
+                <div class="lb-detail">${r.convos} konverzacija  ·  ${r.rate}% conv. rate  ·  ${r.days} dana</div>
+            </div>
+            <div class="lb-bar-wrap">
+                <div class="lb-bar" style="width: ${barWidth}%"></div>
+            </div>
+            <div class="lb-value">${r.booked}</div>
+        </div>`;
+    }).join('');
+
+    // Modal leaderboard
+    renderLeaderboardModal(results);
+}
+
+function renderLeaderboardModal(results) {
+    const container = document.getElementById('lbModalList');
+    if (!container) return;
+
+    // Motivational subtitle
+    const sub = document.getElementById('lbModalSub');
+    if (sub) {
+        sub.textContent = 'Booked calls ove nedelje';
+    }
+
+    container.innerHTML = results.map((r, i) => {
+        const rank = i + 1;
+        const isMe = r.name === currentUser;
+        const isFirst = rank === 1;
+        return `
+        <div class="lb-modal-row ${isFirst ? 'is-first' : ''} ${isMe ? 'is-me' : ''}">
+            <div class="lb-modal-rank rank-${rank}">${rank}</div>
+            <img src="${SETTER_PHOTOS[r.name]}" alt="${r.name}" class="lb-modal-avatar">
+            <div class="lb-modal-info">
+                <div class="lb-modal-name">${r.name}${isMe ? ' <span style="color:var(--accent);font-weight:400;font-size:0.8rem">(ti)</span>' : ''}</div>
+                <div class="lb-modal-detail">${r.convos} konverzacija · ${r.rate}% conv. rate</div>
+            </div>
+            <div class="lb-modal-value">
+                <div class="lb-modal-number">${r.booked}</div>
+                <div class="lb-modal-label">booked</div>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function toggleLeaderboardModal() {
+    const overlay = document.getElementById('lbModalOverlay');
+    overlay.classList.toggle('active');
+}
+
+function closeLeaderboardModal(event) {
+    if (event.target === event.currentTarget) {
+        document.getElementById('lbModalOverlay').classList.remove('active');
+    }
+}
+
+function clearForm() {
+    ['m_outbound_new', 'm_outbound_votes', 'm_follow_ups', 'm_quiz_leads', 'm_conversations', 'm_booked_calls'].forEach(id => {
+        document.getElementById(id).value = '';
+    });
+    document.getElementById('conversionRate').textContent = '—';
+    document.getElementById('conversionRate').className = 'calc-value';
+    document.getElementById('submitFeedback').className = 'submit-feedback';
+    document.getElementById('submitFeedback').textContent = '';
+    document.getElementById('btnSubmit').disabled = false;
+    document.getElementById('btnSubmit').textContent = 'Pošalji izveštaj';
+}
+
+function updateDateDisplay() {
+    const dateInput = document.getElementById('entryDate');
+    const d = new Date(dateInput.value + 'T12:00:00');
+    document.getElementById('entryDateDisplay').textContent = formatDateDisplay(d);
+}
+
+function onEntryDateChange() {
+    updateDateDisplay();
+    clearForm();
+    loadExistingEntry();
+}
+
+async function loadExistingEntry() {
+    const selectedDate = document.getElementById('entryDate').value;
+    try {
+        const entries = await sbGet('daily_entries', `select=*&user_name=eq.${currentUser}&date=eq.${selectedDate}`);
+        if (entries.length > 0) {
+            const existing = entries[0];
+            document.getElementById('m_outbound_new').value = existing.outbound_new;
+            document.getElementById('m_outbound_votes').value = existing.outbound_votes;
+            document.getElementById('m_follow_ups').value = existing.follow_ups;
+            document.getElementById('m_quiz_leads').value = existing.quiz_leads;
+            document.getElementById('m_conversations').value = existing.conversations;
+            document.getElementById('m_booked_calls').value = existing.booked_calls;
+            calcRate();
+            showFeedback('Već postoji unos za ovaj datum. Možeš ga izmeniti.', 'success');
+        }
+    } catch (err) {
+        console.error('Error loading entry:', err);
+    }
+}
+
+function calcRate() {
+    const conversations = parseInt(document.getElementById('m_conversations').value) || 0;
+    const booked = parseInt(document.getElementById('m_booked_calls').value) || 0;
+    const el = document.getElementById('conversionRate');
+
+    if (conversations === 0) {
+        el.textContent = '—';
+        el.className = 'calc-value';
+        return;
+    }
+
+    const rate = Math.round((booked / conversations) * 100);
+    el.textContent = rate + '%';
+
+    if (rate >= 25) {
+        el.className = 'calc-value success';
+    } else if (rate < 10) {
+        el.className = 'calc-value danger';
+    } else {
+        el.className = 'calc-value';
+    }
+}
+
+async function submitEntry() {
+    const btn = document.getElementById('btnSubmit');
+    btn.disabled = true;
+    btn.textContent = 'Šaljem...';
+
+    const selectedDate = document.getElementById('entryDate').value;
+    const payload = {
+        setter: currentUser,
+        date: selectedDate,
+        outbound_new: parseInt(document.getElementById('m_outbound_new').value) || 0,
+        outbound_votes: parseInt(document.getElementById('m_outbound_votes').value) || 0,
+        follow_ups: parseInt(document.getElementById('m_follow_ups').value) || 0,
+        quiz_leads: parseInt(document.getElementById('m_quiz_leads').value) || 0,
+        conversations: parseInt(document.getElementById('m_conversations').value) || 0,
+        booked_calls: parseInt(document.getElementById('m_booked_calls').value) || 0,
+    };
+
+    payload.conversion_rate = payload.conversations > 0
+        ? Math.round((payload.booked_calls / payload.conversations) * 100)
+        : 0;
+
+    try {
+        // Save to Supabase (upsert on user_name + date)
+        await sbUpsert('daily_entries', {
+            user_name: currentUser,
+            date: payload.date,
+            outbound_new: payload.outbound_new,
+            outbound_votes: payload.outbound_votes,
+            follow_ups: payload.follow_ups,
+            quiz_leads: payload.quiz_leads,
+            conversations: payload.conversations,
+            booked_calls: payload.booked_calls,
+            conversion_rate: payload.conversion_rate,
+            updated_at: new Date().toISOString()
+        });
+
+        // Invalidate cache so fresh data is loaded
+        invalidateCache();
+
+        showFeedback('Izveštaj uspešno poslat!', 'success');
+        btn.textContent = 'Poslato ✓';
+
+        // Refresh leaderboard
+        await loadDBAsync();
+        renderLeaderboard();
+    } catch (err) {
+        showFeedback('Greška pri slanju. Pokušaj ponovo.', 'error');
+        btn.disabled = false;
+        btn.textContent = 'Pošalji izveštaj';
+    }
+}
+
+function showFeedback(msg, type) {
+    const el = document.getElementById('submitFeedback');
+    el.textContent = msg;
+    el.className = `submit-feedback ${type}`;
+}
+
+// ════════════════════════════════════════
+// OWNER DASHBOARD
+// ════════════════════════════════════════
+function showOwnerDashboard() {
+    demoData = dbCache || loadDB();
+    document.getElementById('setterApp').classList.remove('active');
+    document.getElementById('loginScreen').style.display = 'none';
+    const app = document.getElementById('ownerApp');
+    app.classList.add('active');
+
+    // Default overview to yesterday
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    document.getElementById('overviewDate').value = formatDate(yesterday);
+    updateOverviewDateDisplay();
+
+    renderOverview();
+    initComparisonDates();
+    updateComparison();
+
+    // Default chart tab to be ready
+    setTimeout(() => updateChart(), 100);
+}
+
+function switchTab(tab) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    event.target.classList.add('active');
+    document.getElementById(`tab-${tab}`).classList.add('active');
+
+    if (tab === 'charts') setTimeout(() => updateChart(), 50);
+    if (tab === 'weekly') renderWeeklyReport();
+}
+
+function updateOverviewDateDisplay() {
+    const val = document.getElementById('overviewDate').value;
+    const d = new Date(val + 'T12:00:00');
+    document.getElementById('overviewDateDisplay').textContent = formatDateDisplay(d);
+}
+
+function onOverviewDateChange() {
+    updateOverviewDateDisplay();
+    renderOverview();
+}
+
+function renderOverview() {
+    const container = document.getElementById('overviewCards');
+    const selectedDate = document.getElementById('overviewDate').value;
+    const displayDate = new Date(selectedDate + 'T12:00:00');
+    const isToday = selectedDate === formatDate(new Date());
+    const dateLabel = isToday ? 'danas' : formatDateDisplay(displayDate);
+
+    container.innerHTML = SETTERS.map(setter => {
+        const data = demoData[setter] || [];
+        const todayData = data.find(d => d.date === selectedDate);
+        const submitted = !!todayData;
+
+        return `
+            <div class="setter-card">
+                <div class="setter-card-header">
+                    <div class="avatar"><img src="${SETTER_PHOTOS[setter]}" alt="${setter}"></div>
+                    <div class="name">${setter}</div>
+                    <span class="status ${submitted ? 'submitted' : 'pending'}">
+                        ${submitted ? 'Poslato' : 'Čeka se'}
+                    </span>
+                </div>
+                ${submitted ? `
+                    <div class="stat-row"><span class="stat-label">Outbound New Followers</span><span class="stat-value">${todayData.outbound_new}</span></div>
+                    <div class="stat-row"><span class="stat-label">Outbound Story Votes</span><span class="stat-value">${todayData.outbound_votes}</span></div>
+                    <div class="stat-row"><span class="stat-label">Follow Ups</span><span class="stat-value">${todayData.follow_ups}</span></div>
+                    <div class="stat-row"><span class="stat-label">Quiz Leads</span><span class="stat-value">${todayData.quiz_leads}</span></div>
+                    <div class="stat-row"><span class="stat-label">Conversations</span><span class="stat-value">${todayData.conversations}</span></div>
+                    <div class="stat-row"><span class="stat-label">Booked Calls</span><span class="stat-value">${todayData.booked_calls}</span></div>
+                    <div class="stat-row"><span class="stat-label">Conversion %</span><span class="stat-value highlight">${todayData.conversion_rate}%</span></div>
+                ` : `
+                    <div style="padding: 24px 0; text-align: center; color: var(--text-muted); font-size: 14px;">
+                        Nema izveštaja za ${dateLabel}
+                    </div>
+                `}
+            </div>
+        `;
+    }).join('');
+}
+
+// ── Charts ──
+const CHART_COLORS = {
+    Lazar: '#DBFF00',
+    Ana: '#00D4FF',
+};
+
+function updateChart() {
+    const setter = document.getElementById('chartSetter').value;
+    const metric = document.getElementById('chartMetric').value;
+    const range = parseInt(document.getElementById('chartRange').value);
+    const canvas = document.getElementById('mainChart');
+    const ctx = canvas.getContext('2d');
+
+    if (chartInstance) chartInstance.destroy();
+
+    const settersToShow = setter === 'all' ? SETTERS : [setter];
+    const metricLabel = METRICS.find(m => m.key === metric).label;
+
+    const datasets = settersToShow.map(s => {
+        const data = demoData[s].slice(-range);
+        return {
+            label: s,
+            data: data.map(d => d[metric]),
+            borderColor: CHART_COLORS[s],
+            backgroundColor: CHART_COLORS[s] + '20',
+            borderWidth: 2,
+            pointRadius: 3,
+            pointHoverRadius: 6,
+            tension: 0.3,
+            fill: settersToShow.length === 1,
+        };
+    });
+
+    const labels = demoData[settersToShow[0]].slice(-range).map(d => {
+        const date = new Date(d.date);
+        return date.toLocaleDateString('sr-Latn', { day: 'numeric', month: 'short' });
+    });
+
+    chartInstance = new Chart(ctx, {
+        type: 'line',
+        data: { labels, datasets },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { intersect: false, mode: 'index' },
+            plugins: {
+                legend: {
+                    display: settersToShow.length > 1,
+                    labels: { color: '#a3a894', font: { family: 'Montserrat', weight: '600' } },
+                },
+                tooltip: {
+                    backgroundColor: '#1e2512',
+                    titleColor: '#f0f0e8',
+                    bodyColor: '#a3a894',
+                    borderColor: 'rgba(255,255,255,0.1)',
+                    borderWidth: 1,
+                    titleFont: { family: 'Montserrat', weight: '700' },
+                    bodyFont: { family: 'Montserrat' },
+                    padding: 12,
+                    cornerRadius: 8,
+                },
+            },
+            scales: {
+                x: {
+                    ticks: { color: '#6b7060', font: { family: 'Montserrat', size: 11 } },
+                    grid: { color: 'rgba(255,255,255,0.05)' },
+                },
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        color: '#6b7060',
+                        font: { family: 'Montserrat', size: 11 },
+                        callback: v => metric === 'conversion_rate' ? v + '%' : v,
+                    },
+                    grid: { color: 'rgba(255,255,255,0.05)' },
+                },
+            },
+        },
+    });
+}
+
+// ── Comparison ──
+function initComparisonDates() {
+    const today = new Date();
+    const weekAgo = new Date(today);
+    weekAgo.setDate(weekAgo.getDate() - 7);
+    document.getElementById('compFrom').value = formatDate(weekAgo);
+    document.getElementById('compTo').value = formatDate(today);
+}
+
+function updateComparison() {
+    const from = document.getElementById('compFrom').value;
+    const to = document.getElementById('compTo').value;
+    if (!from || !to) return;
+
+    const body = document.getElementById('compBody');
+    const metricKeys = METRICS.map(m => m.key);
+
+    // Aggregate data per setter
+    const agg = {};
+    SETTERS.forEach(s => {
+        agg[s] = {};
+        metricKeys.forEach(k => { agg[s][k] = 0; agg[s][k + '_count'] = 0; });
+
+        demoData[s].forEach(d => {
+            if (d.date >= from && d.date <= to) {
+                metricKeys.forEach(k => {
+                    agg[s][k] += d[k];
+                    agg[s][k + '_count']++;
+                });
+            }
+        });
+    });
+
+    body.innerHTML = METRICS.map(m => {
+        const vals = SETTERS.map(s => {
+            if (m.key === 'conversion_rate') {
+                const count = agg[s][m.key + '_count'];
+                return count > 0 ? Math.round(agg[s][m.key] / count) : 0;
+            }
+            return agg[s][m.key];
+        });
+
+        const maxVal = Math.max(...vals);
+
+        return `<tr>
+            <td>${m.label}</td>
+            ${SETTERS.map((s, i) => {
+                const display = m.key === 'conversion_rate' ? vals[i] + '%' : vals[i];
+                const isBest = vals[i] === maxVal && maxVal > 0;
+                return `<td class="${isBest ? 'best' : ''}">${display}</td>`;
+            }).join('')}
+        </tr>`;
+    }).join('');
+}
+
+// ════════════════════════════════════════
+// WEEKLY REPORT
+// ════════════════════════════════════════
+let reportWeekOffset = 0; // 0 = last completed week, -1 = week before, etc.
+
+function getWeekRange(offset) {
+    const now = new Date();
+    // Find last Monday (start of current week)
+    const dayOfWeek = now.getDay(); // 0=Sun, 1=Mon...
+    const daysSinceMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+
+    // Start of THIS week (Monday)
+    const thisMonday = new Date(now);
+    thisMonday.setDate(now.getDate() - daysSinceMonday);
+    thisMonday.setHours(0, 0, 0, 0);
+
+    // Default (offset=0) = last completed week (Monday to Sunday before this week)
+    const weekStart = new Date(thisMonday);
+    weekStart.setDate(thisMonday.getDate() - 7 + (offset * 7));
+    const weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekStart.getDate() + 6);
+
+    return { start: weekStart, end: weekEnd };
+}
+
+function getWeekDays(weekRange) {
+    const days = [];
+    for (let i = 0; i < 7; i++) {
+        const d = new Date(weekRange.start);
+        d.setDate(weekRange.start.getDate() + i);
+        days.push(d);
+    }
+    return days;
+}
+
+const DAY_NAMES_SHORT = ['pon', 'uto', 'sre', 'čet', 'pet', 'sub', 'ned'];
+
+function changeReportWeek(dir) {
+    reportWeekOffset += dir;
+    if (reportWeekOffset > 0) reportWeekOffset = 0; // can't go to future
+    renderWeeklyReport();
+}
+
+function renderWeeklyReport() {
+    const week = getWeekRange(reportWeekOffset);
+    const days = getWeekDays(week);
+    const dayStrings = days.map(d => formatDate(d));
+
+    const opts = { day: 'numeric', month: 'short' };
+    document.getElementById('weekLabel').textContent =
+        `${week.start.toLocaleDateString('sr-Latn', opts)} — ${week.end.toLocaleDateString('sr-Latn', opts)}, ${week.end.getFullYear()}`;
+
+    const container = document.getElementById('weeklyReportContent');
+    const db = loadDB();
+
+    let hasAnyData = false;
+    let grandTotals = { leads: 0, follow_ups: 0, conversations: 0, booked_calls: 0 };
+
+    const setterData = SETTERS.map(setter => {
+        const entries = db[setter] || [];
+        const weekEntries = dayStrings.map(ds => entries.find(e => e.date === ds) || null);
+        const validEntries = weekEntries.filter(e => e !== null);
+        if (validEntries.length > 0) hasAnyData = true;
+
+        const leads = validEntries.reduce((s, e) => s + (e.outbound_new || 0) + (e.outbound_votes || 0) + (e.quiz_leads || 0), 0);
+        const follow_ups = validEntries.reduce((s, e) => s + (e.follow_ups || 0), 0);
+        const conversations = validEntries.reduce((s, e) => s + (e.conversations || 0), 0);
+        const booked_calls = validEntries.reduce((s, e) => s + (e.booked_calls || 0), 0);
+        const convRate = conversations > 0 ? Math.round((booked_calls / conversations) * 100) : 0;
+
+        grandTotals.leads += leads;
+        grandTotals.follow_ups += follow_ups;
+        grandTotals.conversations += conversations;
+        grandTotals.booked_calls += booked_calls;
+
+        return { setter, weekEntries, validEntries, days, leads, follow_ups, conversations, booked_calls, convRate };
+    });
+
+    if (!hasAnyData) {
+        container.innerHTML = `<div class="no-report-data">Nema podataka za ovu nedelju.</div>`;
+        return;
+    }
+
+    const grandConvRate = grandTotals.conversations > 0 ? Math.round((grandTotals.booked_calls / grandTotals.conversations) * 100) : 0;
+
+    // Team total section
+    let html = `
+    <div class="report-setter-section report-team-total">
+        <div class="report-setter-header">
+            <div class="name">Ukupno (svi setteri)</div>
+        </div>
+        <div class="report-summary-grid report-4col">
+            <div class="report-summary-stat">
+                <div class="stat-num">${grandTotals.leads}</div>
+                <div class="stat-lbl">Leadovi</div>
+            </div>
+            <div class="report-summary-stat">
+                <div class="stat-num">${grandTotals.follow_ups}</div>
+                <div class="stat-lbl">Follow Ups</div>
+            </div>
+            <div class="report-summary-stat">
+                <div class="stat-num">${grandTotals.conversations}</div>
+                <div class="stat-lbl">Konverzacije</div>
+            </div>
+            <div class="report-summary-stat">
+                <div class="stat-num" style="color: var(--accent)">${grandTotals.booked_calls}</div>
+                <div class="stat-lbl">Booked Calls</div>
+            </div>
+        </div>
+        <div style="text-align:center;color:var(--text-muted);font-size:0.85rem;margin-top:8px;">
+            Conversion rate: <strong style="color:var(--accent)">${grandConvRate}%</strong>
+        </div>
+    </div>`;
+
+    // Per-setter sections
+    html += setterData.map(sd => {
+        const { setter, weekEntries, validEntries, leads, follow_ups, conversations, booked_calls, convRate } = sd;
+
+        // Daily booked calls grid
+        const dailyCells = weekEntries.map((entry, i) => {
+            const dayName = DAY_NAMES_SHORT[i];
+            const dayNum = days[i].getDate();
+            if (!entry) {
+                return `<div class="report-day-cell no-data">
+                    <div class="day-name">${dayName} ${dayNum}.</div>
+                    <div class="day-val">—</div>
+                </div>`;
+            }
+            return `<div class="report-day-cell">
+                <div class="day-name">${dayName} ${dayNum}.</div>
+                <div class="day-val">${entry.booked_calls}</div>
+            </div>`;
+        }).join('');
+
+        // Insights
+        const insights = generateInsights(setter, weekEntries, days, validEntries, booked_calls);
+
+        return `
+        <div class="report-setter-section">
+            <div class="report-setter-header">
+                <div class="avatar"><img src="${SETTER_PHOTOS[setter]}" alt="${setter}"></div>
+                <div class="name">${setter}</div>
+            </div>
+
+            <div class="report-summary-grid report-4col">
+                <div class="report-summary-stat">
+                    <div class="stat-num">${leads}</div>
+                    <div class="stat-lbl">Leadovi</div>
+                </div>
+                <div class="report-summary-stat">
+                    <div class="stat-num">${follow_ups}</div>
+                    <div class="stat-lbl">Follow Ups</div>
+                </div>
+                <div class="report-summary-stat">
+                    <div class="stat-num">${conversations}</div>
+                    <div class="stat-lbl">Konverzacije</div>
+                </div>
+                <div class="report-summary-stat">
+                    <div class="stat-num" style="color: var(--accent)">${booked_calls}</div>
+                    <div class="stat-lbl">Booked Calls</div>
+                </div>
+            </div>
+            <div style="text-align:center;color:var(--text-muted);font-size:0.85rem;margin-top:8px;">
+                Conversion rate: <strong style="color:var(--accent)">${convRate}%</strong>
+            </div>
+
+            <div class="report-daily-grid">${dailyCells}</div>
+
+            ${insights.length > 0 ? `
+            <div class="report-insights">
+                <h4>Zapažanja</h4>
+                ${insights.map(ins => `
+                    <div class="insight-item">
+                        <span class="insight-icon">${ins.icon}</span>
+                        <span>${ins.text}</span>
+                    </div>
+                `).join('')}
+            </div>` : ''}
+        </div>`;
+    }).join('');
+
+    container.innerHTML = html;
+}
+
+function generateInsights(setter, weekEntries, days, validEntries, totalBooked) {
+    const insights = [];
+    if (validEntries.length === 0) return insights;
+
+    const dayLabels = days.map(d => d.toLocaleDateString('sr-Latn', { weekday: 'long', day: 'numeric', month: 'long' }));
+
+    // Best day
+    let bestDay = null, bestVal = -1;
+    weekEntries.forEach((e, i) => {
+        if (e && e.booked_calls > bestVal) { bestVal = e.booked_calls; bestDay = i; }
+    });
+    if (bestDay !== null && bestVal > 0) {
+        insights.push({
+            icon: '⭐',
+            text: `Najbolji dan: <strong>${dayLabels[bestDay]}</strong> — ${bestVal} booked calls`
+        });
+    }
+
+    // Detect drops (0 after 2+)
+    for (let i = 1; i < weekEntries.length; i++) {
+        const prev = weekEntries[i - 1];
+        const curr = weekEntries[i];
+        if (prev && curr && prev.booked_calls >= 2 && curr.booked_calls === 0) {
+            insights.push({
+                icon: '🔴',
+                text: `<strong>Pad</strong> u ${dayLabels[i]} — 0 booked calls (prethodni dan: ${prev.booked_calls}). Šta se desilo?`
+            });
+        }
+    }
+
+    // Detect drops in conversations
+    for (let i = 1; i < weekEntries.length; i++) {
+        const prev = weekEntries[i - 1];
+        const curr = weekEntries[i];
+        if (prev && curr && prev.conversations >= 4 && curr.conversations <= 1) {
+            insights.push({
+                icon: '📉',
+                text: `Pad konverzacija u ${dayLabels[i]} (${curr.conversations} vs ${prev.conversations} dan ranije)`
+            });
+        }
+    }
+
+    // Missing days (Mon-Fri only)
+    const missingWorkdays = [];
+    weekEntries.forEach((e, i) => {
+        if (i < 5 && e === null) missingWorkdays.push(DAY_NAMES_SHORT[i]);
+    });
+    if (missingWorkdays.length > 0) {
+        insights.push({
+            icon: '⚠️',
+            text: `Nema izveštaja za: ${missingWorkdays.join(', ')}`
+        });
+    }
+
+    return insights;
+}
+
+// ── Init ──
+document.addEventListener('DOMContentLoaded', () => {
+    // PIN input: Enter to submit
+    document.getElementById('pinInput').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') verifyPin();
+        if (e.key === 'Escape') closePinPrompt();
+    });
+});
+</script>
+
+</body>
+</html>

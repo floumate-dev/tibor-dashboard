@@ -1,0 +1,748 @@
+<script>
+/* ============================================================
+   COUNTRY CODES + PHONE VALIDATION
+============================================================ */
+const COUNTRY_DATA = {
+  // Region (ex-YU + komšije)
+  RS: { dial: '+381', flag: '🇷🇸', name: 'Srbija',          min: 8, max: 9, placeholder: '631234567' },
+  ME: { dial: '+382', flag: '🇲🇪', name: 'Crna Gora',       min: 8, max: 8, placeholder: '67123456' },
+  HR: { dial: '+385', flag: '🇭🇷', name: 'Hrvatska',        min: 8, max: 9, placeholder: '912345678' },
+  BA: { dial: '+387', flag: '🇧🇦', name: 'Bosna i Herc.',  min: 8, max: 8, placeholder: '61234567' },
+  SI: { dial: '+386', flag: '🇸🇮', name: 'Slovenija',       min: 8, max: 8, placeholder: '40123456' },
+  MK: { dial: '+389', flag: '🇲🇰', name: 'S. Makedonija',  min: 8, max: 8, placeholder: '70123456' },
+  AL: { dial: '+355', flag: '🇦🇱', name: 'Albanija',        min: 8, max: 9, placeholder: '691234567' },
+  // EU
+  AT: { dial: '+43',  flag: '🇦🇹', name: 'Austrija',        min: 10, max: 13, placeholder: '6601234567' },
+  DE: { dial: '+49',  flag: '🇩🇪', name: 'Nemačka',         min: 10, max: 11, placeholder: '1701234567' },
+  CH: { dial: '+41',  flag: '🇨🇭', name: 'Švajcarska',      min: 9, max: 9, placeholder: '781234567' },
+  IT: { dial: '+39',  flag: '🇮🇹', name: 'Italija',         min: 9, max: 10, placeholder: '3451234567' },
+  FR: { dial: '+33',  flag: '🇫🇷', name: 'Francuska',       min: 9, max: 9, placeholder: '612345678' },
+  GB: { dial: '+44',  flag: '🇬🇧', name: 'V. Britanija',    min: 10, max: 10, placeholder: '7400123456' },
+  ES: { dial: '+34',  flag: '🇪🇸', name: 'Španija',         min: 9, max: 9, placeholder: '612345678' },
+  NL: { dial: '+31',  flag: '🇳🇱', name: 'Holandija',       min: 9, max: 9, placeholder: '612345678' },
+  BE: { dial: '+32',  flag: '🇧🇪', name: 'Belgija',         min: 8, max: 9, placeholder: '470123456' },
+  IE: { dial: '+353', flag: '🇮🇪', name: 'Irska',           min: 7, max: 9, placeholder: '851234567' },
+  PT: { dial: '+351', flag: '🇵🇹', name: 'Portugal',        min: 9, max: 9, placeholder: '912345678' },
+  GR: { dial: '+30',  flag: '🇬🇷', name: 'Grčka',           min: 10, max: 10, placeholder: '6912345678' },
+  CZ: { dial: '+420', flag: '🇨🇿', name: 'Češka',           min: 9, max: 9, placeholder: '601234567' },
+  SK: { dial: '+421', flag: '🇸🇰', name: 'Slovačka',        min: 9, max: 9, placeholder: '901234567' },
+  PL: { dial: '+48',  flag: '🇵🇱', name: 'Poljska',         min: 9, max: 9, placeholder: '512345678' },
+  HU: { dial: '+36',  flag: '🇭🇺', name: 'Mađarska',        min: 8, max: 9, placeholder: '201234567' },
+  RO: { dial: '+40',  flag: '🇷🇴', name: 'Rumunija',        min: 9, max: 9, placeholder: '712345678' },
+  BG: { dial: '+359', flag: '🇧🇬', name: 'Bugarska',        min: 8, max: 9, placeholder: '881234567' },
+  SE: { dial: '+46',  flag: '🇸🇪', name: 'Švedska',         min: 8, max: 10, placeholder: '701234567' },
+  NO: { dial: '+47',  flag: '🇳🇴', name: 'Norveška',        min: 8, max: 8, placeholder: '41234567' },
+  DK: { dial: '+45',  flag: '🇩🇰', name: 'Danska',          min: 8, max: 8, placeholder: '20123456' },
+  FI: { dial: '+358', flag: '🇫🇮', name: 'Finska',          min: 9, max: 11, placeholder: '401234567' },
+  // Vanevropa
+  US: { dial: '+1',   flag: '🇺🇸', name: 'SAD',             min: 10, max: 10, placeholder: '2125550123' },
+  CA: { dial: '+1',   flag: '🇨🇦', name: 'Kanada',          min: 10, max: 10, placeholder: '4165550123' },
+  AU: { dial: '+61',  flag: '🇦🇺', name: 'Australija',      min: 9, max: 9, placeholder: '412345678' },
+  TR: { dial: '+90',  flag: '🇹🇷', name: 'Turska',          min: 10, max: 10, placeholder: '5321234567' },
+};
+
+const COUNTRY_ORDER = ['RS','ME','HR','BA','SI','MK','AL','AT','DE','CH','IT','FR','GB','ES','NL','BE','IE','PT','GR','CZ','SK','PL','HU','RO','BG','SE','NO','DK','FI','US','CA','AU','TR'];
+
+function populateCountrySelect() {
+  const sel = document.getElementById('phoneCountry');
+  if (!sel) return;
+  sel.innerHTML = COUNTRY_ORDER.map(code => {
+    const c = COUNTRY_DATA[code];
+    return `<option value="${code}">${c.flag} ${c.dial}</option>`;
+  }).join('');
+  sel.value = 'RS'; // default fallback
+  updatePhonePlaceholder();
+  sel.addEventListener('change', updatePhonePlaceholder);
+}
+
+function updatePhonePlaceholder() {
+  const code = document.getElementById('phoneCountry')?.value || 'RS';
+  const data = COUNTRY_DATA[code];
+  const input = document.getElementById('telefon');
+  if (input && data) input.placeholder = data.placeholder;
+}
+
+async function detectCountryFromIp() {
+  try {
+    const r = await fetch('https://ipapi.co/json/', { cache: 'no-store' });
+    if (!r.ok) throw new Error('IP geo failed');
+    const d = await r.json();
+    const cc = (d.country_code || '').toUpperCase();
+    if (cc && COUNTRY_DATA[cc]) {
+      const sel = document.getElementById('phoneCountry');
+      if (sel) {
+        sel.value = cc;
+        updatePhonePlaceholder();
+      }
+    }
+  } catch (e) {
+    // Tihi failover na default RS
+  }
+}
+
+/* ============================================================
+   STATE
+============================================================ */
+const state = {
+  diet: 'balance',
+  ime: '', prezime: '',
+  visina_cm: 0, tezina_kg: 0,
+  pol: '', // 'M' | 'Z'
+  dob_dan: 0, dob_mesec: 0, dob_godina: 0,
+  email: '', telefon: '',
+  aktivnost: 0, // faktor (1.55, 1.375, 1.20)
+  telo: '', // manjak | normalno | visak
+  san: -1, energija: -1, stres: -1,
+  // computed
+  godine: 0, visina_m: 0,
+  bmr: 0, tdee: 0, bmi: 0, bmiCategory: '',
+  fatPct: 0, lbmKg: 0, lbmPct: 0, waterPct: 0,
+  bloodPct: 0, organsPct: 0, bonesPct: 0,
+  bodyType: ''
+};
+
+const SCREENS = ['1', '2', '3', '4', '5', 'results-1', '6', '7', '8', 'results-2'];
+let screenIdx = 0;
+
+/* ============================================================
+   NAVIGATION
+============================================================ */
+function showScreen(idx) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const target = SCREENS[idx];
+  const el = document.querySelector(`.screen[data-screen="${target}"]`);
+  if (el) el.classList.add('active');
+  screenIdx = idx;
+
+  // Step indicator (1-8 visible, results screens reuse adjacent step number)
+  const stepMap = { '1': 1, '2': 2, '3': 3, '4': 4, '5': 5, 'results-1': 5, '6': 6, '7': 7, '8': 8, 'results-2': 8 };
+  const stepNum = stepMap[target];
+  document.getElementById('stepNow').textContent = stepNum;
+
+  // Update segment timeline
+  const segs = document.querySelectorAll('#segments .seg');
+  segs.forEach((s, i) => {
+    s.classList.remove('done', 'current');
+    if (i + 1 < stepNum) s.classList.add('done');
+    else if (i + 1 === stepNum) s.classList.add(target === 'results-2' ? 'done' : 'current');
+  });
+
+  // Remaining count text
+  const remaining = 8 - stepNum;
+  let remainingTxt;
+  if (target === 'results-2') remainingTxt = 'gotovo';
+  else if (remaining === 0) remainingTxt = 'završni korak';
+  else if (remaining === 1) remainingTxt = 'još 1 korak';
+  else remainingTxt = `još ${remaining} koraka`;
+  document.getElementById('stepRemaining').textContent = remainingTxt;
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+document.querySelectorAll('[data-next]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    if (!validateCurrent()) return;
+    saveCurrent();
+    if (SCREENS[screenIdx + 1] === 'results-1') runCalculations1();
+    if (SCREENS[screenIdx + 1] === 'results-2') runCalculations2();
+    showScreen(screenIdx + 1);
+  });
+});
+document.querySelectorAll('[data-prev]').forEach(btn => {
+  btn.addEventListener('click', () => showScreen(screenIdx - 1));
+});
+
+// Auto-advance on radio steps
+document.querySelectorAll('[data-auto-next] input[type="radio"]').forEach(input => {
+  input.addEventListener('change', () => {
+    const section = input.closest('[data-auto-next]');
+    if (!section || !section.classList.contains('active')) return;
+    setTimeout(() => {
+      const btn = section.querySelector('[data-next]');
+      if (btn) btn.click();
+    }, 280);
+  });
+});
+
+/* ============================================================
+   VALIDATION + SAVE
+============================================================ */
+function clearError(el) { el.classList.remove('error'); }
+function setError(el) { el.classList.add('error'); }
+
+function validateCurrent() {
+  const screen = SCREENS[screenIdx];
+  let valid = true;
+
+  if (screen === '1') {
+    const v = document.querySelector('input[name="diet"]:checked');
+    if (!v) valid = false;
+  }
+  if (screen === '2') {
+    const ime = document.getElementById('ime');
+    const prezime = document.getElementById('prezime');
+    const email = document.getElementById('email');
+    const telefon = document.getElementById('telefon');
+
+    [ime, prezime, email, telefon].forEach(el => clearError(el.closest('.field')));
+
+    if (!ime.value.trim()) { setError(ime.closest('.field')); valid = false; }
+    if (!prezime.value.trim()) { setError(prezime.closest('.field')); valid = false; }
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email.value)) { setError(email.closest('.field')); valid = false; }
+
+    // Phone — country-aware validation
+    const phoneCountry = document.getElementById('phoneCountry').value;
+    const rules = COUNTRY_DATA[phoneCountry];
+    const digits = telefon.value.replace(/\D/g, '');
+    const errEl = document.getElementById('telefonErr');
+    if (digits.length < rules.min) {
+      setError(telefon.closest('.field'));
+      errEl.textContent = `Broj mora imati najmanje ${rules.min} cifara nakon ${rules.dial}.`;
+      valid = false;
+    } else if (digits.length > rules.max) {
+      setError(telefon.closest('.field'));
+      errEl.textContent = `Broj može imati najviše ${rules.max} cifara nakon ${rules.dial}.`;
+      valid = false;
+    }
+  }
+  if (screen === '3') {
+    const visina = document.getElementById('visina');
+    const tezina = document.getElementById('tezina');
+    const pol = document.querySelector('input[name="pol"]:checked');
+    const dan = document.getElementById('dob_dan');
+    const mesec = document.getElementById('dob_mesec');
+    const godina = document.getElementById('dob_godina');
+
+    [visina, tezina, dan, mesec, godina].forEach(el => clearError(el.closest('.field')));
+
+    const vNum = parseFloat(visina.value);
+    if (!vNum || vNum < 120 || vNum > 220) { setError(visina.closest('.field')); valid = false; }
+    const tNum = parseFloat(tezina.value);
+    if (!tNum || tNum < 35 || tNum > 250) { setError(tezina.closest('.field')); valid = false; }
+
+    if (!pol) {
+      document.getElementById('polErr').style.display = 'block';
+      valid = false;
+    } else {
+      document.getElementById('polErr').style.display = 'none';
+    }
+
+    const dNum = parseInt(dan.value, 10);
+    const mNum = parseInt(mesec.value, 10);
+    const gNum = parseInt(godina.value, 10);
+    const validDate = dNum >= 1 && dNum <= 31 && mNum >= 1 && mNum <= 12 && gNum >= 1925 && gNum <= 2015;
+    if (!validDate) {
+      document.getElementById('dobErr').style.display = 'block';
+      valid = false;
+    } else {
+      document.getElementById('dobErr').style.display = 'none';
+    }
+  }
+  if (screen === '4') {
+    if (!document.querySelector('input[name="aktivnost"]:checked')) valid = false;
+  }
+  if (screen === '5') {
+    if (!document.querySelector('input[name="telo"]:checked')) valid = false;
+  }
+  if (screen === '6') {
+    if (!document.querySelector('input[name="san"]:checked')) valid = false;
+  }
+  if (screen === '7') {
+    if (!document.querySelector('input[name="energija"]:checked')) valid = false;
+  }
+  if (screen === '8') {
+    if (!document.querySelector('input[name="stres"]:checked')) valid = false;
+  }
+
+  return valid;
+}
+
+function saveCurrent() {
+  const screen = SCREENS[screenIdx];
+  if (screen === '1') {
+    state.diet = document.querySelector('input[name="diet"]:checked').value;
+  }
+  if (screen === '2') {
+    state.ime = document.getElementById('ime').value.trim();
+    state.prezime = document.getElementById('prezime').value.trim();
+    state.email = document.getElementById('email').value.trim();
+    const cc = document.getElementById('phoneCountry').value;
+    const subscriber = document.getElementById('telefon').value.replace(/\D/g, '');
+    state.telefon = `${COUNTRY_DATA[cc].dial} ${subscriber}`;
+    state.telefon_country = cc;
+  }
+  if (screen === '3') {
+    state.visina_cm = parseFloat(document.getElementById('visina').value);
+    state.tezina_kg = parseFloat(document.getElementById('tezina').value);
+    state.pol = document.querySelector('input[name="pol"]:checked').value;
+    state.dob_dan = parseInt(document.getElementById('dob_dan').value, 10);
+    state.dob_mesec = parseInt(document.getElementById('dob_mesec').value, 10);
+    state.dob_godina = parseInt(document.getElementById('dob_godina').value, 10);
+  }
+  if (screen === '4') {
+    state.aktivnost = parseFloat(document.querySelector('input[name="aktivnost"]:checked').value);
+  }
+  if (screen === '5') {
+    state.telo = document.querySelector('input[name="telo"]:checked').value;
+  }
+  if (screen === '6') {
+    state.san = parseInt(document.querySelector('input[name="san"]:checked').value, 10);
+  }
+  if (screen === '7') {
+    state.energija = parseInt(document.querySelector('input[name="energija"]:checked').value, 10);
+  }
+  if (screen === '8') {
+    state.stres = parseInt(document.querySelector('input[name="stres"]:checked').value, 10);
+  }
+}
+
+/* ============================================================
+   CALCULATIONS
+============================================================ */
+/* Vokativ — Srpski padež za obraćanje */
+const VOCATIVE_OVERRIDES_M = {
+  'petar': 'Petre',
+  'aleksandar': 'Aleksandre',
+  'vuk': 'Vuče',
+  'jovan': 'Jovane',
+  'milovan': 'Milovane',
+  'oliver': 'Olivere',
+  'igor': 'Igore'
+};
+const VOCATIVE_OVERRIDES_Z = {
+  // Većina ženskih -a imena ide kroz pravilo -a → -o
+};
+
+function toVocative(name, gender) {
+  if (!name) return '';
+  const trimmed = String(name).trim();
+  if (!trimmed) return '';
+  const lower = trimmed.toLowerCase();
+
+  // Override liste
+  if (gender === 'M' && VOCATIVE_OVERRIDES_M[lower]) return VOCATIVE_OVERRIDES_M[lower];
+  if (gender === 'Z' && VOCATIVE_OVERRIDES_Z[lower]) return VOCATIVE_OVERRIDES_Z[lower];
+
+  const last = trimmed.slice(-1).toLowerCase();
+
+  // Ženska imena ostaju ista (Marija, Ana, Jelena, Tijana — kolokvijalno se ne menjaju)
+  if (gender === 'Z') return trimmed;
+
+  // Muška imena koja se završavaju na samoglasnik (osim a) → ostaju ista
+  // Marko, Đorđe, Vasilije, Aleksije
+  if (last === 'o' || last === 'e' || last === 'i' || last === 'u') return trimmed;
+
+  // Muška imena na -a → -o (Nikola → Nikolo, Ilija → Ilijo, Aleksa → Alekso)
+  if (last === 'a') return trimmed.slice(0, -1) + 'o';
+
+  // Muška imena na suglasnik → +e (Dušan → Dušane, Stefan → Stefane, Milan → Milane)
+  return trimmed + 'e';
+}
+
+function calcAge(d, m, y) {
+  const today = new Date();
+  let age = today.getFullYear() - y;
+  const tm = today.getMonth() + 1;
+  const td = today.getDate();
+  if (tm < m || (tm === m && td < d)) age -= 1;
+  return age;
+}
+
+function bmiCategoryLabel(bmi) {
+  if (bmi < 18.5) return 'Neuhranjenost';
+  if (bmi < 25) return 'Normalna težina';
+  if (bmi < 29.5) return 'Prekomerna težina';
+  if (bmi < 35) return 'Gojaznost stepena 1';
+  if (bmi < 39.5) return 'Gojaznost stepena 2';
+  return 'Gojaznost stepena 3';
+}
+
+const FAT_ZONES = {
+  M: [
+    { name: 'Sportska',     min: 6,  max: 14, color: 'z-green'  },
+    { name: 'Normalna',     min: 14, max: 19, color: 'z-green'  },
+    { name: 'Povišena',     min: 19, max: 25, color: 'z-yellow' },
+    { name: 'Rizična',      min: 25, max: 30, color: 'z-orange' },
+    { name: 'Vrlo rizična', min: 30, max: 45, color: 'z-red'    }
+  ],
+  Z: [
+    { name: 'Sportska',     min: 14, max: 21, color: 'z-green'  },
+    { name: 'Normalna',     min: 21, max: 25, color: 'z-green'  },
+    { name: 'Povišena',     min: 25, max: 32, color: 'z-yellow' },
+    { name: 'Rizična',      min: 32, max: 38, color: 'z-orange' },
+    { name: 'Vrlo rizična', min: 38, max: 50, color: 'z-red'    }
+  ]
+};
+
+function renderFatZones(fatPct, isM) {
+  const zones = isM ? FAT_ZONES.M : FAT_ZONES.Z;
+  const bar = document.getElementById('fatZonesBar');
+  const legend = document.getElementById('fatZonesLegend');
+  const valueEl = document.getElementById('fatZoneValue');
+  if (!bar || !legend || !valueEl) return;
+
+  valueEl.textContent = fatPct;
+
+  const activeIdx = zones.findIndex(z => fatPct >= z.min && fatPct < z.max);
+  const safeActive = activeIdx === -1
+    ? (fatPct < zones[0].min ? 0 : zones.length - 1)
+    : activeIdx;
+
+  bar.innerHTML = '';
+  zones.forEach((z, i) => {
+    const seg = document.createElement('div');
+    seg.className = `zone ${z.color}` + (i === safeActive ? ' active' : '');
+    bar.appendChild(seg);
+  });
+
+  const totalMin = zones[0].min;
+  const totalMax = zones[zones.length - 1].max;
+  const clamped = Math.min(Math.max(fatPct, totalMin), totalMax);
+  const pct = ((clamped - totalMin) / (totalMax - totalMin)) * 100;
+  const marker = document.createElement('div');
+  marker.className = 'marker';
+  marker.style.left = pct + '%';
+  bar.appendChild(marker);
+
+  legend.innerHTML = '';
+  zones.forEach((z, i) => {
+    const leg = document.createElement('div');
+    leg.className = `leg ${z.color}` + (i === safeActive ? ' active' : '');
+    leg.innerHTML = `<span class="leg-name">${z.name}</span><span class="leg-range">${z.min}–${z.max}%</span>`;
+    legend.appendChild(leg);
+  });
+}
+
+function determineBodyType(bmi, fatPct, lbmPct, gender) {
+  // gender: 'M' | 'Z'
+  const isM = gender === 'M';
+  // Order: most specific / extreme first
+  if (bmi > 30 && fatPct > (isM ? 28 : 35)) return 'Gojaznost';
+  if (bmi >= 25 && bmi <= 30 && fatPct > (isM ? 22 : 30) && lbmPct < (isM ? 42 : 32)) return 'Višak kilograma';
+  if (bmi >= 25 && bmi <= 30 && fatPct <= (isM ? 18 : 25) && lbmPct >= (isM ? 47 : 37)) return 'Mišićava građa';
+  if (bmi >= 22 && bmi <= 26 && fatPct <= (isM ? 18 : 25) && lbmPct >= (isM ? 43 : 33)) return 'Atletska građa';
+  if (bmi < 20 && fatPct < (isM ? 18 : 25) && lbmPct < (isM ? 40 : 30)) return 'Mršav';
+  if (bmi >= 18.5 && bmi < 25 && fatPct > (isM ? 22 : 30) && lbmPct < (isM ? 38 : 28)) return 'Mršav i mekan';
+  return 'Prosečna građa';
+}
+
+function runCalculations1() {
+  const isM = state.pol === 'M';
+  const kg = state.tezina_kg;
+  const cm = state.visina_cm;
+  const m = cm / 100;
+  state.visina_m = m;
+  state.godine = calcAge(state.dob_dan, state.dob_mesec, state.dob_godina);
+  const age = state.godine;
+
+  // BMR (Mifflin-St Jeor)
+  const bmr = isM
+    ? (10 * kg) + (6.25 * cm) - (5 * age) + 5
+    : (10 * kg) + (6.25 * cm) - (5 * age) - 161;
+  state.bmr = Math.round(bmr);
+
+  // TDEE
+  state.tdee = Math.round(bmr * state.aktivnost);
+
+  // BMI
+  const bmi = kg / (m * m);
+  state.bmi = +(bmi).toFixed(1);
+  state.bmiCategory = bmiCategoryLabel(bmi);
+
+  // % masti — CUN-BAE (2012)
+  const sexF = isM ? 0 : 1;
+  const fat = -44.988 + (0.503 * age) + (10.689 * sexF)
+            + (3.172 * bmi) - (0.026 * bmi * bmi)
+            + (0.181 * bmi * sexF)
+            - (0.02 * bmi * age)
+            - (0.005 * bmi * bmi * sexF)
+            + (0.00021 * bmi * bmi * age);
+  state.fatPct = +(fat).toFixed(1);
+
+  // % vode — Watson
+  const tbw = isM
+    ? 2.447 - (0.09156 * age) + (0.1074 * cm) + (0.3362 * kg)
+    : -2.097 + (0.1069 * cm) + (0.2466 * kg);
+  state.waterPct = +((tbw * 100) / kg).toFixed(1);
+
+  // Skeletna mišićna masa — Lee (2000)
+  const smm = (0.244 * kg) + (7.80 * m) - (0.098 * age) + (6.6 * (isM ? 1 : 0)) - 3.3;
+  state.lbmKg = +(smm).toFixed(1);
+  state.lbmPct = +((smm / kg) * 100).toFixed(1);
+
+  // Volumen krvi — Nadler
+  const m3 = m * m * m;
+  const blood = isM
+    ? (0.3669 * m3) + (0.03219 * kg) + 0.6041
+    : (0.3561 * m3) + (0.03308 * kg) + 0.1833;
+  const bloodKg = blood * 1.06;
+  state.bloodPct = +((bloodKg / kg) * 100).toFixed(1);
+
+  // Organi
+  const organsKg = isM ? kg * 0.058 : kg * 0.053;
+  state.organsPct = +((organsKg / kg) * 100).toFixed(1);
+
+  // Kosti
+  const bonesKg = isM ? (0.0290 * kg + 0.7426) : (0.0245 * kg + 0.6920);
+  state.bonesPct = +((bonesKg / kg) * 100).toFixed(1);
+
+  // Body type trigger
+  state.bodyType = determineBodyType(bmi, state.fatPct, state.lbmPct, state.pol);
+
+  // Render
+  const vocName = toVocative(state.ime, state.pol);
+  document.getElementById('resultGreeting').textContent = `${vocName}, ovo su tvoji brojevi`;
+  document.getElementById('bmiValue').textContent = state.bmi;
+  document.getElementById('bmiCategory').textContent = state.bmiCategory;
+  document.getElementById('bodyTypeLabel').textContent = state.bodyType;
+  document.getElementById('tdeeValue').textContent = state.tdee.toLocaleString('sr-RS');
+  document.getElementById('bmrValue').textContent = state.bmr.toLocaleString('sr-RS');
+  document.getElementById('fatPct').textContent = state.fatPct;
+  document.getElementById('lbmPct').textContent = state.lbmPct;
+  document.getElementById('waterPct').textContent = state.waterPct;
+  document.getElementById('bloodPct').textContent = state.bloodPct;
+  document.getElementById('organsPct').textContent = state.organsPct;
+  document.getElementById('bonesPct').textContent = state.bonesPct;
+
+  // Fat zones
+  renderFatZones(state.fatPct, isM);
+
+  // Commentary
+  const cat = state.bmiCategory.toLowerCase();
+  const tipoStr = state.bodyType.toLowerCase();
+  document.getElementById('commentary1').innerHTML =
+    `Tvoj indeks telesne mase pokazuje <strong>${cat}</strong>, a tvoja građa je <strong>${tipoStr}</strong>. Tvoje dnevne kalorijske potrebe su <strong>${state.tdee.toLocaleString('sr-RS')} kcal</strong>, sa procenom da imaš <strong>${state.fatPct}% masti</strong>, ${state.lbmPct}% mišića, ${state.waterPct}% vode, ${state.bloodPct}% krvi, ${state.organsPct}% organa i ${state.bonesPct}% minerala.`;
+}
+
+/* ============================================================
+   RADAR CHART (5 axes)
+============================================================ */
+function buildRadarChart() {
+  // Subjective curve: penalizes optimistic self-reports, caps at 75
+  // raw 100 → 75, raw 90 → 65, raw 70 → 46, raw 50 → 28
+  function subjectiveCurve(raw) {
+    return Math.round(Math.pow(Math.max(0, raw) / 100, 1.4) * 75);
+  }
+
+  // Compute 5 axis scores (0-100)
+  // 1. Telesna masa: BMI deviation from 22, stricter scoring
+  const bmiDeviation = Math.abs(state.bmi - 22);
+  const telesnaMasa = Math.max(0, Math.min(100, 100 - (bmiDeviation * 12)));
+
+  // 2. Telesni sastav: composite from fat % and SMM % deviation, stricter scoring
+  const isM = state.pol === 'M';
+  const idealFat = isM ? 15 : 22;
+  const idealSmm = isM ? 45 : 35;
+  const fatScore = Math.max(0, 100 - Math.abs(state.fatPct - idealFat) * 7);
+  const smmScore = Math.max(0, 100 - Math.abs(state.lbmPct - idealSmm) * 7);
+  const telesniSastav = Math.round((fatScore + smmScore) / 2);
+
+  // 3. Hormonski balans: derived from stress (inverted), nonlinear curve
+  const hormonski = subjectiveCurve(100 - state.stres);
+
+  // 4. Kvalitet sna: nonlinear curve
+  const san = subjectiveCurve(state.san);
+
+  // 5. Dnevna energija: nonlinear curve
+  const energija = subjectiveCurve(state.energija);
+
+  const userScores = {
+    'Telesna masa': Math.round(telesnaMasa),
+    'Dnevna energija': energija,
+    'Telesni sastav': telesniSastav,
+    'Hormonski balans': hormonski,
+    'Kvalitet sna': san
+  };
+  const refScores = {
+    'Telesna masa': 100,
+    'Dnevna energija': 100,
+    'Telesni sastav': 100,
+    'Hormonski balans': 100,
+    'Kvalitet sna': 100
+  };
+
+  const labels = Object.keys(userScores);
+  const cx = 240, cy = 240, r = 160;
+
+  // 5 axes, starting from top, clockwise
+  const angles = labels.map((_, i) => -Math.PI / 2 + (i * 2 * Math.PI / 5));
+
+  function pointAt(score, i) {
+    const dist = (score / 100) * r;
+    return [cx + Math.cos(angles[i]) * dist, cy + Math.sin(angles[i]) * dist];
+  }
+
+  // Build SVG
+  let svg = '';
+
+  // Background grid (4 levels)
+  for (let level = 1; level <= 4; level++) {
+    const pts = labels.map((_, i) => {
+      const dist = (level / 4) * r;
+      return `${cx + Math.cos(angles[i]) * dist},${cy + Math.sin(angles[i]) * dist}`;
+    }).join(' ');
+    svg += `<polygon points="${pts}" fill="none" stroke="#ececec" stroke-width="1" />`;
+  }
+
+  // Axis lines
+  labels.forEach((_, i) => {
+    const [x, y] = [cx + Math.cos(angles[i]) * r, cy + Math.sin(angles[i]) * r];
+    svg += `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="#ececec" stroke-width="1" />`;
+  });
+
+  // Reference polygon — fill area RED to visualize "gap from healthy ideal"
+  const refPts = labels.map((label, i) => {
+    const [x, y] = pointAt(refScores[label], i);
+    return `${x},${y}`;
+  }).join(' ');
+  svg += `<polygon points="${refPts}" fill="rgba(210,59,59,0.14)" stroke="rgba(49,112,57,0.9)" stroke-width="2.5" stroke-linejoin="round" />`;
+
+  // User polygon — opaque fill cancels red within user area
+  const userPts = labels.map((label, i) => {
+    const [x, y] = pointAt(userScores[label], i);
+    return `${x},${y}`;
+  }).join(' ');
+  svg += `<polygon points="${userPts}" fill="rgba(255,253,248,0.95)" stroke="none" />`;
+  svg += `<polygon points="${userPts}" fill="rgba(232,154,60,0.28)" stroke="#e89a3c" stroke-width="2.5" stroke-linejoin="round" />`;
+
+  // User dots
+  labels.forEach((label, i) => {
+    const [x, y] = pointAt(userScores[label], i);
+    svg += `<circle cx="${x}" cy="${y}" r="4" fill="#e89a3c" stroke="#fff" stroke-width="1.5" />`;
+  });
+
+  // Labels around perimeter
+  labels.forEach((label, i) => {
+    const labelDist = r + 32;
+    const lx = cx + Math.cos(angles[i]) * labelDist;
+    const ly = cy + Math.sin(angles[i]) * labelDist;
+    let anchor = 'middle';
+    if (Math.cos(angles[i]) > 0.3) anchor = 'start';
+    else if (Math.cos(angles[i]) < -0.3) anchor = 'end';
+    svg += `<text x="${lx}" y="${ly}" text-anchor="${anchor}" dominant-baseline="middle" fill="#101a24" font-size="13" font-weight="600" font-family="Instrument Sans, sans-serif">${label}</text>`;
+    // Score below label
+    const sx = lx;
+    const sy = ly + 16;
+    svg += `<text x="${sx}" y="${sy}" text-anchor="${anchor}" dominant-baseline="middle" fill="#e89a3c" font-size="12" font-weight="600" font-family="Instrument Sans, sans-serif">${userScores[label]}/100</text>`;
+  });
+
+  const avg = Math.round((userScores['Telesna masa'] + userScores['Telesni sastav'] + userScores['Hormonski balans'] + userScores['Kvalitet sna'] + userScores['Dnevna energija']) / 5);
+
+  document.getElementById('radarSvg').innerHTML = svg;
+
+  // Gap callout below chart
+  const gapEl = document.getElementById('scoreGap');
+  if (gapEl) gapEl.textContent = (100 - avg);
+  let interp = '';
+  if (avg >= 75) {
+    interp = 'Tvoj grafikon je <strong>blizu zdravog referentnog profila</strong>. Postoje samo manja odstupanja koja možeš lako da koriguješ kroz ovaj 28-dnevni protokol.';
+  } else if (avg >= 50) {
+    interp = 'Tvoj grafikon <strong>odstupa od zdravog profila u nekoliko parametara</strong>. To znači da tvoj sistem trenutno ne radi optimalno — ali je još daleko od kritične zone. 28 dana je sasvim dovoljno da se sve vrati u balans.';
+  } else {
+    interp = 'Tvoj grafikon <strong>značajno odstupa u svim ključnim parametrima</strong>, što kod ovakvog profila ukazuje na povišen rizik od metaboličkog sindroma. Dobra vest: telo ima neverovatnu sposobnost regeneracije — 28 dana strukturisanog protokola može da napravi ogromnu razliku.';
+  }
+  document.getElementById('finalCommentary').innerHTML =
+    `<p>${interp}</p><p><strong>Sledeći korak:</strong> rezerviši svoje mesto u izazovu i počni 25. maja sa grupom.</p>`;
+}
+
+function buildCheckoutPayload() {
+  const dobIso = state.dob_godina && state.dob_mesec && state.dob_dan
+    ? `${state.dob_godina}-${String(state.dob_mesec).padStart(2,'0')}-${String(state.dob_dan).padStart(2,'0')}`
+    : '';
+  const phoneE164 = (state.telefon || '').replace(/\s+/g, '');
+  const affiliate = new URLSearchParams(window.location.search).get('affiliate') || '';
+  return {
+    plan: 'custom',
+    customPlanName: 'mangrowe',
+    name: state.ime,
+    lastname: state.prezime,
+    email: state.email,
+    phoneNumber: phoneE164,
+    locale: 'sr',
+    affiliate,
+    order_id: generateOrderId(),
+    diet: state.diet,
+    height: state.visina_cm,
+    weight: state.tezina_kg,
+    gender: state.pol,
+    dateOfBirth: dobIso,
+    age: state.godine,
+    activityFactor: state.aktivnost,
+    selfBodyType: state.telo,
+    bmi: state.bmi,
+    bmr: state.bmr,
+    tdee: state.tdee,
+    bodyType: state.bodyType,
+    bmiCategory: state.bmiCategory,
+    fatPct: state.fatPct,
+    lbmPct: state.lbmPct,
+    waterPct: state.waterPct,
+    bloodPct: state.bloodPct,
+    organsPct: state.organsPct,
+    bonesPct: state.bonesPct,
+    sleepScore: state.san,
+    energyScore: state.energija,
+    stressScore: state.stres,
+  };
+}
+
+function generateOrderId() {
+  if (window.crypto && typeof window.crypto.randomUUID === 'function') {
+    return 'mangrowe_' + window.crypto.randomUUID();
+  }
+  return 'mangrowe_xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+    const r = Math.random() * 16 | 0;
+    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
+
+async function submitCheckout() {
+  const btn = document.getElementById('checkoutBtn');
+  const errEl = document.getElementById('checkoutError');
+  const originalText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Učitavanje...';
+  if (errEl) { errEl.hidden = true; errEl.textContent = ''; }
+
+  try {
+    const payload = buildCheckoutPayload();
+    const res = await fetch('https://raifpay-prod.nutribox.dev/checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    if (!data.redirectUrl) throw new Error('Nedostaje redirectUrl u odgovoru.');
+    window.location.href = data.redirectUrl;
+  } catch (err) {
+    btn.disabled = false;
+    btn.textContent = originalText;
+    if (errEl) {
+      errEl.textContent = 'Greška pri inicijalizaciji plaćanja. Pokušaj ponovo.';
+      errEl.hidden = false;
+    }
+  }
+}
+
+document.getElementById('checkoutBtn')?.addEventListener('click', submitCheckout);
+
+function runCalculations2() {
+  buildRadarChart();
+}
+
+/* ============================================================
+   INIT — set initial active option styling for opt cards
+============================================================ */
+document.querySelectorAll('input[type="radio"]').forEach(input => {
+  input.addEventListener('change', () => {
+    // remove styling tracking - .opt:has(input:checked) handles it
+  });
+});
+
+// Init
+populateCountrySelect();
+detectCountryFromIp();
+showScreen(0);
+</script>

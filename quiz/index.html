@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="sr-Latn-RS">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Nauči Dizajn — 1-minut kviz (TEST)</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { background: #232421; min-height: 100vh; }
+    body {
+      font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+      color: #FFFFFF;
+    }
+    .nd-test-banner {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      background: #DBFF00;
+      color: #232421;
+      padding: 6px 16px;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 600;
+      z-index: 99999;
+    }
+    .nd-test-banner code {
+      background: rgba(35,36,33,0.15);
+      padding: 1px 6px;
+      border-radius: 3px;
+      font-family: monospace;
+    }
+  </style>
+  <!-- flag-icons biblioteka za zastavice u country picker-u (svi browser-i, svi OS-ovi) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css">
+  <link rel="stylesheet" href="naucidizajn-kviz.css">
+</head>
+<body>
+  <div class="nd-test-banner">
+    🧪 TEST OKRUŽENJE — Pixel i Webhook su isključeni. Otvori Console (F12) za debug podatke. Ovo NE utiče na production na <code>naucidizajn.com</code>.
+  </div>
+
+  <!-- Forma se renderuje ovde -->
+  <div id="nd-quiz" class="nd-embedded" role="form" aria-label="Nauči Dizajn 1-minut kviz">
+    <div class="nd-progress" aria-hidden="true">
+      <div class="nd-progress-fill"></div>
+      <div class="nd-progress-track"></div>
+    </div>
+    <div class="nd-stage" id="nd-stage"><!-- steps injected by JS --></div>
+  </div>
+
+  <script src="naucidizajn-kviz.js"></script>
+</body>
+</html>

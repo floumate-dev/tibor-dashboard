@@ -1,0 +1,466 @@
+
+<div class="step-timeline" id="stepTimeline">
+  <div class="step-timeline-inner">
+    <div class="segments" id="segments">
+      <span class="seg"></span>
+      <span class="seg"></span>
+      <span class="seg"></span>
+      <span class="seg"></span>
+      <span class="seg"></span>
+      <span class="seg"></span>
+      <span class="seg"></span>
+      <span class="seg"></span>
+    </div>
+    <div class="step-meta">
+      <strong id="stepNow">1</strong>
+      <span>/ 8</span>
+      <span class="step-meta-sep">·</span>
+      <span class="step-meta-remaining" id="stepRemaining">još 7 koraka</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============ STEP 1 — Tip ishrane ============ -->
+<section class="screen active" data-screen="1" data-auto-next>
+  <div class="wrap">
+    <div class="step-head">
+      <span class="micro">Korak 1 · Tip ishrane</span>
+      <h1>Izaberi svoj tip ishrane</h1>
+      <p class="lead">Prilagođavamo meni — svi obroci u tvom boxu prate ovaj izbor.</p>
+    </div>
+
+    <div class="options">
+      <label class="opt">
+        <input type="radio" name="diet" value="vegeterian" />
+        <span class="opt-radio"></span>
+        <div class="opt-body">
+          <div class="opt-title"><span class="opt-emoji">🥗</span>Vegeterijanski</div>
+          <div class="opt-desc">Bez mesa i ribe. Biljni proteini, mlečni proizvodi, jaja.</div>
+        </div>
+      </label>
+      <label class="opt">
+        <input type="radio" name="diet" value="balance" />
+        <span class="opt-radio"></span>
+        <div class="opt-body">
+          <div class="opt-title"><span class="opt-emoji">🍽️</span>Balans (meso + riba)</div>
+          <div class="opt-desc">Pun balansiran meni — meso, riba, povrće, žitarice.</div>
+        </div>
+      </label>
+      <label class="opt">
+        <input type="radio" name="diet" value="pescaterian" />
+        <span class="opt-radio"></span>
+        <div class="opt-body">
+          <div class="opt-title"><span class="opt-emoji">🐟</span>Pescaterian</div>
+          <div class="opt-desc">Bez mesa — riba, plodovi mora, biljna hrana.</div>
+        </div>
+      </label>
+    </div>
+
+    <div class="nav-row">
+      <span></span>
+      <button class="btn" data-next>Dalje →</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STEP 2 — Ime + Kontakt ============ -->
+<section class="screen" data-screen="2">
+  <div class="wrap">
+    <div class="step-head">
+      <span class="micro">Korak 2 · Tvoji podaci</span>
+      <h1>Predstavi se</h1>
+      <p class="lead">Šaljemo ti potvrdu prijave + instrukcije pre starta izazova.</p>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label for="ime">Ime</label>
+        <input id="ime" type="text" autocomplete="given-name" required />
+        <div class="err">Unesi ime.</div>
+      </div>
+      <div class="field">
+        <label for="prezime">Prezime</label>
+        <input id="prezime" type="text" autocomplete="family-name" required />
+        <div class="err">Unesi prezime.</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="email">E-mail adresa</label>
+      <input id="email" type="email" autocomplete="email" required placeholder="ti@primer.com" />
+      <div class="err">Unesi važeću email adresu.</div>
+    </div>
+
+    <div class="field">
+      <label for="telefon">Kontakt telefon</label>
+      <div class="phone-row">
+        <select id="phoneCountry" aria-label="Pozivni broj">
+          <!-- populated by JS -->
+        </select>
+        <span class="divider" aria-hidden="true"></span>
+        <input id="telefon" type="tel" autocomplete="tel" required placeholder="63 1234567" inputmode="tel" />
+      </div>
+      <div class="err" id="telefonErr">Unesi važeći broj telefona.</div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn ghost" data-prev>← Nazad</button>
+      <button class="btn" data-next>Dalje →</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STEP 3 — Lični podaci za proračun ============ -->
+<section class="screen" data-screen="3">
+  <div class="wrap">
+    <div class="step-head">
+      <span class="micro">Korak 3 · Lični podaci</span>
+      <h1>Osnovni podaci o tebi</h1>
+      <p class="lead">Koristimo ih za personalizaciju protokola i porcija. Svi podaci su privatni.</p>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label for="visina">Visina</label>
+        <div class="field-suffix-wrap">
+          <input id="visina" type="number" min="120" max="220" step="1" inputmode="numeric" required />
+          <span class="suffix">cm</span>
+        </div>
+        <div class="err">Visina mora biti između 120 i 220 cm.</div>
+      </div>
+      <div class="field">
+        <label for="tezina">Težina</label>
+        <div class="field-suffix-wrap">
+          <input id="tezina" type="number" min="35" max="250" step="0.1" inputmode="decimal" required />
+          <span class="suffix">kg</span>
+        </div>
+        <div class="err">Težina mora biti između 35 i 250 kg.</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Pol</label>
+      <div class="options cols-2">
+        <label class="opt">
+          <input type="radio" name="pol" value="M" />
+          <span class="opt-radio"></span>
+          <div class="opt-body">
+            <div class="opt-title">Muški</div>
+          </div>
+        </label>
+        <label class="opt">
+          <input type="radio" name="pol" value="Z" />
+          <span class="opt-radio"></span>
+          <div class="opt-body">
+            <div class="opt-title">Ženski</div>
+          </div>
+        </label>
+      </div>
+      <div class="err" id="polErr">Izaberi pol.</div>
+    </div>
+
+    <div class="field">
+      <label>Datum rođenja</label>
+      <div class="date-row">
+        <input id="dob_dan" type="number" min="1" max="31" placeholder="Dan" inputmode="numeric" required />
+        <select id="dob_mesec" required>
+          <option value="">Mesec</option>
+          <option value="1">Januar</option>
+          <option value="2">Februar</option>
+          <option value="3">Mart</option>
+          <option value="4">April</option>
+          <option value="5">Maj</option>
+          <option value="6">Jun</option>
+          <option value="7">Jul</option>
+          <option value="8">Avgust</option>
+          <option value="9">Septembar</option>
+          <option value="10">Oktobar</option>
+          <option value="11">Novembar</option>
+          <option value="12">Decembar</option>
+        </select>
+        <input id="dob_godina" type="number" min="1925" max="2015" placeholder="Godina" inputmode="numeric" required />
+      </div>
+      <div class="err" id="dobErr">Unesi važeći datum rođenja.</div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn ghost" data-prev>← Nazad</button>
+      <button class="btn" data-next>Dalje →</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STEP 4 — Aktivnost ============ -->
+<section class="screen" data-screen="4" data-auto-next>
+  <div class="wrap">
+    <div class="step-head">
+      <span class="micro">Korak 4 · Aktivnost</span>
+      <h1>Koliko se krećeš tokom dana?</h1>
+      <p class="lead">Određuje koliko kalorija ti telo realno troši — osnov za podešavanje protokola.</p>
+    </div>
+
+    <div class="options">
+      <label class="opt">
+        <input type="radio" name="aktivnost" value="1.55" />
+        <span class="opt-radio"></span>
+        <div class="opt-body">
+          <div class="opt-title">Dosta — treniram ili posao na nogama</div>
+          <div class="opt-desc">Faktor aktivnosti 1.55</div>
+        </div>
+      </label>
+      <label class="opt">
+        <input type="radio" name="aktivnost" value="1.375" />
+        <span class="opt-radio"></span>
+        <div class="opt-body">
+          <div class="opt-title">Umereno — povremene šetnje</div>
+          <div class="opt-desc">Faktor aktivnosti 1.375</div>
+        </div>
+      </label>
+      <label class="opt">
+        <input type="radio" name="aktivnost" value="1.20" />
+        <span class="opt-radio"></span>
+        <div class="opt-body">
+          <div class="opt-title">Malo — uglavnom sedim</div>
+          <div class="opt-desc">Faktor aktivnosti 1.20</div>
+        </div>
+      </label>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn ghost" data-prev>← Nazad</button>
+      <button class="btn" data-next>Dalje →</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STEP 5 — Tip tela ============ -->
+<section class="screen" data-screen="5" data-auto-next>
+  <div class="wrap">
+    <div class="step-head">
+      <span class="micro">Korak 5 · Tip tela</span>
+      <h1>Kako izgleda tvoje telo trenutno?</h1>
+      <p class="lead">Tvoja iskrena percepcija — neće uticati na proračune, samo na ton komentara.</p>
+    </div>
+
+    <div class="options">
+      <label class="opt">
+        <input type="radio" name="telo" value="manjak" />
+        <span class="opt-radio"></span>
+        <div class="opt-body">
+          <div class="opt-title">Manjak kilograma</div>
+          <div class="opt-desc">Teško dobijaš težinu.</div>
+        </div>
+      </label>
+      <label class="opt">
+        <input type="radio" name="telo" value="normalno" />
+        <span class="opt-radio"></span>
+        <div class="opt-body">
+          <div class="opt-title">Normalno, ali postoje „mekani" delovi</div>
+          <div class="opt-desc">Težina je u redu, ali sastav nije idealan.</div>
+        </div>
+      </label>
+      <label class="opt">
+        <input type="radio" name="telo" value="visak" />
+        <span class="opt-radio"></span>
+        <div class="opt-body">
+          <div class="opt-title">Višak kg</div>
+          <div class="opt-desc">Imaš višak težine koji želiš da skineš.</div>
+        </div>
+      </label>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn ghost" data-prev>← Nazad</button>
+      <button class="btn" data-next>Izračunaj moj profil →</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ INTERIM RESULTS — Body composition ============ -->
+<section class="screen" data-screen="results-1">
+  <div class="wrap wide">
+    <div class="step-head">
+      <span class="micro">Tvoja metabolička analiza</span>
+      <h1 id="resultGreeting">Tvoje telo u brojevima</h1>
+      <p class="lead">Ovo su tvoje izmerene vrednosti, izračunate iz podataka koje si uneo.</p>
+    </div>
+
+    <div class="result-hero">
+      <div class="hero-main">
+        <div class="label">BMI</div>
+        <div class="value green"><span id="bmiValue">0.0</span></div>
+      </div>
+      <div class="sub" id="bmiCategory">—</div>
+    </div>
+
+    <div class="result-grid">
+      <div class="result-card">
+        <div class="key">Tip građe</div>
+        <div class="num" id="bodyTypeLabel" style="font-size:14px; line-height:1.2;">—</div>
+      </div>
+      <div class="result-card">
+        <div class="key">TDEE</div>
+        <div class="num"><span id="tdeeValue">0</span> <span class="pct">kcal</span></div>
+      </div>
+      <div class="result-card">
+        <div class="key">BMR</div>
+        <div class="num"><span id="bmrValue">0</span> <span class="pct">kcal</span></div>
+      </div>
+    </div>
+
+    <div class="result-section-label">Telesni sastav</div>
+    <div class="result-grid cols-6">
+      <div class="result-card">
+        <div class="key">Masti</div>
+        <div class="num"><span id="fatPct">0</span><span class="pct">%</span></div>
+      </div>
+      <div class="result-card">
+        <div class="key">Mišići</div>
+        <div class="num"><span id="lbmPct">0</span><span class="pct">%</span></div>
+      </div>
+      <div class="result-card">
+        <div class="key">Voda</div>
+        <div class="num"><span id="waterPct">0</span><span class="pct">%</span></div>
+      </div>
+      <div class="result-card">
+        <div class="key">Krv</div>
+        <div class="num"><span id="bloodPct">0</span><span class="pct">%</span></div>
+      </div>
+      <div class="result-card">
+        <div class="key">Organi</div>
+        <div class="num"><span id="organsPct">0</span><span class="pct">%</span></div>
+      </div>
+      <div class="result-card">
+        <div class="key">Minerali</div>
+        <div class="num"><span id="bonesPct">0</span><span class="pct">%</span></div>
+      </div>
+    </div>
+
+    <div class="fat-zones">
+      <div class="fat-zones-header">
+        <span class="fat-zones-title">Tvoj % masti u odnosu na zdravstvene zone</span>
+        <span class="fat-zones-value"><span id="fatZoneValue">0</span>%</span>
+      </div>
+      <div class="fat-zones-bar" id="fatZonesBar"></div>
+      <div class="fat-zones-legend" id="fatZonesLegend"></div>
+    </div>
+
+    <div class="commentary">
+      <p id="commentary1">—</p>
+      <p id="commentary2"><strong>A ovo je samo početak.</strong> Sada krećemo u dubinsku analizu tvog sistema — jer brojevi koje si video nisu uzrok, već posledica onoga što se dešava unutar tvog tela.</p>
+    </div>
+
+    <div class="nav-row center">
+      <button class="btn lg" data-next>Nastavi na dubinsku analizu →</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STEP 6 — San ============ -->
+<section class="screen" data-screen="6" data-auto-next>
+  <div class="wrap">
+    <div class="step-head">
+      <span class="micro">Korak 6 · Kvalitet sna</span>
+      <h1>Kako spavaš?</h1>
+      <p class="lead">San je osnov hormonskog balansa — direktno utiče na to kako tvoje telo regeneriše.</p>
+    </div>
+
+    <div class="options">
+      <label class="opt"><input type="radio" name="san" value="100" /><span class="opt-radio"></span><div class="opt-body"><div class="opt-title">Budim se potpuno odmoran</div></div></label>
+      <label class="opt"><input type="radio" name="san" value="75" /><span class="opt-radio"></span><div class="opt-body"><div class="opt-title">Uglavnom dobro, retko umoran</div></div></label>
+      <label class="opt"><input type="radio" name="san" value="50" /><span class="opt-radio"></span><div class="opt-body"><div class="opt-title">Promenljivo — neki dani da, neki ne</div></div></label>
+      <label class="opt"><input type="radio" name="san" value="25" /><span class="opt-radio"></span><div class="opt-body"><div class="opt-title">Često se budim umoran</div></div></label>
+      <label class="opt"><input type="radio" name="san" value="0" /><span class="opt-radio"></span><div class="opt-body"><div class="opt-title">Skoro uvek umoran, čak i posle 8h</div></div></label>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn ghost" data-prev>← Nazad</button>
+      <button class="btn" data-next>Dalje →</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STEP 7 — Energija ============ -->
+<section class="screen" data-screen="7" data-auto-next>
+  <div class="wrap">
+    <div class="step-head">
+      <span class="micro">Korak 7 · Dnevna energija</span>
+      <h1>Kako ti ide energija kroz dan?</h1>
+      <p class="lead">Pokazuje koliko stabilno tvoj sistem radi — od šećera u krvi do kortizola.</p>
+    </div>
+
+    <div class="options">
+      <label class="opt"><input type="radio" name="energija" value="100" /><span class="opt-radio"></span><div class="opt-body"><div class="opt-title">Stabilna ceo dan</div></div></label>
+      <label class="opt"><input type="radio" name="energija" value="75" /><span class="opt-radio"></span><div class="opt-body"><div class="opt-title">Uglavnom stabilna, mali pad popodne</div></div></label>
+      <label class="opt"><input type="radio" name="energija" value="50" /><span class="opt-radio"></span><div class="opt-body"><div class="opt-title">Padne 1–2 puta u toku dana</div></div></label>
+      <label class="opt"><input type="radio" name="energija" value="25" /><span class="opt-radio"></span><div class="opt-body"><div class="opt-title">Više padova kroz dan</div></div></label>
+      <label class="opt"><input type="radio" name="energija" value="0" /><span class="opt-radio"></span><div class="opt-body"><div class="opt-title">Veliki padovi, jedva funkcionišem</div></div></label>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn ghost" data-prev>← Nazad</button>
+      <button class="btn" data-next>Dalje →</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STEP 8 — Stres ============ -->
+<section class="screen" data-screen="8" data-auto-next>
+  <div class="wrap">
+    <div class="step-head">
+      <span class="micro">Korak 8 · Nivo stresa</span>
+      <h1>Kako izgleda tvoj nivo stresa?</h1>
+      <p class="lead">Stres direktno ruši hormonsku ravnotežu. Iskreno, kako se tvoj nivo menja kroz dan?</p>
+    </div>
+
+    <div class="options">
+      <label class="opt"><input type="radio" name="stres" value="0" /><span class="opt-radio"></span><div class="opt-body"><div class="opt-title">Stabilno nizak</div></div></label>
+      <label class="opt"><input type="radio" name="stres" value="25" /><span class="opt-radio"></span><div class="opt-body"><div class="opt-title">Ujutru visok, kasnije pada</div></div></label>
+      <label class="opt"><input type="radio" name="stres" value="50" /><span class="opt-radio"></span><div class="opt-body"><div class="opt-title">Ujutru visok, skače, uveče pada</div></div></label>
+      <label class="opt"><input type="radio" name="stres" value="75" /><span class="opt-radio"></span><div class="opt-body"><div class="opt-title">Ujutru visok, skače, uveče ostaje visok</div></div></label>
+      <label class="opt"><input type="radio" name="stres" value="100" /><span class="opt-radio"></span><div class="opt-body"><div class="opt-title">Ceo dan visok</div></div></label>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn ghost" data-prev>← Nazad</button>
+      <button class="btn" data-next>Vidi moj grafikon →</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FINAL RESULTS — Radar + Checkout ============ -->
+<section class="screen" data-screen="results-2">
+  <div class="wrap wide">
+    <div class="step-head">
+      <span class="micro">Tvoj grafikon</span>
+      <h1>Ovde se vidi cela slika</h1>
+      <p class="lead">Zelena kriva je referentni profil zdravog organizma. Narandžasta su tvoje izmerene vrednosti.</p>
+    </div>
+
+    <div class="radar-wrap">
+      <svg class="radar-svg" viewBox="0 0 480 480" id="radarSvg">
+        <!-- populated by JS -->
+      </svg>
+      <div class="radar-legend">
+        <div class="item"><span class="dot green"></span>Zdrav ideal</div>
+        <div class="item"><span class="dot orange"></span>Tvoje vrednosti</div>
+        <div class="item"><span class="dot red"></span>Razmak do ideala</div>
+      </div>
+    </div>
+
+    <div class="score-gap-callout">
+      Razlika od <strong><span id="scoreGap">0</span> poena</strong> — toliko te tvoj sistem udaljava od stanja u kome telo funkcioniše optimalno.
+    </div>
+
+    <div class="commentary" id="finalCommentary">
+      <p>—</p>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn ghost" data-prev>← Nazad</button>
+      <button type="button" class="btn lg" id="checkoutBtn">Rezerviši svoje mesto →</button>
+    </div>
+    <div class="checkout-error" id="checkoutError" hidden></div>
+  </div>
+</section>
+

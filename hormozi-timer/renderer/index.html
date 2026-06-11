@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Hormozi Timer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    color-scheme: dark;
+    --bg: #08080d;
+    --panel: #101018;
+    --panel-2: #1a1a24;
+    --border: rgba(255, 255, 255, 0.1);
+    --border-strong: rgba(255, 255, 255, 0.15);
+    --text: #f3f3f7;
+    --muted: #9ca3af;
+    --accent: #6c5ce7;
+    --accent-hover: #7d6ee9;
+    --accent-soft: rgba(108, 92, 231, 0.1);
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    padding: 18px;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-size: 14px;
+    user-select: none;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .brand {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .time {
+    font-size: 11px;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .question {
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.3;
+    margin-bottom: 10px;
+  }
+  textarea {
+    width: 100%;
+    height: 90px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    color: var(--text);
+    padding: 12px 14px;
+    font-family: inherit;
+    font-size: 14px;
+    line-height: 1.45;
+    resize: none;
+    outline: none;
+    user-select: text;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  textarea::placeholder { color: var(--muted); }
+  textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+  }
+  button {
+    font-family: inherit;
+    cursor: pointer;
+    border: none;
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    background: var(--accent);
+    color: #ffffff;
+    width: 100%;
+    margin-top: 12px;
+    transition: background 0.15s;
+  }
+  button:hover { background: var(--accent-hover); }
+  button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    background: var(--accent);
+  }
+
+  .history-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--muted);
+    margin: 16px 0 8px;
+    font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  .history-label a {
+    color: var(--muted);
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 10px;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+  .history-label a:hover { color: var(--text); }
+
+  .history {
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
+    padding-right: 4px;
+  }
+  .history::-webkit-scrollbar { width: 6px; }
+  .history::-webkit-scrollbar-track { background: transparent; }
+  .history::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  .entry {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 11px 13px;
+    margin-bottom: 6px;
+    font-size: 13px;
+    line-height: 1.4;
+    user-select: text;
+    transition: border-color 0.15s;
+  }
+  .entry:hover { border-color: var(--border-strong); }
+  .entry .ts {
+    font-size: 10px;
+    color: var(--muted);
+    margin-bottom: 4px;
+    font-variant-numeric: tabular-nums;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 500;
+  }
+  .empty {
+    text-align: center;
+    color: var(--muted);
+    font-size: 12px;
+    padding: 20px 0;
+  }
+  .kbd {
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 10px;
+    font-family: ui-monospace, SFMono-Regular, monospace;
+    margin-left: 6px;
+    color: rgba(255, 255, 255, 0.85);
+  }
+</style>
+</head>
+<body>
+  <div class="header">
+    <div class="brand">⏰ Hormozi Timer</div>
+    <div class="time" id="time"></div>
+  </div>
+
+  <div class="question">What did you do in the last 15 min?</div>
+
+  <textarea id="text" placeholder="e.g. Wrote landing copy..." autofocus></textarea>
+
+  <button id="submit" disabled>Submit <span class="kbd">⌘↵</span></button>
+
+  <div class="history-label">
+    <span>Previously</span>
+    <a id="open-summary">View all →</a>
+  </div>
+
+  <div class="history" id="history"></div>
+
+<script>
+  const { ipcRenderer } = require('electron');
+
+  const textarea = document.getElementById('text');
+  const submitBtn = document.getElementById('submit');
+  const historyEl = document.getElementById('history');
+  const timeEl = document.getElementById('time');
+  const summaryLink = document.getElementById('open-summary');
+
+  function updateTime() {
+    timeEl.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
+  updateTime();
+  setInterval(updateTime, 10000);
+
+  function updateSubmit() {
+    submitBtn.disabled = !textarea.value.trim();
+  }
+  textarea.addEventListener('input', updateSubmit);
+
+  function fmtTime(iso) {
+    const d = new Date(iso);
+    const now = new Date();
+    const isToday = d.toDateString() === now.toDateString();
+    const y = new Date(now);
+    y.setDate(y.getDate() - 1);
+    const isYesterday = d.toDateString() === y.toDateString();
+    const time = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    if (isToday) return time;
+    if (isYesterday) return `Yesterday ${time}`;
+    return d.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ' ' + time;
+  }
+
+  function escape(s) {
+    return (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  async function refreshHistory() {
+    const state = await ipcRenderer.invoke('get-state');
+    const entries = [...(state.entries || [])].sort(
+      (a, b) => new Date(b.timestamp) - new Date(a.timestamp)
+    );
+    if (!entries.length) {
+      historyEl.innerHTML = '<div class="empty">No entries yet.</div>';
+      return;
+    }
+    historyEl.innerHTML = entries
+      .map(
+        (e) => `
+        <div class="entry">
+          <div class="ts">${fmtTime(e.timestamp)}</div>
+          <div>${escape(e.text)}</div>
+        </div>
+      `
+      )
+      .join('');
+  }
+
+  async function submit() {
+    if (submitBtn.disabled) return;
+    await ipcRenderer.invoke('submit-entry', { text: textarea.value.trim() });
+    textarea.value = '';
+    updateSubmit();
+    refreshHistory();
+  }
+
+  submitBtn.addEventListener('click', submit);
+  summaryLink.addEventListener('click', () => ipcRenderer.invoke('open-summary'));
+
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+      e.preventDefault();
+      submit();
+    }
+  });
+
+  ipcRenderer.on('timer-fired', () => {
+    textarea.focus();
+    refreshHistory();
+  });
+
+  window.addEventListener('focus', () => {
+    setTimeout(() => textarea.focus(), 50);
+    refreshHistory();
+  });
+
+  refreshHistory();
+</script>
+</body>
+</html>

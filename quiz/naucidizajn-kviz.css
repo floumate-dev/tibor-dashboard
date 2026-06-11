@@ -1,0 +1,711 @@
+/* Verzija: v1.27 */
+
+/* === BODY BACKGROUND OVERRIDE (uklanja beli okvir koji daje Webflow/browser default) === */
+  html, body { background: #232421 !important; margin: 0 !important; padding: 0 !important; }
+
+  /* === CSS RESET (samo unutar forme) === */
+  #nd-quiz, #nd-quiz *, #nd-quiz *::before, #nd-quiz *::after { box-sizing: border-box; }
+  #nd-quiz button { font: inherit; cursor: pointer; border: none; background: none; color: inherit; padding: 0; }
+  #nd-quiz input, #nd-quiz textarea { font: inherit; color: inherit; background: transparent; border: none; outline: none; }
+  #nd-quiz input::placeholder, #nd-quiz textarea::placeholder { color: rgba(255,255,255,0.4); }
+
+  /* === THEME (iz Typeform theme JSON + računato iz computed CSS-a) === */
+  #nd-quiz {
+    --nd-bg: #232421;
+    --nd-question: #FFFFFF;
+    --nd-answer: #DBFF00;
+    --nd-button: #DBFF00;
+    --nd-button-content: #181818;
+    --nd-text-muted: #D3D3D3;
+    /* Choice button bg = rgba(35, 36, 33, 0.6) (tamna pozadina sa 60% opacity) */
+    --nd-answer-bg: rgba(35, 36, 33, 0.6);
+    --nd-answer-bg-hover: rgba(219, 255, 0, 0.10);
+    --nd-answer-bg-selected: rgba(219, 255, 0, 0.16);
+    --nd-answer-border: rgba(219, 255, 0, 0.30);
+    --nd-answer-border-selected: rgba(219, 255, 0, 0.95);
+    --nd-radius-md: 8px;
+    --nd-easing: cubic-bezier(0.215, 0.61, 0.355, 1.0);
+    --nd-duration: 380ms;
+
+    font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+    color: var(--nd-question);
+    background: var(--nd-bg);
+    width: 100%;
+    min-height: 100vh;
+    position: relative;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* When embedded in Webflow, allow full-viewport height but not fixed */
+  #nd-quiz.nd-embedded {
+    min-height: 640px;
+  }
+  /* In small viewports (mobile), ne fiksiramo visinu */
+  @media (max-width: 640px) {
+    #nd-quiz.nd-embedded { min-height: 100vh; height: auto; }
+  }
+
+  /* === PROGRESS BAR (Typeform style: 2 segmenta sa gap-om) === */
+  #nd-quiz .nd-progress {
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 3px;
+    z-index: 10;
+    display: flex;
+    gap: 8px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 200ms ease;
+  }
+  #nd-quiz.nd-quiz-started .nd-progress { opacity: 1; }
+  #nd-quiz .nd-progress-fill {
+    height: 100%;
+    background: var(--nd-answer);
+    width: 0%;
+    transition: width 480ms var(--nd-easing);
+    flex-shrink: 0;
+  }
+  #nd-quiz .nd-progress-track {
+    height: 100%;
+    background: rgba(219, 255, 0, 0.25);
+    flex: 1;
+  }
+
+  /* === STEP CONTAINER === */
+  /* Stage je relativan kontejner. Steps su apsolutno pozicionirani jedan iznad drugog
+     (svi se overlap-uju, samo aktivni je vidljiv) ali svaki ima sopstveni min-height
+     da se sadržaj pravilno centrira u viewport-u. */
+  #nd-quiz .nd-stage {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    display: block;
+  }
+
+  #nd-quiz .nd-step {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    min-height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 24px 80px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(60px);
+    transition:
+      opacity var(--nd-duration) var(--nd-easing),
+      transform var(--nd-duration) var(--nd-easing),
+      visibility 0s linear var(--nd-duration);
+    pointer-events: none;
+  }
+  #nd-quiz .nd-step.nd-active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: auto;
+    transition:
+      opacity var(--nd-duration) var(--nd-easing),
+      transform var(--nd-duration) var(--nd-easing),
+      visibility 0s linear 0s;
+  }
+  #nd-quiz .nd-step.nd-leaving {
+    transform: translateY(-60px);
+    opacity: 0;
+  }
+
+  #nd-quiz .nd-step-inner {
+    width: 100%;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+  /* Scale step (Q12 - 0 do 10) treba malo više prostora da svih 11 buttona stane u red */
+  #nd-quiz .nd-step[data-key="q12_motivacija"] .nd-step-inner {
+    max-width: 780px;
+  }
+
+  /* === QUESTION HEADER (iz Typeform: 26px/34px/weight 400) === */
+  #nd-quiz .nd-q-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+  #nd-quiz .nd-q-num {
+    flex: 0 0 auto;
+    background: var(--nd-answer);
+    color: var(--nd-button-content);
+    font-weight: 700;
+    font-size: 12px;
+    line-height: 1;
+    padding: 4px 6px 3px 6px;
+    border-radius: 4px;
+    margin-top: 9px;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    min-width: 20px;
+    justify-content: center;
+  }
+  #nd-quiz .nd-q-title {
+    flex: 1;
+    font-size: 26px;
+    line-height: 34px;
+    font-weight: 400;
+    color: var(--nd-question);
+    margin: 0;
+  }
+  #nd-quiz .nd-q-title em { font-style: italic; }
+  #nd-quiz .nd-q-required { color: var(--nd-answer); margin-left: 1px; }
+  #nd-quiz .nd-q-desc {
+    margin: -8px 0 24px 0;
+    font-size: 18px;
+    line-height: 24px;
+    color: var(--nd-text-muted);
+    padding-left: 30px;
+  }
+
+  /* === CHOICES (1:1 iz Typeform CSS-a, hex boje preko ColorZilla) === */
+  /* Container: širina po najdužem choice-u; svi choice-i unutra zauzimaju punu širinu */
+  /* Container je uvučen za 32px (širina question num badge + gap) - kao u Typeform-u */
+  #nd-quiz .nd-choices {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    width: fit-content;
+    min-width: 280px;
+    max-width: 100%;
+    gap: 8px;
+    margin-bottom: 24px;
+    margin-left: 32px;
+  }
+  /* Choice button (spoljni padding 6px 10px):
+     Normal:   bg #2E321F, box-shadow rgba(219,255,0,0.1) 1px
+     Hover:    bg #363B1B, box-shadow rgba(219,255,0,0.4)
+     Selected: bg #222421, box-shadow #DBFF00 2px
+  */
+  #nd-quiz .nd-choice {
+    all: unset;
+    box-sizing: border-box;
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    cursor: pointer;
+    background-color: #2E321F;
+    color: var(--nd-answer);
+    gap: 8px;
+    padding: 6px 10px;
+    border-radius: 8px;
+    box-shadow: rgba(219, 255, 0, 0.1) 0 0 0 1px;
+    transition-property: background-color, color, box-shadow;
+    transition-duration: 0.25s;
+    transition-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+    font-family: inherit;
+  }
+  #nd-quiz .nd-choice:hover {
+    background-color: #363B1B;
+    box-shadow: rgba(219, 255, 0, 0.4) 0 0 0 1px;
+  }
+  #nd-quiz .nd-choice.nd-selected,
+  #nd-quiz .nd-choice.nd-selected:hover {
+    background-color: #222421;
+    box-shadow: #DBFF00 0 0 0 2px;
+  }
+  /* A/B/C/D key (kvadratić sa slovom):
+     Padding 4px gore i dole tako da dobijemo: 4 + 24(line-height) + 4 = 32px visine
+     -> Sa spoljnim 6+6 -> ukupno 44px
+     Normal:   bg #2F321F, border #586317
+     Selected: bg #DBFF00, text #232421
+  */
+  #nd-quiz .nd-choice-key {
+    flex: 0 0 auto;
+    min-width: 24px;
+    padding: 4px 6px;
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 600;
+    line-height: 16px;
+    background-color: #2F321F;
+    box-shadow: #586317 0 0 0 1px;
+    color: var(--nd-answer);
+    transition: all 0.25s cubic-bezier(0.215, 0.61, 0.355, 1);
+    text-transform: uppercase;
+  }
+  #nd-quiz .nd-choice.nd-selected .nd-choice-key {
+    background-color: #DBFF00;
+    color: #232421;
+    box-shadow: #DBFF00 0 0 0 1px;
+  }
+  /* Tekst u choice-u: 18px/24px/400 + 4px padding gore i dole = 32px visine
+     + 4px padding levo i desno za pravilan razmak */
+  #nd-quiz .nd-choice-label {
+    font-size: 18px;
+    line-height: 24px;
+    font-weight: 400;
+    flex: 1;
+    padding: 4px;
+  }
+
+  /* === OPINION SCALE (Q12 — 0 to 10 buttons) ===
+     Container 58x56 sa istim bojama kao choice buttons:
+     Normal:   bg #2E321F, box-shadow rgba(219,255,0,0.1) 1px
+     Hover:    bg #363B1B, box-shadow rgba(219,255,0,0.4) 1px
+     Selected: bg #222421, box-shadow #DBFF00 2px
+  */
+  #nd-quiz .nd-scale {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 24px;
+    margin-left: 32px;
+  }
+  #nd-quiz .nd-scale-btn {
+    all: unset;
+    box-sizing: border-box;
+    width: 58px;
+    height: 56px;
+    background-color: #2E321F;
+    color: var(--nd-answer);
+    border-radius: 8px;
+    box-shadow: rgba(219, 255, 0, 0.1) 0 0 0 1px;
+    font-size: 18px;
+    line-height: 24px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: inherit;
+    transition-property: background-color, color, box-shadow;
+    transition-duration: 0.25s;
+    transition-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+  }
+  #nd-quiz .nd-scale-btn:hover {
+    background-color: #363B1B;
+    box-shadow: rgba(219, 255, 0, 0.4) 0 0 0 1px;
+  }
+  #nd-quiz .nd-scale-btn.nd-selected,
+  #nd-quiz .nd-scale-btn.nd-selected:hover {
+    background-color: #222421;
+    box-shadow: #DBFF00 0 0 0 2px;
+  }
+
+  /* === TEXT / EMAIL / PHONE INPUTS === */
+  #nd-quiz .nd-input-wrap {
+    margin-bottom: 24px;
+    margin-left: 32px;
+    border-bottom: 2px solid rgba(219, 255, 0, 0.4);
+    padding-bottom: 2px;
+    transition: border-color 200ms ease;
+  }
+  /* Inside phone-row or contact-grid, input-wrap doesn't need extra indent (parent has it) */
+  #nd-quiz .nd-phone-row .nd-input-wrap,
+  #nd-quiz .nd-contact-grid .nd-input-wrap { margin-left: 0; }
+  #nd-quiz .nd-input-wrap:focus-within { border-bottom-color: var(--nd-answer); }
+  #nd-quiz .nd-input {
+    width: 100%;
+    font-size: 26px;
+    color: var(--nd-answer);
+    padding: 2px 0;
+  }
+  #nd-quiz .nd-input-label {
+    font-size: 20px;
+    font-weight: 400;
+    color: #FFFFFF;
+    margin-bottom: 2px;
+    display: block;
+  }
+  /* Phone row: ceo red ima JEDNU liniju ispod (umesto da +381 i input imaju zasebne linije) */
+  #nd-quiz .nd-phone-row {
+    position: relative;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-left: 32px;
+    margin-bottom: 24px;
+    border-bottom: 2px solid rgba(219, 255, 0, 0.4);
+    padding-bottom: 8px;
+    transition: border-color 200ms ease;
+  }
+  #nd-quiz .nd-phone-row:focus-within {
+    border-bottom-color: var(--nd-answer);
+  }
+
+  /* Country picker trigger (zastavica + chevron) */
+  #nd-quiz .nd-country-trigger {
+    all: unset;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    padding: 4px 2px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+  }
+  #nd-quiz .nd-country-trigger:hover {
+    background-color: rgba(219, 255, 0, 0.05);
+  }
+  #nd-quiz .nd-country-trigger:focus-visible {
+    outline: 2px solid var(--nd-answer);
+    outline-offset: 2px;
+  }
+  #nd-quiz .nd-flag-chevron {
+    width: 12px;
+    height: 8px;
+    color: var(--nd-answer);
+    transition: transform 0.2s ease;
+    flex-shrink: 0;
+  }
+  /* Kad je dropdown otvoren, strelica rotirana */
+  #nd-quiz .nd-country-trigger[aria-expanded="true"] .nd-flag-chevron {
+    transform: rotate(180deg);
+  }
+
+  /* Phone input direktno u row-u */
+  #nd-quiz .nd-phone-input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    padding: 6px 0;
+  }
+
+  /* Country dropdown - apsolutno pozicioniran ispod row-a */
+  /* Bg #232421 (kao u originalu), žuti glow border */
+  /* 24px padding sa strana, items su 320px široki, scrollbar dodatnih 8px */
+  #nd-quiz .nd-country-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    width: 376px; /* 320 + 24*2 + 8 (scrollbar prostor) */
+    max-width: 95vw;
+    max-height: 380px;
+    background: #232421;
+    box-shadow: rgba(219, 255, 0, 0.6) 0 0 0 1px;
+    border-radius: 14px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding: 12px 0 0 0;
+  }
+  #nd-quiz .nd-country-dropdown[hidden] {
+    display: none;
+  }
+
+  /* Search bar gore u dropdown-u - bez border-bottom-a u originalu */
+  #nd-quiz .nd-country-search-wrap {
+    position: relative;
+    margin: 0 24px 8px 24px;
+  }
+  #nd-quiz .nd-country-search {
+    width: 100%;
+    background: transparent;
+    border: none;
+    color: var(--nd-answer);
+    font-size: 16px;
+    line-height: 22px;
+    font-family: inherit;
+    padding: 6px 28px 6px 0;
+    outline: none;
+  }
+  #nd-quiz .nd-country-search::placeholder {
+    color: rgba(219, 255, 0, 0.45);
+  }
+  #nd-quiz .nd-country-search-icon {
+    position: absolute;
+    right: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 18px;
+    height: 18px;
+    color: var(--nd-answer);
+    pointer-events: none;
+  }
+
+  /* Lista zemalja - scrollable, items 320px široki */
+  /* Padding 24px sa strana, malo manji desno za scrollbar */
+  #nd-quiz .nd-country-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 4px 16px 12px 24px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--nd-answer) transparent;
+  }
+  #nd-quiz .nd-country-list::-webkit-scrollbar {
+    width: 6px;
+  }
+  #nd-quiz .nd-country-list::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  #nd-quiz .nd-country-list::-webkit-scrollbar-thumb {
+    background: var(--nd-answer);
+    border-radius: 3px;
+  }
+
+  /* Pojedinačna stavka u listi - 320x45 sa padding 6px/12px
+     Normal:   bg #2E321F, box-shadow rgba(219,255,0,0.1) 1px
+     Hover:    bg #363B1B, box-shadow rgba(219,255,0,0.4) 1px
+     Selected: bg #222421, box-shadow #DBFF00 2px
+  */
+  #nd-quiz .nd-country-item {
+    all: unset;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 320px;
+    height: 45px;
+    box-sizing: border-box;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    color: var(--nd-answer);
+    background-color: #2E321F;
+    box-shadow: rgba(219, 255, 0, 0.1) 0 0 0 1px;
+    margin-bottom: 6px;
+    transition: background-color 0.25s cubic-bezier(0.215, 0.61, 0.355, 1),
+                box-shadow 0.25s cubic-bezier(0.215, 0.61, 0.355, 1);
+  }
+  #nd-quiz .nd-country-item:hover {
+    background-color: #363B1B;
+    box-shadow: rgba(219, 255, 0, 0.4) 0 0 0 1px;
+  }
+  #nd-quiz .nd-country-item.nd-selected {
+    background-color: #222421;
+    box-shadow: #DBFF00 0 0 0 2px;
+  }
+  /* Poslednja stavka nema margin-bottom */
+  #nd-quiz .nd-country-item:last-child {
+    margin-bottom: 0;
+  }
+  #nd-quiz .nd-country-item-flag {
+    flex-shrink: 0;
+    width: 24px;
+    height: 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+  }
+  /* flag-icons biblioteka (CSS sprite) - svaka zastavica je background image */
+  #nd-quiz .nd-country-item-flag .fi,
+  #nd-quiz .nd-flag .fi {
+    width: 24px;
+    height: 18px;
+    display: inline-block;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: 2px;
+  }
+  /* Trigger zastavica može biti malo veća */
+  #nd-quiz .nd-flag .fi {
+    width: 26px;
+    height: 19px;
+  }
+  #nd-quiz .nd-country-item-name {
+    flex: 1;
+    font-size: 14px;
+    line-height: 20px;
+  }
+  #nd-quiz .nd-country-item-dial {
+    flex-shrink: 0;
+    font-size: 13px;
+    color: var(--nd-answer);
+  }
+  #nd-quiz .nd-country-empty {
+    padding: 20px;
+    text-align: center;
+    color: rgba(219, 255, 0, 0.5);
+    font-size: 14px;
+  }
+
+  /* Trigger zastavica - kontejner za flag-icons span */
+  #nd-quiz .nd-flag {
+    width: 28px;
+    height: 21px;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Contact info group (Q18 - First name / Last name / Email - vertikalno) */
+  #nd-quiz .nd-contact-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-bottom: 24px;
+    margin-left: 32px;
+  }
+  #nd-quiz .nd-contact-field { display: block; }
+  #nd-quiz .nd-required {
+    color: #DBFF00;
+    margin-left: 2px;
+  }
+
+  /* === SUBMIT / OK BUTTON ===
+     OK (Q1-Q18):    59x40 — 8px padding svuda + tekst 18px/24px sa 8px L/R padding
+     Kreni (welcome): 117x40 — isto, ali sa širim label padding-om
+  */
+  #nd-quiz .nd-actions {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-top: 16px;
+    margin-left: 32px;
+  }
+  #nd-quiz .nd-btn-primary {
+    background: var(--nd-button);
+    color: var(--nd-button-content);
+    font-weight: 600;
+    font-size: 18px;
+    line-height: 24px;
+    padding: 8px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: filter 120ms ease;
+    font-family: inherit;
+  }
+  /* Tekst unutar buttona ima dodatnih 8px horizontalno (vertikalno 0) */
+  #nd-quiz .nd-btn-primary > .nd-btn-label {
+    padding: 0 8px;
+    display: inline-block;
+  }
+  /* "Kreni" na welcome screenu - 117x40, širi tekst padding */
+  #nd-quiz .nd-welcome .nd-btn-primary {
+    min-width: 117px;
+  }
+  #nd-quiz .nd-btn-primary:hover { filter: brightness(0.92); }
+  #nd-quiz .nd-btn-primary[disabled] { opacity: 0.4; pointer-events: none; }
+
+  /* Back button — bela strelica levo od OK-a (suptilna, ne ometa OK) */
+  #nd-quiz .nd-btn-back {
+    background: rgba(255, 255, 255, 0.04);
+    color: rgba(255, 255, 255, 0.7);
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: color 120ms ease, background 120ms ease;
+    font-family: inherit;
+    padding: 0;
+  }
+  #nd-quiz .nd-btn-back svg { width: 18px; height: 18px; }
+  #nd-quiz .nd-btn-back:hover { color: #FFFFFF; background: rgba(255, 255, 255, 0.10); }
+  #nd-quiz .nd-btn-back:focus-visible { outline: 2px solid var(--nd-button); outline-offset: 2px; color: #FFFFFF; }
+
+  #nd-quiz .nd-enter-hint {
+    font-size: 13px;
+    color: rgba(255,255,255,0.55);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  #nd-quiz .nd-enter-hint kbd {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-family: inherit;
+    font-size: 11px;
+  }
+
+  /* === WELCOME / END SCREENS (iz Typeform: H1 26px/34px/400 belo, par 18px/24px #D3D3D3, time pill 14px/18px) === */
+  #nd-quiz .nd-welcome { text-align: center; max-width: 720px; margin: 0 auto; }
+  #nd-quiz .nd-welcome-title {
+    font-size: 26px;
+    line-height: 34px;
+    font-weight: 400;
+    margin: 0 0 18px 0;
+    color: var(--nd-question);
+  }
+  #nd-quiz .nd-welcome-desc {
+    font-size: 18px;
+    line-height: 24px;
+    color: var(--nd-text-muted);
+    margin: 0 auto 12px;
+    font-weight: 400;
+  }
+  #nd-quiz .nd-welcome-desc:last-of-type { margin-bottom: 28px; }
+  #nd-quiz .nd-welcome-desc strong { font-weight: 700; color: var(--nd-text-muted); }
+  #nd-quiz .nd-welcome .nd-actions { justify-content: center; margin-top: 0; margin-left: 0; }
+  #nd-quiz .nd-time-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 14px;
+    font-size: 14px;
+    line-height: 18px;
+    color: var(--nd-text-muted);
+    font-weight: 400;
+  }
+  #nd-quiz .nd-time-pill svg { width: 14px; height: 14px; opacity: 0.85; }
+
+  /* === LOADING SCREEN (after submit, before redirect) === */
+  #nd-quiz .nd-loading {
+    text-align: center;
+  }
+  #nd-quiz .nd-loading-title {
+    font-size: 28px;
+    margin-bottom: 18px;
+  }
+  #nd-quiz .nd-spinner {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    border: 3px solid rgba(219, 255, 0, 0.2);
+    border-top-color: var(--nd-answer);
+    margin: 0 auto 20px;
+    animation: nd-spin 720ms linear infinite;
+  }
+  @keyframes nd-spin { to { transform: rotate(360deg); } }
+
+  #nd-quiz .nd-error {
+    margin-top: 14px;
+    color: #ff6b6b;
+    font-size: 14px;
+  }
+
+  /* === MOBILE === */
+  @media (max-width: 640px) {
+    #nd-quiz .nd-q-title { font-size: 20px; line-height: 26px; }
+    #nd-quiz .nd-welcome-title { font-size: 22px; line-height: 28px; }
+    #nd-quiz .nd-welcome-desc { font-size: 16px; line-height: 22px; }
+    #nd-quiz .nd-input { font-size: 18px; }
+    #nd-quiz .nd-step, #nd-quiz .nd-stage { padding: 48px 18px 64px; }
+    #nd-quiz .nd-q-desc { padding-left: 0; margin-top: 0; }
+    #nd-quiz .nd-choice-label { font-size: 16px; line-height: 22px; }
+    /* Manje uvlačenje na mobilnom */
+    #nd-quiz .nd-choices,
+    #nd-quiz .nd-scale,
+    #nd-quiz .nd-input-wrap,
+    #nd-quiz .nd-phone-row,
+    #nd-quiz .nd-contact-grid,
+    #nd-quiz .nd-actions { margin-left: 0; }
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    #nd-quiz .nd-step { transition: opacity 200ms linear; }
+    #nd-quiz .nd-step.nd-leaving { transform: none; }
+  }
+
+  /* === WELCOME MOBILE FIX === */
+  /* Na mobile-u welcome ekran je vertikalno centriran u 100vh, što ostavlja
+     ~200px praznog prostora gore. Override: align-items: flex-start +
+     manji padding-top → sadržaj počinje od vrha sa malim dahnutim prostorom. */
+  @media (max-width: 640px) {
+    #nd-quiz .nd-step[data-key="__welcome"] {
+      align-items: flex-start;
+      padding-top: 50px;
+    }
+  }

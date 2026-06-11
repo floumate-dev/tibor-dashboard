@@ -1,0 +1,197 @@
+{
+    "name": "Stripe PI → GHL Invoice (module library)",
+    "flow": [
+        {
+            "id": 1,
+            "module": "gateway:CustomWebHook",
+            "version": 1,
+            "parameters": {
+                "hook": null,
+                "maxResults": 1
+            },
+            "mapper": {},
+            "metadata": {
+                "designer": { "x": 0, "y": 0 },
+                "restore": {
+                    "parameters": {
+                        "hook": {
+                            "data": { "editable": "true" },
+                            "label": "Pick or create any webhook (placeholder)"
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "hook",
+                        "type": "hook:gateway-webhook",
+                        "label": "Webhook",
+                        "required": true
+                    },
+                    {
+                        "name": "maxResults",
+                        "type": "number",
+                        "label": "Maximum number of results"
+                    }
+                ]
+            }
+        },
+        {
+            "id": 2,
+            "module": "http:ActionSendData",
+            "version": 3,
+            "parameters": {
+                "handleErrors": true,
+                "useNewZLibDeCompress": true
+            },
+            "mapper": {
+                "url": "https://services.leadconnectorhq.com/contacts/upsert",
+                "method": "post",
+                "headers": [
+                    { "name": "Authorization", "value": "Bearer pit-3da6b689-7fa4-498b-b305-da8350fae1c0" },
+                    { "name": "Version", "value": "2021-07-28" },
+                    { "name": "Accept", "value": "application/json" }
+                ],
+                "qs": [],
+                "bodyType": "raw",
+                "parseResponse": true,
+                "authPass": "",
+                "authUser": "",
+                "timeout": "",
+                "shareCookies": false,
+                "ca": "",
+                "rejectUnauthorized": true,
+                "followRedirect": true,
+                "useQuerystring": false,
+                "gzip": true,
+                "useMtls": false,
+                "contentType": "application/json",
+                "data": "{\n  \"locationId\": \"HpPZXEDKEJEJ82JxAWWU\",\n  \"email\": \"{{ifempty(1.data.object.receipt_email; 1.data.object.charges.data[].billing_details.email)}}\",\n  \"firstName\": \"{{1.data.object.charges.data[].billing_details.name}}\"\n}",
+                "followAllRedirects": false
+            },
+            "metadata": { "designer": { "x": 300, "y": 0 } }
+        },
+        {
+            "id": 3,
+            "module": "http:ActionSendData",
+            "version": 3,
+            "parameters": {
+                "handleErrors": true,
+                "useNewZLibDeCompress": true
+            },
+            "mapper": {
+                "url": "https://services.leadconnectorhq.com/invoices/",
+                "method": "post",
+                "headers": [
+                    { "name": "Authorization", "value": "Bearer pit-3da6b689-7fa4-498b-b305-da8350fae1c0" },
+                    { "name": "Version", "value": "2021-07-28" },
+                    { "name": "Accept", "value": "application/json" }
+                ],
+                "qs": [],
+                "bodyType": "raw",
+                "parseResponse": true,
+                "authPass": "",
+                "authUser": "",
+                "timeout": "",
+                "shareCookies": false,
+                "ca": "",
+                "rejectUnauthorized": true,
+                "followRedirect": true,
+                "useQuerystring": false,
+                "gzip": true,
+                "useMtls": false,
+                "contentType": "application/json",
+                "data": "{\n  \"altId\": \"HpPZXEDKEJEJ82JxAWWU\",\n  \"altType\": \"location\",\n  \"name\": \"Invoice {{1.data.object.id}}\",\n  \"currency\": \"{{upper(1.data.object.currency)}}\",\n  \"contactDetails\": { \"id\": \"{{2.contact.id}}\" },\n  \"items\": [\n    {\n      \"name\": \"{{ifempty(1.data.object.description; \"Service\")}}\",\n      \"currency\": \"{{upper(1.data.object.currency)}}\",\n      \"amount\": {{1.data.object.amount / 100}},\n      \"qty\": 1\n    }\n  ],\n  \"liveMode\": true,\n  \"issueDate\": \"{{formatDate(now; \"YYYY-MM-DD\")}}\",\n  \"dueDate\": \"{{formatDate(now; \"YYYY-MM-DD\")}}\"\n}",
+                "followAllRedirects": false
+            },
+            "metadata": { "designer": { "x": 600, "y": 0 } }
+        },
+        {
+            "id": 4,
+            "module": "http:ActionSendData",
+            "version": 3,
+            "parameters": {
+                "handleErrors": true,
+                "useNewZLibDeCompress": true
+            },
+            "mapper": {
+                "url": "https://services.leadconnectorhq.com/invoices/{{3._id}}/send",
+                "method": "post",
+                "headers": [
+                    { "name": "Authorization", "value": "Bearer pit-3da6b689-7fa4-498b-b305-da8350fae1c0" },
+                    { "name": "Version", "value": "2021-07-28" },
+                    { "name": "Accept", "value": "application/json" }
+                ],
+                "qs": [],
+                "bodyType": "raw",
+                "parseResponse": true,
+                "authPass": "",
+                "authUser": "",
+                "timeout": "",
+                "shareCookies": false,
+                "ca": "",
+                "rejectUnauthorized": true,
+                "followRedirect": true,
+                "useQuerystring": false,
+                "gzip": true,
+                "useMtls": false,
+                "contentType": "application/json",
+                "data": "{\n  \"altId\": \"HpPZXEDKEJEJ82JxAWWU\",\n  \"altType\": \"location\",\n  \"userId\": \"jJC1xQ6yuMyQa2GRMhz7\",\n  \"action\": \"email\",\n  \"liveMode\": true\n}",
+                "followAllRedirects": false
+            },
+            "metadata": { "designer": { "x": 900, "y": 0 } }
+        },
+        {
+            "id": 5,
+            "module": "http:ActionSendData",
+            "version": 3,
+            "parameters": {
+                "handleErrors": true,
+                "useNewZLibDeCompress": true
+            },
+            "mapper": {
+                "url": "https://services.leadconnectorhq.com/invoices/{{3._id}}/record-payment",
+                "method": "post",
+                "headers": [
+                    { "name": "Authorization", "value": "Bearer pit-3da6b689-7fa4-498b-b305-da8350fae1c0" },
+                    { "name": "Version", "value": "2021-07-28" },
+                    { "name": "Accept", "value": "application/json" }
+                ],
+                "qs": [],
+                "bodyType": "raw",
+                "parseResponse": true,
+                "authPass": "",
+                "authUser": "",
+                "timeout": "",
+                "shareCookies": false,
+                "ca": "",
+                "rejectUnauthorized": true,
+                "followRedirect": true,
+                "useQuerystring": false,
+                "gzip": true,
+                "useMtls": false,
+                "contentType": "application/json",
+                "data": "{\n  \"altId\": \"HpPZXEDKEJEJ82JxAWWU\",\n  \"altType\": \"location\",\n  \"mode\": \"live\",\n  \"amount\": {{1.data.object.amount / 100}},\n  \"paymentMethod\": { \"type\": \"card\" },\n  \"notes\": \"Stripe PI: {{1.data.object.id}}\"\n}",
+                "followAllRedirects": false
+            },
+            "metadata": { "designer": { "x": 1200, "y": 0 } }
+        }
+    ],
+    "metadata": {
+        "instant": true,
+        "version": 1,
+        "scenario": {
+            "roundtrips": 1,
+            "maxErrors": 3,
+            "autoCommit": true,
+            "autoCommitTriggerLast": true,
+            "sequential": false,
+            "slots": null,
+            "confidential": false,
+            "dataloss": false,
+            "dlq": false,
+            "freshVariables": false
+        },
+        "designer": { "orphans": [] },
+        "zone": "us2.make.com"
+    }
+}

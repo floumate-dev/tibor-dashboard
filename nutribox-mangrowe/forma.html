@@ -1,0 +1,1794 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Prijava — 28-dnevni izazov · Mangrowe × Nutribox</title>
+<meta name="description" content="Popuni formu i dobij personalizovanu metaboličku analizu pre nego što kreneš sa izazovom." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #317039;
+    --primary-hover: #388041;
+    --primary-soft: #e8f1e9;
+    --dark: #101a24;
+    --text: #101a24cc;
+    --text-soft: #101a2499;
+    --background: #ffffff;
+    --secondary: #f8f8f8;
+    --line: #ececec;
+    --line-strong: #d8dad6;
+    --accent: #f23849;
+    --accent-deep: #b80003;
+    --warn-bg: #fff3cd;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--secondary);
+    color: var(--dark);
+    font-family: 'Instrument Sans', system-ui, -apple-system, sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+  img { display: block; max-width: 100%; height: auto; }
+
+  /* === Step timeline === */
+  .step-timeline {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 40px 24px 0;
+  }
+  .step-timeline-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .segments {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 6px;
+  }
+  .seg {
+    height: 4px;
+    border-radius: 999px;
+    background: var(--line);
+    transition: background .3s ease, transform .3s ease;
+  }
+  .seg.done { background: var(--primary); }
+  .seg.current {
+    background: var(--primary);
+    transform: scaleY(1.5);
+  }
+  .step-meta {
+    font-size: 13px;
+    color: var(--text-soft);
+    letter-spacing: 0.01em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .step-meta strong { color: var(--dark); font-weight: 600; }
+  .step-meta-sep { color: var(--line-strong); }
+  .step-meta-remaining { color: var(--text-soft); }
+  @media (max-width: 600px) {
+    .step-timeline { padding: 24px 20px 0; }
+    .segments { gap: 4px; }
+  }
+
+  /* === Layout === */
+  .wrap {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 64px 24px 120px;
+  }
+  .wrap.wide { max-width: 720px; }
+
+  h1, h2, h3, h4 {
+    font-family: 'Instrument Sans', sans-serif;
+    margin: 0 0 16px;
+    color: var(--dark);
+    text-wrap: balance;
+    line-height: 1.15;
+  }
+  h1 { font-size: 26px; font-weight: 600; letter-spacing: -0.01em; }
+  h2 { font-size: 21px; font-weight: 600; }
+  h3 { font-size: 17px; font-weight: 600; }
+  @media (max-width: 600px) {
+    h1 { font-size: 22px; }
+    h2 { font-size: 19px; }
+  }
+  p { margin: 0 0 12px; color: var(--text); text-wrap: pretty; font-size: 14px; }
+  .lead { font-size: 15px; line-height: 1.5; color: var(--text); }
+  .micro { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--primary); font-weight: 600; }
+
+  /* Step heading */
+  .step-head { margin-bottom: 24px; }
+  .step-head .micro { display: block; margin-bottom: 8px; }
+
+  /* === Cards (radio) === */
+  .options { display: grid; gap: 12px; }
+  .options.cols-3 { grid-template-columns: repeat(3, 1fr); }
+  .options.cols-2 { grid-template-columns: repeat(2, 1fr); }
+  @media (max-width: 600px) {
+    .options.cols-3, .options.cols-2 { grid-template-columns: 1fr; }
+  }
+
+  .opt {
+    background: #fff;
+    border: 1.5px solid var(--line);
+    border-radius: 16px 4px;
+    padding: 22px 22px;
+    cursor: pointer;
+    transition: all .15s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    user-select: none;
+    position: relative;
+  }
+  .opt:hover {
+    border-color: var(--primary);
+    transform: translateY(-1px);
+  }
+  .opt input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .opt .opt-radio {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    border: 1.5px solid var(--line-strong);
+    flex: 0 0 22px;
+    margin-top: 2px;
+    transition: all .15s;
+    position: relative;
+  }
+  .opt input:checked ~ .opt-radio {
+    border-color: var(--primary);
+    background: var(--primary);
+  }
+  .opt input:checked ~ .opt-radio::after {
+    content: "";
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #fff;
+  }
+  .opt input:checked + .opt-radio,
+  .opt:has(input:checked) {
+    border-color: var(--primary);
+    background: var(--primary-soft);
+  }
+  .opt-body { flex: 1; }
+  .opt-title { font-weight: 600; font-size: 16px; margin-bottom: 4px; color: var(--dark); }
+  .opt-desc { font-size: 13px; color: var(--text-soft); line-height: 1.4; }
+  .opt-emoji { font-size: 22px; margin-right: 4px; }
+
+  /* === Form fields === */
+  .field { margin-bottom: 22px; }
+  .field > label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--dark);
+    margin-bottom: 8px;
+  }
+  .field .hint { font-size: 12px; color: var(--text-soft); margin-top: 6px; }
+  .field input, .field select {
+    width: 100%;
+    background: #fff;
+    border: 1.5px solid var(--line);
+    border-radius: 12px;
+    padding: 14px 16px;
+    font-family: inherit;
+    font-size: 16px;
+    color: var(--dark);
+    transition: border-color .15s, box-shadow .15s;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  .field input:focus, .field select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(49,112,57,0.12);
+  }
+  .field.error input, .field.error select {
+    border-color: var(--accent);
+  }
+  .field .err {
+    display: none;
+    color: var(--accent);
+    font-size: 13px;
+    margin-top: 6px;
+  }
+  .field.error .err { display: block; }
+
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 600px) { .field-row { grid-template-columns: 1fr; gap: 0; } }
+
+  .field-suffix-wrap { position: relative; }
+  .field-suffix-wrap .suffix {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-soft);
+    font-size: 14px;
+    pointer-events: none;
+  }
+  .field-suffix-wrap input { padding-right: 48px; }
+
+  /* === Phone with country code (single unified field) === */
+  .phone-row {
+    display: flex;
+    align-items: stretch;
+    background: #fff;
+    border: 1.5px solid var(--line);
+    border-radius: 12px;
+    transition: border-color .15s, box-shadow .15s;
+    overflow: hidden;
+  }
+  .phone-row:focus-within {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(49,112,57,0.12);
+  }
+  .field.error .phone-row { border-color: var(--accent); }
+  .phone-row select,
+  .phone-row input {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    border-radius: 0;
+  }
+  .phone-row select:focus,
+  .phone-row input:focus {
+    outline: none;
+    box-shadow: none;
+    border: none;
+  }
+  .phone-row select {
+    flex: 0 0 auto;
+    width: 116px;
+    padding-right: 32px;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23101a24' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    cursor: pointer;
+    font-weight: 500;
+  }
+  .phone-row .divider {
+    width: 1px;
+    background: var(--line);
+    margin: 10px 0;
+    flex: 0 0 1px;
+  }
+  .phone-row input { flex: 1; min-width: 0; }
+
+  /* === Buttons === */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    border-radius: 1rem;
+    padding: 14px 36px;
+    font-weight: 600;
+    font-family: inherit;
+    font-size: 16px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all .18s;
+    box-shadow: 0 6px 20px -8px rgba(49,112,57,0.45);
+  }
+  .btn:hover { background: var(--primary-hover); transform: translateY(-1px); }
+  .btn:disabled { background: var(--line-strong); cursor: not-allowed; box-shadow: none; transform: none; }
+  .btn.lg { padding: 18px 44px; font-size: 17px; }
+  .btn.ghost {
+    background: transparent;
+    color: var(--dark);
+    box-shadow: none;
+    border: 1.5px solid var(--line);
+  }
+  .btn.ghost:hover { background: var(--secondary); border-color: var(--line-strong); }
+
+  .nav-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 14px;
+    margin-top: 36px;
+  }
+  .nav-row.center { justify-content: center; }
+  .nav-row .btn:only-child { margin-left: auto; }
+
+  /* === Screens === */
+  .screen { display: none; animation: fadeIn .3s ease; }
+  .screen.active { display: block; }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* === Result tiles (composition) — compact === */
+  .result-hero {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 14px 4px;
+    padding: 14px 20px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .result-hero .hero-main { display: flex; align-items: baseline; gap: 12px; flex: 1; min-width: 0; }
+  .result-hero .label { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-soft); font-weight: 600; margin: 0; white-space: nowrap; }
+  .result-hero .value { font-size: 30px; font-weight: 600; line-height: 1; letter-spacing: -0.02em; }
+  .result-hero .value.green { color: var(--primary); }
+  .result-hero .sub {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--primary);
+    background: var(--primary-soft);
+    padding: 5px 12px;
+    border-radius: 999px;
+    margin: 0;
+    letter-spacing: 0.01em;
+  }
+
+  .result-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 6px; }
+  .result-grid.cols-6 { grid-template-columns: repeat(6, 1fr); }
+  @media (max-width: 900px) { .result-grid.cols-6 { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 720px) { .result-grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 480px) {
+    .result-grid, .result-grid.cols-6 { grid-template-columns: 1fr 1fr; }
+    .result-hero { padding: 12px 16px; }
+    .result-hero .value { font-size: 26px; }
+  }
+
+  .result-card {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 10px 3px;
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 4px;
+  }
+  .result-card .key { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-soft); font-weight: 600; margin-bottom: 4px; line-height: 1.2; }
+  .result-card .num { font-size: 18px; font-weight: 600; color: var(--dark); letter-spacing: -0.01em; line-height: 1.1; }
+  .result-card .num .pct { color: var(--text-soft); font-size: 12px; font-weight: 500; }
+
+  .fat-zones {
+    margin-top: 20px;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 10px 3px;
+    padding: 16px 18px;
+  }
+  .fat-zones-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .fat-zones-title { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-soft); font-weight: 600; }
+  .fat-zones-value { font-size: 18px; font-weight: 700; color: var(--dark); }
+  .fat-zones-bar {
+    position: relative;
+    display: flex;
+    height: 14px;
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 10px;
+  }
+  .fat-zones-bar .zone {
+    flex: 1;
+    position: relative;
+    opacity: 0.35;
+    transition: opacity 0.3s;
+  }
+  .fat-zones-bar .zone.active { opacity: 1; }
+  .fat-zones-bar .zone.z-green  { background: #2faa6b; }
+  .fat-zones-bar .zone.z-yellow { background: #e8b633; }
+  .fat-zones-bar .zone.z-orange { background: #e67a2e; }
+  .fat-zones-bar .zone.z-red    { background: #d23b3b; }
+  .fat-zones-bar .marker {
+    position: absolute;
+    top: -3px;
+    bottom: -3px;
+    width: 2px;
+    background: var(--dark);
+    border-radius: 2px;
+    transform: translateX(-50%);
+    box-shadow: 0 0 0 3px #fff;
+  }
+  .fat-zones-legend {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
+    font-size: 10px;
+    color: var(--text-soft);
+  }
+  .fat-zones-legend .leg {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding-left: 8px;
+    border-left: 2px solid transparent;
+    line-height: 1.3;
+  }
+  .fat-zones-legend .leg.active { color: var(--dark); font-weight: 700; }
+  .fat-zones-legend .leg .leg-name { font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; }
+  .fat-zones-legend .leg .leg-range { font-size: 11px; }
+  .fat-zones-legend .leg.z-green  { border-left-color: #2faa6b; }
+  .fat-zones-legend .leg.z-yellow { border-left-color: #e8b633; }
+  .fat-zones-legend .leg.z-orange { border-left-color: #e67a2e; }
+  .fat-zones-legend .leg.z-red    { border-left-color: #d23b3b; }
+  @media (max-width: 600px) {
+    .fat-zones-legend { grid-template-columns: repeat(2, 1fr); }
+  }
+  .result-section-label {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-soft);
+    font-weight: 600;
+    margin: 12px 0 6px;
+  }
+
+  .commentary {
+    background: linear-gradient(160deg, #d8412a, #b80003);
+    color: #fff;
+    border-radius: 24px 6px;
+    padding: 28px 32px;
+    margin: 28px 0 32px;
+    box-shadow: 0 12px 32px -16px rgba(184,0,3,0.4);
+  }
+  .commentary p { color: rgba(255,255,255,0.95); margin-bottom: 12px; font-size: 16px; line-height: 1.55; }
+  .commentary p:last-child { margin-bottom: 0; }
+  .commentary strong { color: #fff; font-weight: 600; }
+
+  .body-type-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--primary);
+    color: #fff;
+    border-radius: 999px;
+    padding: 8px 18px;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    margin-bottom: 16px;
+  }
+
+  /* === Radar chart === */
+  .radar-wrap {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 24px 6px;
+    padding: 32px;
+    text-align: center;
+    margin-bottom: 28px;
+  }
+  .radar-svg { width: 100%; max-width: 480px; height: auto; margin: 0 auto; }
+  .radar-legend { display: flex; gap: 24px; justify-content: center; margin-top: 20px; font-size: 14px; flex-wrap: wrap; }
+  .radar-legend .item { display: flex; align-items: center; gap: 8px; color: var(--text); }
+  .radar-legend .dot { width: 12px; height: 12px; border-radius: 50%; }
+  .radar-legend .dot.green { background: rgba(49,112,57,0.85); }
+  .radar-legend .dot.orange { background: #e89a3c; }
+  .radar-legend .dot.red { background: rgba(210,59,59,0.55); }
+
+  .score-compare {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: stretch;
+    gap: 16px;
+    margin: 28px auto 0;
+    max-width: 720px;
+  }
+  .score-compare-item {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 12px 4px;
+    padding: 20px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .score-compare-item.healthy { border-color: rgba(49,112,57,0.35); background: rgba(49,112,57,0.04); }
+  .score-compare-item.current { border-color: rgba(232,154,60,0.45); background: rgba(232,154,60,0.05); }
+  .score-compare-label { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-soft); font-weight: 700; }
+  .score-compare-value {
+    font-size: 48px;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--dark);
+  }
+  .score-compare-item.healthy .score-compare-value { color: #2f7a3a; }
+  .score-compare-item.current .score-compare-value { color: #c87420; }
+  .score-compare-value .suffix { font-size: 18px; color: var(--text-soft); font-weight: 500; margin-left: 4px; }
+  .score-compare-bar {
+    height: 8px;
+    background: #eee;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .score-compare-bar .fill {
+    height: 100%;
+    transition: width 0.6s ease-out;
+  }
+  .score-compare-bar .fill.green { background: linear-gradient(90deg, #2faa6b, #2f7a3a); }
+  .score-compare-bar .fill.orange { background: linear-gradient(90deg, #e89a3c, #d23b3b); }
+  .score-compare-sub { font-size: 12px; color: var(--text-soft); line-height: 1.3; }
+  .score-compare-vs {
+    align-self: center;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    padding: 0 4px;
+  }
+
+  .score-gap-callout {
+    max-width: 720px;
+    margin: 14px auto 0;
+    padding: 14px 18px;
+    background: rgba(210,59,59,0.08);
+    border-left: 3px solid #d23b3b;
+    border-radius: 4px;
+    font-size: 14px;
+    color: var(--dark);
+    line-height: 1.5;
+  }
+  .score-gap-callout strong { color: #d23b3b; font-weight: 700; }
+
+  @media (max-width: 600px) {
+    .score-compare { grid-template-columns: 1fr; }
+    .score-compare-vs { padding: 4px 0; }
+    .score-compare-value { font-size: 40px; }
+  }
+
+  /* === Birthdate inline trio === */
+  .date-row { display: grid; grid-template-columns: 1fr 1.4fr 1fr; gap: 10px; }
+
+  /* === Checkout CTA === */
+  .checkout-error { color: var(--accent-deep); font-size: 14px; text-align: center; margin-top: 12px; }
+</style>
+</head>
+<body>
+
+<div class="step-timeline" id="stepTimeline">
+  <div class="step-timeline-inner">
+    <div class="segments" id="segments">
+      <span class="seg"></span>
+      <span class="seg"></span>
+      <span class="seg"></span>
+      <span class="seg"></span>
+      <span class="seg"></span>
+      <span class="seg"></span>
+      <span class="seg"></span>
+      <span class="seg"></span>
+    </div>
+    <div class="step-meta">
+      <strong id="stepNow">1</strong>
+      <span>/ 8</span>
+      <span class="step-meta-sep">·</span>
+      <span class="step-meta-remaining" id="stepRemaining">još 7 koraka</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============ STEP 1 — Tip ishrane ============ -->
+<section class="screen active" data-screen="1" data-auto-next>
+  <div class="wrap">
+    <div class="step-head">
+      <span class="micro">Korak 1 · Tip ishrane</span>
+      <h1>Izaberi svoj tip ishrane</h1>
+      <p class="lead">Prilagođavamo meni — svi obroci u tvom boxu prate ovaj izbor.</p>
+    </div>
+
+    <div class="options">
+      <label class="opt">
+        <input type="radio" name="diet" value="vegeterian" />
+        <span class="opt-radio"></span>
+        <div class="opt-body">
+          <div class="opt-title"><span class="opt-emoji">🥗</span>Vegeterijanski</div>
+          <div class="opt-desc">Bez mesa i ribe. Biljni proteini, mlečni proizvodi, jaja.</div>
+        </div>
+      </label>
+      <label class="opt">
+        <input type="radio" name="diet" value="balance" />
+        <span class="opt-radio"></span>
+        <div class="opt-body">
+          <div class="opt-title"><span class="opt-emoji">🍽️</span>Balans (meso + riba)</div>
+          <div class="opt-desc">Pun balansiran meni — meso, riba, povrće, žitarice.</div>
+        </div>
+      </label>
+      <label class="opt">
+        <input type="radio" name="diet" value="pescaterian" />
+        <span class="opt-radio"></span>
+        <div class="opt-body">
+          <div class="opt-title"><span class="opt-emoji">🐟</span>Pescaterian</div>
+          <div class="opt-desc">Bez mesa — riba, plodovi mora, biljna hrana.</div>
+        </div>
+      </label>
+    </div>
+
+    <div class="nav-row">
+      <span></span>
+      <button class="btn" data-next>Dalje →</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STEP 2 — Ime + Kontakt ============ -->
+<section class="screen" data-screen="2">
+  <div class="wrap">
+    <div class="step-head">
+      <span class="micro">Korak 2 · Tvoji podaci</span>
+      <h1>Predstavi se</h1>
+      <p class="lead">Šaljemo ti potvrdu prijave + instrukcije pre starta izazova.</p>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label for="ime">Ime</label>
+        <input id="ime" type="text" autocomplete="given-name" required />
+        <div class="err">Unesi ime.</div>
+      </div>
+      <div class="field">
+        <label for="prezime">Prezime</label>
+        <input id="prezime" type="text" autocomplete="family-name" required />
+        <div class="err">Unesi prezime.</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="email">E-mail adresa</label>
+      <input id="email" type="email" autocomplete="email" required placeholder="ti@primer.com" />
+      <div class="err">Unesi važeću email adresu.</div>
+    </div>
+
+    <div class="field">
+      <label for="telefon">Kontakt telefon</label>
+      <div class="phone-row">
+        <select id="phoneCountry" aria-label="Pozivni broj">
+          <!-- populated by JS -->
+        </select>
+        <span class="divider" aria-hidden="true"></span>
+        <input id="telefon" type="tel" autocomplete="tel" required placeholder="63 1234567" inputmode="tel" />
+      </div>
+      <div class="err" id="telefonErr">Unesi važeći broj telefona.</div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn ghost" data-prev>← Nazad</button>
+      <button class="btn" data-next>Dalje →</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STEP 3 — Lični podaci za proračun ============ -->
+<section class="screen" data-screen="3">
+  <div class="wrap">
+    <div class="step-head">
+      <span class="micro">Korak 3 · Lični podaci</span>
+      <h1>Osnovni podaci o tebi</h1>
+      <p class="lead">Koristimo ih za personalizaciju protokola i porcija. Svi podaci su privatni.</p>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label for="visina">Visina</label>
+        <div class="field-suffix-wrap">
+          <input id="visina" type="number" min="120" max="220" step="1" inputmode="numeric" required />
+          <span class="suffix">cm</span>
+        </div>
+        <div class="err">Visina mora biti između 120 i 220 cm.</div>
+      </div>
+      <div class="field">
+        <label for="tezina">Težina</label>
+        <div class="field-suffix-wrap">
+          <input id="tezina" type="number" min="35" max="250" step="0.1" inputmode="decimal" required />
+          <span class="suffix">kg</span>
+        </div>
+        <div class="err">Težina mora biti između 35 i 250 kg.</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Pol</label>
+      <div class="options cols-2">
+        <label class="opt">
+          <input type="radio" name="pol" value="M" />
+          <span class="opt-radio"></span>
+          <div class="opt-body">
+            <div class="opt-title">Muški</div>
+          </div>
+        </label>
+        <label class="opt">
+          <input type="radio" name="pol" value="Z" />
+          <span class="opt-radio"></span>
+          <div class="opt-body">
+            <div class="opt-title">Ženski</div>
+          </div>
+        </label>
+      </div>
+      <div class="err" id="polErr">Izaberi pol.</div>
+    </div>
+
+    <div class="field">
+      <label>Datum rođenja</label>
+      <div class="date-row">
+        <input id="dob_dan" type="number" min="1" max="31" placeholder="Dan" inputmode="numeric" required />
+        <select id="dob_mesec" required>
+          <option value="">Mesec</option>
+          <option value="1">Januar</option>
+          <option value="2">Februar</option>
+          <option value="3">Mart</option>
+          <option value="4">April</option>
+          <option value="5">Maj</option>
+          <option value="6">Jun</option>
+          <option value="7">Jul</option>
+          <option value="8">Avgust</option>
+          <option value="9">Septembar</option>
+          <option value="10">Oktobar</option>
+          <option value="11">Novembar</option>
+          <option value="12">Decembar</option>
+        </select>
+        <input id="dob_godina" type="number" min="1925" max="2015" placeholder="Godina" inputmode="numeric" required />
+      </div>
+      <div class="err" id="dobErr">Unesi važeći datum rođenja.</div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn ghost" data-prev>← Nazad</button>
+      <button class="btn" data-next>Dalje →</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STEP 4 — Aktivnost ============ -->
+<section class="screen" data-screen="4" data-auto-next>
+  <div class="wrap">
+    <div class="step-head">
+      <span class="micro">Korak 4 · Aktivnost</span>
+      <h1>Koliko se krećeš tokom dana?</h1>
+      <p class="lead">Određuje koliko kalorija ti telo realno troši — osnov za podešavanje protokola.</p>
+    </div>
+
+    <div class="options">
+      <label class="opt">
+        <input type="radio" name="aktivnost" value="1.55" />
+        <span class="opt-radio"></span>
+        <div class="opt-body">
+          <div class="opt-title">Dosta — treniram ili posao na nogama</div>
+          <div class="opt-desc">Faktor aktivnosti 1.55</div>
+        </div>
+      </label>
+      <label class="opt">
+        <input type="radio" name="aktivnost" value="1.375" />
+        <span class="opt-radio"></span>
+        <div class="opt-body">
+          <div class="opt-title">Umereno — povremene šetnje</div>
+          <div class="opt-desc">Faktor aktivnosti 1.375</div>
+        </div>
+      </label>
+      <label class="opt">
+        <input type="radio" name="aktivnost" value="1.20" />
+        <span class="opt-radio"></span>
+        <div class="opt-body">
+          <div class="opt-title">Malo — uglavnom sedim</div>
+          <div class="opt-desc">Faktor aktivnosti 1.20</div>
+        </div>
+      </label>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn ghost" data-prev>← Nazad</button>
+      <button class="btn" data-next>Dalje →</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STEP 5 — Tip tela ============ -->
+<section class="screen" data-screen="5" data-auto-next>
+  <div class="wrap">
+    <div class="step-head">
+      <span class="micro">Korak 5 · Tip tela</span>
+      <h1>Kako izgleda tvoje telo trenutno?</h1>
+      <p class="lead">Tvoja iskrena percepcija — neće uticati na proračune, samo na ton komentara.</p>
+    </div>
+
+    <div class="options">
+      <label class="opt">
+        <input type="radio" name="telo" value="manjak" />
+        <span class="opt-radio"></span>
+        <div class="opt-body">
+          <div class="opt-title">Manjak kilograma</div>
+          <div class="opt-desc">Teško dobijaš težinu.</div>
+        </div>
+      </label>
+      <label class="opt">
+        <input type="radio" name="telo" value="normalno" />
+        <span class="opt-radio"></span>
+        <div class="opt-body">
+          <div class="opt-title">Normalno, ali postoje „mekani" delovi</div>
+          <div class="opt-desc">Težina je u redu, ali sastav nije idealan.</div>
+        </div>
+      </label>
+      <label class="opt">
+        <input type="radio" name="telo" value="visak" />
+        <span class="opt-radio"></span>
+        <div class="opt-body">
+          <div class="opt-title">Višak kg</div>
+          <div class="opt-desc">Imaš višak težine koji želiš da skineš.</div>
+        </div>
+      </label>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn ghost" data-prev>← Nazad</button>
+      <button class="btn" data-next>Izračunaj moj profil →</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ INTERIM RESULTS — Body composition ============ -->
+<section class="screen" data-screen="results-1">
+  <div class="wrap wide">
+    <div class="step-head">
+      <span class="micro">Tvoja metabolička analiza</span>
+      <h1 id="resultGreeting">Tvoje telo u brojevima</h1>
+      <p class="lead">Ovo su tvoje izmerene vrednosti, izračunate iz podataka koje si uneo.</p>
+    </div>
+
+    <div class="result-hero">
+      <div class="hero-main">
+        <div class="label">BMI</div>
+        <div class="value green"><span id="bmiValue">0.0</span></div>
+      </div>
+      <div class="sub" id="bmiCategory">—</div>
+    </div>
+
+    <div class="result-grid">
+      <div class="result-card">
+        <div class="key">Tip građe</div>
+        <div class="num" id="bodyTypeLabel" style="font-size:14px; line-height:1.2;">—</div>
+      </div>
+      <div class="result-card">
+        <div class="key">TDEE</div>
+        <div class="num"><span id="tdeeValue">0</span> <span class="pct">kcal</span></div>
+      </div>
+      <div class="result-card">
+        <div class="key">BMR</div>
+        <div class="num"><span id="bmrValue">0</span> <span class="pct">kcal</span></div>
+      </div>
+    </div>
+
+    <div class="result-section-label">Telesni sastav</div>
+    <div class="result-grid cols-6">
+      <div class="result-card">
+        <div class="key">Masti</div>
+        <div class="num"><span id="fatPct">0</span><span class="pct">%</span></div>
+      </div>
+      <div class="result-card">
+        <div class="key">Mišići</div>
+        <div class="num"><span id="lbmPct">0</span><span class="pct">%</span></div>
+      </div>
+      <div class="result-card">
+        <div class="key">Voda</div>
+        <div class="num"><span id="waterPct">0</span><span class="pct">%</span></div>
+      </div>
+      <div class="result-card">
+        <div class="key">Krv</div>
+        <div class="num"><span id="bloodPct">0</span><span class="pct">%</span></div>
+      </div>
+      <div class="result-card">
+        <div class="key">Organi</div>
+        <div class="num"><span id="organsPct">0</span><span class="pct">%</span></div>
+      </div>
+      <div class="result-card">
+        <div class="key">Minerali</div>
+        <div class="num"><span id="bonesPct">0</span><span class="pct">%</span></div>
+      </div>
+    </div>
+
+    <div class="fat-zones">
+      <div class="fat-zones-header">
+        <span class="fat-zones-title">Tvoj % masti u odnosu na zdravstvene zone</span>
+        <span class="fat-zones-value"><span id="fatZoneValue">0</span>%</span>
+      </div>
+      <div class="fat-zones-bar" id="fatZonesBar"></div>
+      <div class="fat-zones-legend" id="fatZonesLegend"></div>
+    </div>
+
+    <div class="commentary">
+      <p id="commentary1">—</p>
+      <p id="commentary2"><strong>A ovo je samo početak.</strong> Sada krećemo u dubinsku analizu tvog sistema — jer brojevi koje si video nisu uzrok, već posledica onoga što se dešava unutar tvog tela.</p>
+    </div>
+
+    <div class="nav-row center">
+      <button class="btn lg" data-next>Nastavi na dubinsku analizu →</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STEP 6 — San ============ -->
+<section class="screen" data-screen="6" data-auto-next>
+  <div class="wrap">
+    <div class="step-head">
+      <span class="micro">Korak 6 · Kvalitet sna</span>
+      <h1>Kako spavaš?</h1>
+      <p class="lead">San je osnov hormonskog balansa — direktno utiče na to kako tvoje telo regeneriše.</p>
+    </div>
+
+    <div class="options">
+      <label class="opt"><input type="radio" name="san" value="100" /><span class="opt-radio"></span><div class="opt-body"><div class="opt-title">Budim se potpuno odmoran</div></div></label>
+      <label class="opt"><input type="radio" name="san" value="75" /><span class="opt-radio"></span><div class="opt-body"><div class="opt-title">Uglavnom dobro, retko umoran</div></div></label>
+      <label class="opt"><input type="radio" name="san" value="50" /><span class="opt-radio"></span><div class="opt-body"><div class="opt-title">Promenljivo — neki dani da, neki ne</div></div></label>
+      <label class="opt"><input type="radio" name="san" value="25" /><span class="opt-radio"></span><div class="opt-body"><div class="opt-title">Često se budim umoran</div></div></label>
+      <label class="opt"><input type="radio" name="san" value="0" /><span class="opt-radio"></span><div class="opt-body"><div class="opt-title">Skoro uvek umoran, čak i posle 8h</div></div></label>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn ghost" data-prev>← Nazad</button>
+      <button class="btn" data-next>Dalje →</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STEP 7 — Energija ============ -->
+<section class="screen" data-screen="7" data-auto-next>
+  <div class="wrap">
+    <div class="step-head">
+      <span class="micro">Korak 7 · Dnevna energija</span>
+      <h1>Kako ti ide energija kroz dan?</h1>
+      <p class="lead">Pokazuje koliko stabilno tvoj sistem radi — od šećera u krvi do kortizola.</p>
+    </div>
+
+    <div class="options">
+      <label class="opt"><input type="radio" name="energija" value="100" /><span class="opt-radio"></span><div class="opt-body"><div class="opt-title">Stabilna ceo dan</div></div></label>
+      <label class="opt"><input type="radio" name="energija" value="75" /><span class="opt-radio"></span><div class="opt-body"><div class="opt-title">Uglavnom stabilna, mali pad popodne</div></div></label>
+      <label class="opt"><input type="radio" name="energija" value="50" /><span class="opt-radio"></span><div class="opt-body"><div class="opt-title">Padne 1–2 puta u toku dana</div></div></label>
+      <label class="opt"><input type="radio" name="energija" value="25" /><span class="opt-radio"></span><div class="opt-body"><div class="opt-title">Više padova kroz dan</div></div></label>
+      <label class="opt"><input type="radio" name="energija" value="0" /><span class="opt-radio"></span><div class="opt-body"><div class="opt-title">Veliki padovi, jedva funkcionišem</div></div></label>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn ghost" data-prev>← Nazad</button>
+      <button class="btn" data-next>Dalje →</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STEP 8 — Stres ============ -->
+<section class="screen" data-screen="8" data-auto-next>
+  <div class="wrap">
+    <div class="step-head">
+      <span class="micro">Korak 8 · Nivo stresa</span>
+      <h1>Kako izgleda tvoj nivo stresa?</h1>
+      <p class="lead">Stres direktno ruši hormonsku ravnotežu. Iskreno, kako se tvoj nivo menja kroz dan?</p>
+    </div>
+
+    <div class="options">
+      <label class="opt"><input type="radio" name="stres" value="0" /><span class="opt-radio"></span><div class="opt-body"><div class="opt-title">Stabilno nizak</div></div></label>
+      <label class="opt"><input type="radio" name="stres" value="25" /><span class="opt-radio"></span><div class="opt-body"><div class="opt-title">Ujutru visok, kasnije pada</div></div></label>
+      <label class="opt"><input type="radio" name="stres" value="50" /><span class="opt-radio"></span><div class="opt-body"><div class="opt-title">Ujutru visok, skače, uveče pada</div></div></label>
+      <label class="opt"><input type="radio" name="stres" value="75" /><span class="opt-radio"></span><div class="opt-body"><div class="opt-title">Ujutru visok, skače, uveče ostaje visok</div></div></label>
+      <label class="opt"><input type="radio" name="stres" value="100" /><span class="opt-radio"></span><div class="opt-body"><div class="opt-title">Ceo dan visok</div></div></label>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn ghost" data-prev>← Nazad</button>
+      <button class="btn" data-next>Vidi moj grafikon →</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FINAL RESULTS — Radar + Checkout ============ -->
+<section class="screen" data-screen="results-2">
+  <div class="wrap wide">
+    <div class="step-head">
+      <span class="micro">Tvoj grafikon</span>
+      <h1>Ovde se vidi cela slika</h1>
+      <p class="lead">Zelena kriva je referentni profil zdravog organizma. Narandžasta su tvoje izmerene vrednosti.</p>
+    </div>
+
+    <div class="radar-wrap">
+      <svg class="radar-svg" viewBox="0 0 480 480" id="radarSvg">
+        <!-- populated by JS -->
+      </svg>
+      <div class="radar-legend">
+        <div class="item"><span class="dot green"></span>Zdrav ideal</div>
+        <div class="item"><span class="dot orange"></span>Tvoje vrednosti</div>
+        <div class="item"><span class="dot red"></span>Razmak do ideala</div>
+      </div>
+    </div>
+
+    <div class="score-gap-callout">
+      Razlika od <strong><span id="scoreGap">0</span> poena</strong> — toliko te tvoj sistem udaljava od stanja u kome telo funkcioniše optimalno.
+    </div>
+
+    <div class="commentary" id="finalCommentary">
+      <p>—</p>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn ghost" data-prev>← Nazad</button>
+      <button type="button" class="btn lg" id="checkoutBtn">Rezerviši svoje mesto →</button>
+    </div>
+    <div class="checkout-error" id="checkoutError" hidden></div>
+  </div>
+</section>
+
+<script>
+/* ============================================================
+   COUNTRY CODES + PHONE VALIDATION
+============================================================ */
+const COUNTRY_DATA = {
+  // Region (ex-YU + komšije)
+  RS: { dial: '+381', flag: '🇷🇸', name: 'Srbija',          min: 8, max: 9, placeholder: '631234567' },
+  ME: { dial: '+382', flag: '🇲🇪', name: 'Crna Gora',       min: 8, max: 8, placeholder: '67123456' },
+  HR: { dial: '+385', flag: '🇭🇷', name: 'Hrvatska',        min: 8, max: 9, placeholder: '912345678' },
+  BA: { dial: '+387', flag: '🇧🇦', name: 'Bosna i Herc.',  min: 8, max: 8, placeholder: '61234567' },
+  SI: { dial: '+386', flag: '🇸🇮', name: 'Slovenija',       min: 8, max: 8, placeholder: '40123456' },
+  MK: { dial: '+389', flag: '🇲🇰', name: 'S. Makedonija',  min: 8, max: 8, placeholder: '70123456' },
+  AL: { dial: '+355', flag: '🇦🇱', name: 'Albanija',        min: 8, max: 9, placeholder: '691234567' },
+  // EU
+  AT: { dial: '+43',  flag: '🇦🇹', name: 'Austrija',        min: 10, max: 13, placeholder: '6601234567' },
+  DE: { dial: '+49',  flag: '🇩🇪', name: 'Nemačka',         min: 10, max: 11, placeholder: '1701234567' },
+  CH: { dial: '+41',  flag: '🇨🇭', name: 'Švajcarska',      min: 9, max: 9, placeholder: '781234567' },
+  IT: { dial: '+39',  flag: '🇮🇹', name: 'Italija',         min: 9, max: 10, placeholder: '3451234567' },
+  FR: { dial: '+33',  flag: '🇫🇷', name: 'Francuska',       min: 9, max: 9, placeholder: '612345678' },
+  GB: { dial: '+44',  flag: '🇬🇧', name: 'V. Britanija',    min: 10, max: 10, placeholder: '7400123456' },
+  ES: { dial: '+34',  flag: '🇪🇸', name: 'Španija',         min: 9, max: 9, placeholder: '612345678' },
+  NL: { dial: '+31',  flag: '🇳🇱', name: 'Holandija',       min: 9, max: 9, placeholder: '612345678' },
+  BE: { dial: '+32',  flag: '🇧🇪', name: 'Belgija',         min: 8, max: 9, placeholder: '470123456' },
+  IE: { dial: '+353', flag: '🇮🇪', name: 'Irska',           min: 7, max: 9, placeholder: '851234567' },
+  PT: { dial: '+351', flag: '🇵🇹', name: 'Portugal',        min: 9, max: 9, placeholder: '912345678' },
+  GR: { dial: '+30',  flag: '🇬🇷', name: 'Grčka',           min: 10, max: 10, placeholder: '6912345678' },
+  CZ: { dial: '+420', flag: '🇨🇿', name: 'Češka',           min: 9, max: 9, placeholder: '601234567' },
+  SK: { dial: '+421', flag: '🇸🇰', name: 'Slovačka',        min: 9, max: 9, placeholder: '901234567' },
+  PL: { dial: '+48',  flag: '🇵🇱', name: 'Poljska',         min: 9, max: 9, placeholder: '512345678' },
+  HU: { dial: '+36',  flag: '🇭🇺', name: 'Mađarska',        min: 8, max: 9, placeholder: '201234567' },
+  RO: { dial: '+40',  flag: '🇷🇴', name: 'Rumunija',        min: 9, max: 9, placeholder: '712345678' },
+  BG: { dial: '+359', flag: '🇧🇬', name: 'Bugarska',        min: 8, max: 9, placeholder: '881234567' },
+  SE: { dial: '+46',  flag: '🇸🇪', name: 'Švedska',         min: 8, max: 10, placeholder: '701234567' },
+  NO: { dial: '+47',  flag: '🇳🇴', name: 'Norveška',        min: 8, max: 8, placeholder: '41234567' },
+  DK: { dial: '+45',  flag: '🇩🇰', name: 'Danska',          min: 8, max: 8, placeholder: '20123456' },
+  FI: { dial: '+358', flag: '🇫🇮', name: 'Finska',          min: 9, max: 11, placeholder: '401234567' },
+  // Vanevropa
+  US: { dial: '+1',   flag: '🇺🇸', name: 'SAD',             min: 10, max: 10, placeholder: '2125550123' },
+  CA: { dial: '+1',   flag: '🇨🇦', name: 'Kanada',          min: 10, max: 10, placeholder: '4165550123' },
+  AU: { dial: '+61',  flag: '🇦🇺', name: 'Australija',      min: 9, max: 9, placeholder: '412345678' },
+  TR: { dial: '+90',  flag: '🇹🇷', name: 'Turska',          min: 10, max: 10, placeholder: '5321234567' },
+};
+
+const COUNTRY_ORDER = ['RS','ME','HR','BA','SI','MK','AL','AT','DE','CH','IT','FR','GB','ES','NL','BE','IE','PT','GR','CZ','SK','PL','HU','RO','BG','SE','NO','DK','FI','US','CA','AU','TR'];
+
+function populateCountrySelect() {
+  const sel = document.getElementById('phoneCountry');
+  if (!sel) return;
+  sel.innerHTML = COUNTRY_ORDER.map(code => {
+    const c = COUNTRY_DATA[code];
+    return `<option value="${code}">${c.flag} ${c.dial}</option>`;
+  }).join('');
+  sel.value = 'RS'; // default fallback
+  updatePhonePlaceholder();
+  sel.addEventListener('change', updatePhonePlaceholder);
+}
+
+function updatePhonePlaceholder() {
+  const code = document.getElementById('phoneCountry')?.value || 'RS';
+  const data = COUNTRY_DATA[code];
+  const input = document.getElementById('telefon');
+  if (input && data) input.placeholder = data.placeholder;
+}
+
+async function detectCountryFromIp() {
+  try {
+    const r = await fetch('https://ipapi.co/json/', { cache: 'no-store' });
+    if (!r.ok) throw new Error('IP geo failed');
+    const d = await r.json();
+    const cc = (d.country_code || '').toUpperCase();
+    if (cc && COUNTRY_DATA[cc]) {
+      const sel = document.getElementById('phoneCountry');
+      if (sel) {
+        sel.value = cc;
+        updatePhonePlaceholder();
+      }
+    }
+  } catch (e) {
+    // Tihi failover na default RS
+  }
+}
+
+/* ============================================================
+   STATE
+============================================================ */
+const state = {
+  diet: 'balance',
+  ime: '', prezime: '',
+  visina_cm: 0, tezina_kg: 0,
+  pol: '', // 'M' | 'Z'
+  dob_dan: 0, dob_mesec: 0, dob_godina: 0,
+  email: '', telefon: '',
+  aktivnost: 0, // faktor (1.55, 1.375, 1.20)
+  telo: '', // manjak | normalno | visak
+  san: -1, energija: -1, stres: -1,
+  // computed
+  godine: 0, visina_m: 0,
+  bmr: 0, tdee: 0, bmi: 0, bmiCategory: '',
+  fatPct: 0, lbmKg: 0, lbmPct: 0, waterPct: 0,
+  bloodPct: 0, organsPct: 0, bonesPct: 0,
+  bodyType: ''
+};
+
+const SCREENS = ['1', '2', '3', '4', '5', 'results-1', '6', '7', '8', 'results-2'];
+let screenIdx = 0;
+
+/* ============================================================
+   NAVIGATION
+============================================================ */
+function showScreen(idx) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const target = SCREENS[idx];
+  const el = document.querySelector(`.screen[data-screen="${target}"]`);
+  if (el) el.classList.add('active');
+  screenIdx = idx;
+
+  // Step indicator (1-8 visible, results screens reuse adjacent step number)
+  const stepMap = { '1': 1, '2': 2, '3': 3, '4': 4, '5': 5, 'results-1': 5, '6': 6, '7': 7, '8': 8, 'results-2': 8 };
+  const stepNum = stepMap[target];
+  document.getElementById('stepNow').textContent = stepNum;
+
+  // Update segment timeline
+  const segs = document.querySelectorAll('#segments .seg');
+  segs.forEach((s, i) => {
+    s.classList.remove('done', 'current');
+    if (i + 1 < stepNum) s.classList.add('done');
+    else if (i + 1 === stepNum) s.classList.add(target === 'results-2' ? 'done' : 'current');
+  });
+
+  // Remaining count text
+  const remaining = 8 - stepNum;
+  let remainingTxt;
+  if (target === 'results-2') remainingTxt = 'gotovo';
+  else if (remaining === 0) remainingTxt = 'završni korak';
+  else if (remaining === 1) remainingTxt = 'još 1 korak';
+  else remainingTxt = `još ${remaining} koraka`;
+  document.getElementById('stepRemaining').textContent = remainingTxt;
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+document.querySelectorAll('[data-next]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    if (!validateCurrent()) return;
+    saveCurrent();
+    if (SCREENS[screenIdx + 1] === 'results-1') runCalculations1();
+    if (SCREENS[screenIdx + 1] === 'results-2') runCalculations2();
+    showScreen(screenIdx + 1);
+  });
+});
+document.querySelectorAll('[data-prev]').forEach(btn => {
+  btn.addEventListener('click', () => showScreen(screenIdx - 1));
+});
+
+// Auto-advance on radio steps
+document.querySelectorAll('[data-auto-next] input[type="radio"]').forEach(input => {
+  input.addEventListener('change', () => {
+    const section = input.closest('[data-auto-next]');
+    if (!section || !section.classList.contains('active')) return;
+    setTimeout(() => {
+      const btn = section.querySelector('[data-next]');
+      if (btn) btn.click();
+    }, 280);
+  });
+});
+
+/* ============================================================
+   VALIDATION + SAVE
+============================================================ */
+function clearError(el) { el.classList.remove('error'); }
+function setError(el) { el.classList.add('error'); }
+
+function validateCurrent() {
+  const screen = SCREENS[screenIdx];
+  let valid = true;
+
+  if (screen === '1') {
+    const v = document.querySelector('input[name="diet"]:checked');
+    if (!v) valid = false;
+  }
+  if (screen === '2') {
+    const ime = document.getElementById('ime');
+    const prezime = document.getElementById('prezime');
+    const email = document.getElementById('email');
+    const telefon = document.getElementById('telefon');
+
+    [ime, prezime, email, telefon].forEach(el => clearError(el.closest('.field')));
+
+    if (!ime.value.trim()) { setError(ime.closest('.field')); valid = false; }
+    if (!prezime.value.trim()) { setError(prezime.closest('.field')); valid = false; }
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email.value)) { setError(email.closest('.field')); valid = false; }
+
+    // Phone — country-aware validation
+    const phoneCountry = document.getElementById('phoneCountry').value;
+    const rules = COUNTRY_DATA[phoneCountry];
+    const digits = telefon.value.replace(/\D/g, '');
+    const errEl = document.getElementById('telefonErr');
+    if (digits.length < rules.min) {
+      setError(telefon.closest('.field'));
+      errEl.textContent = `Broj mora imati najmanje ${rules.min} cifara nakon ${rules.dial}.`;
+      valid = false;
+    } else if (digits.length > rules.max) {
+      setError(telefon.closest('.field'));
+      errEl.textContent = `Broj može imati najviše ${rules.max} cifara nakon ${rules.dial}.`;
+      valid = false;
+    }
+  }
+  if (screen === '3') {
+    const visina = document.getElementById('visina');
+    const tezina = document.getElementById('tezina');
+    const pol = document.querySelector('input[name="pol"]:checked');
+    const dan = document.getElementById('dob_dan');
+    const mesec = document.getElementById('dob_mesec');
+    const godina = document.getElementById('dob_godina');
+
+    [visina, tezina, dan, mesec, godina].forEach(el => clearError(el.closest('.field')));
+
+    const vNum = parseFloat(visina.value);
+    if (!vNum || vNum < 120 || vNum > 220) { setError(visina.closest('.field')); valid = false; }
+    const tNum = parseFloat(tezina.value);
+    if (!tNum || tNum < 35 || tNum > 250) { setError(tezina.closest('.field')); valid = false; }
+
+    if (!pol) {
+      document.getElementById('polErr').style.display = 'block';
+      valid = false;
+    } else {
+      document.getElementById('polErr').style.display = 'none';
+    }
+
+    const dNum = parseInt(dan.value, 10);
+    const mNum = parseInt(mesec.value, 10);
+    const gNum = parseInt(godina.value, 10);
+    const validDate = dNum >= 1 && dNum <= 31 && mNum >= 1 && mNum <= 12 && gNum >= 1925 && gNum <= 2015;
+    if (!validDate) {
+      document.getElementById('dobErr').style.display = 'block';
+      valid = false;
+    } else {
+      document.getElementById('dobErr').style.display = 'none';
+    }
+  }
+  if (screen === '4') {
+    if (!document.querySelector('input[name="aktivnost"]:checked')) valid = false;
+  }
+  if (screen === '5') {
+    if (!document.querySelector('input[name="telo"]:checked')) valid = false;
+  }
+  if (screen === '6') {
+    if (!document.querySelector('input[name="san"]:checked')) valid = false;
+  }
+  if (screen === '7') {
+    if (!document.querySelector('input[name="energija"]:checked')) valid = false;
+  }
+  if (screen === '8') {
+    if (!document.querySelector('input[name="stres"]:checked')) valid = false;
+  }
+
+  return valid;
+}
+
+function saveCurrent() {
+  const screen = SCREENS[screenIdx];
+  if (screen === '1') {
+    state.diet = document.querySelector('input[name="diet"]:checked').value;
+  }
+  if (screen === '2') {
+    state.ime = document.getElementById('ime').value.trim();
+    state.prezime = document.getElementById('prezime').value.trim();
+    state.email = document.getElementById('email').value.trim();
+    const cc = document.getElementById('phoneCountry').value;
+    const subscriber = document.getElementById('telefon').value.replace(/\D/g, '');
+    state.telefon = `${COUNTRY_DATA[cc].dial} ${subscriber}`;
+    state.telefon_country = cc;
+  }
+  if (screen === '3') {
+    state.visina_cm = parseFloat(document.getElementById('visina').value);
+    state.tezina_kg = parseFloat(document.getElementById('tezina').value);
+    state.pol = document.querySelector('input[name="pol"]:checked').value;
+    state.dob_dan = parseInt(document.getElementById('dob_dan').value, 10);
+    state.dob_mesec = parseInt(document.getElementById('dob_mesec').value, 10);
+    state.dob_godina = parseInt(document.getElementById('dob_godina').value, 10);
+  }
+  if (screen === '4') {
+    state.aktivnost = parseFloat(document.querySelector('input[name="aktivnost"]:checked').value);
+  }
+  if (screen === '5') {
+    state.telo = document.querySelector('input[name="telo"]:checked').value;
+  }
+  if (screen === '6') {
+    state.san = parseInt(document.querySelector('input[name="san"]:checked').value, 10);
+  }
+  if (screen === '7') {
+    state.energija = parseInt(document.querySelector('input[name="energija"]:checked').value, 10);
+  }
+  if (screen === '8') {
+    state.stres = parseInt(document.querySelector('input[name="stres"]:checked').value, 10);
+  }
+}
+
+/* ============================================================
+   CALCULATIONS
+============================================================ */
+/* Vokativ — Srpski padež za obraćanje */
+const VOCATIVE_OVERRIDES_M = {
+  'petar': 'Petre',
+  'aleksandar': 'Aleksandre',
+  'vuk': 'Vuče',
+  'jovan': 'Jovane',
+  'milovan': 'Milovane',
+  'oliver': 'Olivere',
+  'igor': 'Igore'
+};
+const VOCATIVE_OVERRIDES_Z = {
+  // Većina ženskih -a imena ide kroz pravilo -a → -o
+};
+
+function toVocative(name, gender) {
+  if (!name) return '';
+  const trimmed = String(name).trim();
+  if (!trimmed) return '';
+  const lower = trimmed.toLowerCase();
+
+  // Override liste
+  if (gender === 'M' && VOCATIVE_OVERRIDES_M[lower]) return VOCATIVE_OVERRIDES_M[lower];
+  if (gender === 'Z' && VOCATIVE_OVERRIDES_Z[lower]) return VOCATIVE_OVERRIDES_Z[lower];
+
+  const last = trimmed.slice(-1).toLowerCase();
+
+  // Ženska imena ostaju ista (Marija, Ana, Jelena, Tijana — kolokvijalno se ne menjaju)
+  if (gender === 'Z') return trimmed;
+
+  // Muška imena koja se završavaju na samoglasnik (osim a) → ostaju ista
+  // Marko, Đorđe, Vasilije, Aleksije
+  if (last === 'o' || last === 'e' || last === 'i' || last === 'u') return trimmed;
+
+  // Muška imena na -a → -o (Nikola → Nikolo, Ilija → Ilijo, Aleksa → Alekso)
+  if (last === 'a') return trimmed.slice(0, -1) + 'o';
+
+  // Muška imena na suglasnik → +e (Dušan → Dušane, Stefan → Stefane, Milan → Milane)
+  return trimmed + 'e';
+}
+
+function calcAge(d, m, y) {
+  const today = new Date();
+  let age = today.getFullYear() - y;
+  const tm = today.getMonth() + 1;
+  const td = today.getDate();
+  if (tm < m || (tm === m && td < d)) age -= 1;
+  return age;
+}
+
+function bmiCategoryLabel(bmi) {
+  if (bmi < 18.5) return 'Neuhranjenost';
+  if (bmi < 25) return 'Normalna težina';
+  if (bmi < 29.5) return 'Prekomerna težina';
+  if (bmi < 35) return 'Gojaznost stepena 1';
+  if (bmi < 39.5) return 'Gojaznost stepena 2';
+  return 'Gojaznost stepena 3';
+}
+
+const FAT_ZONES = {
+  M: [
+    { name: 'Sportska',     min: 6,  max: 14, color: 'z-green'  },
+    { name: 'Normalna',     min: 14, max: 19, color: 'z-green'  },
+    { name: 'Povišena',     min: 19, max: 25, color: 'z-yellow' },
+    { name: 'Rizična',      min: 25, max: 30, color: 'z-orange' },
+    { name: 'Vrlo rizična', min: 30, max: 45, color: 'z-red'    }
+  ],
+  Z: [
+    { name: 'Sportska',     min: 14, max: 21, color: 'z-green'  },
+    { name: 'Normalna',     min: 21, max: 25, color: 'z-green'  },
+    { name: 'Povišena',     min: 25, max: 32, color: 'z-yellow' },
+    { name: 'Rizična',      min: 32, max: 38, color: 'z-orange' },
+    { name: 'Vrlo rizična', min: 38, max: 50, color: 'z-red'    }
+  ]
+};
+
+function renderFatZones(fatPct, isM) {
+  const zones = isM ? FAT_ZONES.M : FAT_ZONES.Z;
+  const bar = document.getElementById('fatZonesBar');
+  const legend = document.getElementById('fatZonesLegend');
+  const valueEl = document.getElementById('fatZoneValue');
+  if (!bar || !legend || !valueEl) return;
+
+  valueEl.textContent = fatPct;
+
+  const activeIdx = zones.findIndex(z => fatPct >= z.min && fatPct < z.max);
+  const safeActive = activeIdx === -1
+    ? (fatPct < zones[0].min ? 0 : zones.length - 1)
+    : activeIdx;
+
+  bar.innerHTML = '';
+  zones.forEach((z, i) => {
+    const seg = document.createElement('div');
+    seg.className = `zone ${z.color}` + (i === safeActive ? ' active' : '');
+    bar.appendChild(seg);
+  });
+
+  const totalMin = zones[0].min;
+  const totalMax = zones[zones.length - 1].max;
+  const clamped = Math.min(Math.max(fatPct, totalMin), totalMax);
+  const pct = ((clamped - totalMin) / (totalMax - totalMin)) * 100;
+  const marker = document.createElement('div');
+  marker.className = 'marker';
+  marker.style.left = pct + '%';
+  bar.appendChild(marker);
+
+  legend.innerHTML = '';
+  zones.forEach((z, i) => {
+    const leg = document.createElement('div');
+    leg.className = `leg ${z.color}` + (i === safeActive ? ' active' : '');
+    leg.innerHTML = `<span class="leg-name">${z.name}</span><span class="leg-range">${z.min}–${z.max}%</span>`;
+    legend.appendChild(leg);
+  });
+}
+
+function determineBodyType(bmi, fatPct, lbmPct, gender) {
+  // gender: 'M' | 'Z'
+  const isM = gender === 'M';
+  // Order: most specific / extreme first
+  if (bmi > 30 && fatPct > (isM ? 28 : 35)) return 'Gojaznost';
+  if (bmi >= 25 && bmi <= 30 && fatPct > (isM ? 22 : 30) && lbmPct < (isM ? 42 : 32)) return 'Višak kilograma';
+  if (bmi >= 25 && bmi <= 30 && fatPct <= (isM ? 18 : 25) && lbmPct >= (isM ? 47 : 37)) return 'Mišićava građa';
+  if (bmi >= 22 && bmi <= 26 && fatPct <= (isM ? 18 : 25) && lbmPct >= (isM ? 43 : 33)) return 'Atletska građa';
+  if (bmi < 20 && fatPct < (isM ? 18 : 25) && lbmPct < (isM ? 40 : 30)) return 'Mršav';
+  if (bmi >= 18.5 && bmi < 25 && fatPct > (isM ? 22 : 30) && lbmPct < (isM ? 38 : 28)) return 'Mršav i mekan';
+  return 'Prosečna građa';
+}
+
+function runCalculations1() {
+  const isM = state.pol === 'M';
+  const kg = state.tezina_kg;
+  const cm = state.visina_cm;
+  const m = cm / 100;
+  state.visina_m = m;
+  state.godine = calcAge(state.dob_dan, state.dob_mesec, state.dob_godina);
+  const age = state.godine;
+
+  // BMR (Mifflin-St Jeor)
+  const bmr = isM
+    ? (10 * kg) + (6.25 * cm) - (5 * age) + 5
+    : (10 * kg) + (6.25 * cm) - (5 * age) - 161;
+  state.bmr = Math.round(bmr);
+
+  // TDEE
+  state.tdee = Math.round(bmr * state.aktivnost);
+
+  // BMI
+  const bmi = kg / (m * m);
+  state.bmi = +(bmi).toFixed(1);
+  state.bmiCategory = bmiCategoryLabel(bmi);
+
+  // % masti — CUN-BAE (2012)
+  const sexF = isM ? 0 : 1;
+  const fat = -44.988 + (0.503 * age) + (10.689 * sexF)
+            + (3.172 * bmi) - (0.026 * bmi * bmi)
+            + (0.181 * bmi * sexF)
+            - (0.02 * bmi * age)
+            - (0.005 * bmi * bmi * sexF)
+            + (0.00021 * bmi * bmi * age);
+  state.fatPct = +(fat).toFixed(1);
+
+  // % vode — Watson
+  const tbw = isM
+    ? 2.447 - (0.09156 * age) + (0.1074 * cm) + (0.3362 * kg)
+    : -2.097 + (0.1069 * cm) + (0.2466 * kg);
+  state.waterPct = +((tbw * 100) / kg).toFixed(1);
+
+  // Skeletna mišićna masa — Lee (2000)
+  const smm = (0.244 * kg) + (7.80 * m) - (0.098 * age) + (6.6 * (isM ? 1 : 0)) - 3.3;
+  state.lbmKg = +(smm).toFixed(1);
+  state.lbmPct = +((smm / kg) * 100).toFixed(1);
+
+  // Volumen krvi — Nadler
+  const m3 = m * m * m;
+  const blood = isM
+    ? (0.3669 * m3) + (0.03219 * kg) + 0.6041
+    : (0.3561 * m3) + (0.03308 * kg) + 0.1833;
+  const bloodKg = blood * 1.06;
+  state.bloodPct = +((bloodKg / kg) * 100).toFixed(1);
+
+  // Organi
+  const organsKg = isM ? kg * 0.058 : kg * 0.053;
+  state.organsPct = +((organsKg / kg) * 100).toFixed(1);
+
+  // Kosti
+  const bonesKg = isM ? (0.0290 * kg + 0.7426) : (0.0245 * kg + 0.6920);
+  state.bonesPct = +((bonesKg / kg) * 100).toFixed(1);
+
+  // Body type trigger
+  state.bodyType = determineBodyType(bmi, state.fatPct, state.lbmPct, state.pol);
+
+  // Render
+  const vocName = toVocative(state.ime, state.pol);
+  document.getElementById('resultGreeting').textContent = `${vocName}, ovo su tvoji brojevi`;
+  document.getElementById('bmiValue').textContent = state.bmi;
+  document.getElementById('bmiCategory').textContent = state.bmiCategory;
+  document.getElementById('bodyTypeLabel').textContent = state.bodyType;
+  document.getElementById('tdeeValue').textContent = state.tdee.toLocaleString('sr-RS');
+  document.getElementById('bmrValue').textContent = state.bmr.toLocaleString('sr-RS');
+  document.getElementById('fatPct').textContent = state.fatPct;
+  document.getElementById('lbmPct').textContent = state.lbmPct;
+  document.getElementById('waterPct').textContent = state.waterPct;
+  document.getElementById('bloodPct').textContent = state.bloodPct;
+  document.getElementById('organsPct').textContent = state.organsPct;
+  document.getElementById('bonesPct').textContent = state.bonesPct;
+
+  // Fat zones
+  renderFatZones(state.fatPct, isM);
+
+  // Commentary
+  const cat = state.bmiCategory.toLowerCase();
+  const tipoStr = state.bodyType.toLowerCase();
+  document.getElementById('commentary1').innerHTML =
+    `Tvoj indeks telesne mase pokazuje <strong>${cat}</strong>, a tvoja građa je <strong>${tipoStr}</strong>. Tvoje dnevne kalorijske potrebe su <strong>${state.tdee.toLocaleString('sr-RS')} kcal</strong>, sa procenom da imaš <strong>${state.fatPct}% masti</strong>, ${state.lbmPct}% mišića, ${state.waterPct}% vode, ${state.bloodPct}% krvi, ${state.organsPct}% organa i ${state.bonesPct}% minerala.`;
+}
+
+/* ============================================================
+   RADAR CHART (5 axes)
+============================================================ */
+function buildRadarChart() {
+  // Subjective curve: penalizes optimistic self-reports, caps at 75
+  // raw 100 → 75, raw 90 → 65, raw 70 → 46, raw 50 → 28
+  function subjectiveCurve(raw) {
+    return Math.round(Math.pow(Math.max(0, raw) / 100, 1.4) * 75);
+  }
+
+  // Compute 5 axis scores (0-100)
+  // 1. Telesna masa: BMI deviation from 22, stricter scoring
+  const bmiDeviation = Math.abs(state.bmi - 22);
+  const telesnaMasa = Math.max(0, Math.min(100, 100 - (bmiDeviation * 12)));
+
+  // 2. Telesni sastav: composite from fat % and SMM % deviation, stricter scoring
+  const isM = state.pol === 'M';
+  const idealFat = isM ? 15 : 22;
+  const idealSmm = isM ? 45 : 35;
+  const fatScore = Math.max(0, 100 - Math.abs(state.fatPct - idealFat) * 7);
+  const smmScore = Math.max(0, 100 - Math.abs(state.lbmPct - idealSmm) * 7);
+  const telesniSastav = Math.round((fatScore + smmScore) / 2);
+
+  // 3. Hormonski balans: derived from stress (inverted), nonlinear curve
+  const hormonski = subjectiveCurve(100 - state.stres);
+
+  // 4. Kvalitet sna: nonlinear curve
+  const san = subjectiveCurve(state.san);
+
+  // 5. Dnevna energija: nonlinear curve
+  const energija = subjectiveCurve(state.energija);
+
+  const userScores = {
+    'Telesna masa': Math.round(telesnaMasa),
+    'Dnevna energija': energija,
+    'Telesni sastav': telesniSastav,
+    'Hormonski balans': hormonski,
+    'Kvalitet sna': san
+  };
+  const refScores = {
+    'Telesna masa': 100,
+    'Dnevna energija': 100,
+    'Telesni sastav': 100,
+    'Hormonski balans': 100,
+    'Kvalitet sna': 100
+  };
+
+  const labels = Object.keys(userScores);
+  const cx = 240, cy = 240, r = 160;
+
+  // 5 axes, starting from top, clockwise
+  const angles = labels.map((_, i) => -Math.PI / 2 + (i * 2 * Math.PI / 5));
+
+  function pointAt(score, i) {
+    const dist = (score / 100) * r;
+    return [cx + Math.cos(angles[i]) * dist, cy + Math.sin(angles[i]) * dist];
+  }
+
+  // Build SVG
+  let svg = '';
+
+  // Background grid (4 levels)
+  for (let level = 1; level <= 4; level++) {
+    const pts = labels.map((_, i) => {
+      const dist = (level / 4) * r;
+      return `${cx + Math.cos(angles[i]) * dist},${cy + Math.sin(angles[i]) * dist}`;
+    }).join(' ');
+    svg += `<polygon points="${pts}" fill="none" stroke="#ececec" stroke-width="1" />`;
+  }
+
+  // Axis lines
+  labels.forEach((_, i) => {
+    const [x, y] = [cx + Math.cos(angles[i]) * r, cy + Math.sin(angles[i]) * r];
+    svg += `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="#ececec" stroke-width="1" />`;
+  });
+
+  // Reference polygon — fill area RED to visualize "gap from healthy ideal"
+  const refPts = labels.map((label, i) => {
+    const [x, y] = pointAt(refScores[label], i);
+    return `${x},${y}`;
+  }).join(' ');
+  svg += `<polygon points="${refPts}" fill="rgba(210,59,59,0.14)" stroke="rgba(49,112,57,0.9)" stroke-width="2.5" stroke-linejoin="round" />`;
+
+  // User polygon — opaque fill cancels red within user area
+  const userPts = labels.map((label, i) => {
+    const [x, y] = pointAt(userScores[label], i);
+    return `${x},${y}`;
+  }).join(' ');
+  svg += `<polygon points="${userPts}" fill="rgba(255,253,248,0.95)" stroke="none" />`;
+  svg += `<polygon points="${userPts}" fill="rgba(232,154,60,0.28)" stroke="#e89a3c" stroke-width="2.5" stroke-linejoin="round" />`;
+
+  // User dots
+  labels.forEach((label, i) => {
+    const [x, y] = pointAt(userScores[label], i);
+    svg += `<circle cx="${x}" cy="${y}" r="4" fill="#e89a3c" stroke="#fff" stroke-width="1.5" />`;
+  });
+
+  // Labels around perimeter
+  labels.forEach((label, i) => {
+    const labelDist = r + 32;
+    const lx = cx + Math.cos(angles[i]) * labelDist;
+    const ly = cy + Math.sin(angles[i]) * labelDist;
+    let anchor = 'middle';
+    if (Math.cos(angles[i]) > 0.3) anchor = 'start';
+    else if (Math.cos(angles[i]) < -0.3) anchor = 'end';
+    svg += `<text x="${lx}" y="${ly}" text-anchor="${anchor}" dominant-baseline="middle" fill="#101a24" font-size="13" font-weight="600" font-family="Instrument Sans, sans-serif">${label}</text>`;
+    // Score below label
+    const sx = lx;
+    const sy = ly + 16;
+    svg += `<text x="${sx}" y="${sy}" text-anchor="${anchor}" dominant-baseline="middle" fill="#e89a3c" font-size="12" font-weight="600" font-family="Instrument Sans, sans-serif">${userScores[label]}/100</text>`;
+  });
+
+  const avg = Math.round((userScores['Telesna masa'] + userScores['Telesni sastav'] + userScores['Hormonski balans'] + userScores['Kvalitet sna'] + userScores['Dnevna energija']) / 5);
+
+  document.getElementById('radarSvg').innerHTML = svg;
+
+  // Gap callout below chart
+  const gapEl = document.getElementById('scoreGap');
+  if (gapEl) gapEl.textContent = (100 - avg);
+  let interp = '';
+  if (avg >= 75) {
+    interp = 'Tvoj grafikon je <strong>blizu zdravog referentnog profila</strong>. Postoje samo manja odstupanja koja možeš lako da koriguješ kroz ovaj 28-dnevni protokol.';
+  } else if (avg >= 50) {
+    interp = 'Tvoj grafikon <strong>odstupa od zdravog profila u nekoliko parametara</strong>. To znači da tvoj sistem trenutno ne radi optimalno — ali je još daleko od kritične zone. 28 dana je sasvim dovoljno da se sve vrati u balans.';
+  } else {
+    interp = 'Tvoj grafikon <strong>značajno odstupa u svim ključnim parametrima</strong>, što kod ovakvog profila ukazuje na povišen rizik od metaboličkog sindroma. Dobra vest: telo ima neverovatnu sposobnost regeneracije — 28 dana strukturisanog protokola može da napravi ogromnu razliku.';
+  }
+  document.getElementById('finalCommentary').innerHTML =
+    `<p>${interp}</p><p><strong>Sledeći korak:</strong> rezerviši svoje mesto u izazovu i počni 25. maja sa grupom.</p>`;
+}
+
+function buildCheckoutPayload() {
+  const dobIso = state.dob_godina && state.dob_mesec && state.dob_dan
+    ? `${state.dob_godina}-${String(state.dob_mesec).padStart(2,'0')}-${String(state.dob_dan).padStart(2,'0')}`
+    : '';
+  const phoneE164 = (state.telefon || '').replace(/\s+/g, '');
+  const affiliate = new URLSearchParams(window.location.search).get('affiliate') || '';
+  return {
+    plan: 'custom',
+    customPlanName: 'mangrowe',
+    name: state.ime,
+    lastname: state.prezime,
+    email: state.email,
+    phoneNumber: phoneE164,
+    locale: 'sr',
+    affiliate,
+    order_id: generateOrderId(),
+    diet: state.diet,
+    height: state.visina_cm,
+    weight: state.tezina_kg,
+    gender: state.pol,
+    dateOfBirth: dobIso,
+    age: state.godine,
+    activityFactor: state.aktivnost,
+    selfBodyType: state.telo,
+    bmi: state.bmi,
+    bmr: state.bmr,
+    tdee: state.tdee,
+    bodyType: state.bodyType,
+    bmiCategory: state.bmiCategory,
+    fatPct: state.fatPct,
+    lbmPct: state.lbmPct,
+    waterPct: state.waterPct,
+    bloodPct: state.bloodPct,
+    organsPct: state.organsPct,
+    bonesPct: state.bonesPct,
+    sleepScore: state.san,
+    energyScore: state.energija,
+    stressScore: state.stres,
+  };
+}
+
+function generateOrderId() {
+  if (window.crypto && typeof window.crypto.randomUUID === 'function') {
+    return 'mangrowe_' + window.crypto.randomUUID();
+  }
+  return 'mangrowe_xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+    const r = Math.random() * 16 | 0;
+    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
+
+async function submitCheckout() {
+  const btn = document.getElementById('checkoutBtn');
+  const errEl = document.getElementById('checkoutError');
+  const originalText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Učitavanje...';
+  if (errEl) { errEl.hidden = true; errEl.textContent = ''; }
+
+  try {
+    const payload = buildCheckoutPayload();
+    const res = await fetch('https://raifpay-prod.nutribox.dev/checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    if (!data.redirectUrl) throw new Error('Nedostaje redirectUrl u odgovoru.');
+    window.location.href = data.redirectUrl;
+  } catch (err) {
+    btn.disabled = false;
+    btn.textContent = originalText;
+    if (errEl) {
+      errEl.textContent = 'Greška pri inicijalizaciji plaćanja. Pokušaj ponovo.';
+      errEl.hidden = false;
+    }
+  }
+}
+
+document.getElementById('checkoutBtn')?.addEventListener('click', submitCheckout);
+
+function runCalculations2() {
+  buildRadarChart();
+}
+
+/* ============================================================
+   INIT — set initial active option styling for opt cards
+============================================================ */
+document.querySelectorAll('input[type="radio"]').forEach(input => {
+  input.addEventListener('change', () => {
+    // remove styling tracking - .opt:has(input:checked) handles it
+  });
+});
+
+// Init
+populateCountrySelect();
+detectCountryFromIp();
+showScreen(0);
+</script>
+
+</body>
+</html>

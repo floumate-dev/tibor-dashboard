@@ -1,0 +1,995 @@
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+    .aj-form-wrapper * , .aj-form-wrapper *::before, .aj-form-wrapper *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    .aj-form-wrapper {
+        font-family: 'Inter', sans-serif;
+        width: 100%;
+        max-width: 560px;
+        margin: 0 auto;
+        padding: 40px 20px 20px;
+        color: #1a1a1a;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    .aj-progress-bar-track {
+        width: 100%;
+        height: 4px;
+        background: rgba(209, 170, 103, 0.2);
+        border-radius: 2px;
+        margin-bottom: 32px;
+        overflow: hidden;
+    }
+
+    .aj-progress-bar-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #d1aa67, #e8c878);
+        border-radius: 2px;
+        transition: width 0.4s ease;
+        width: 0%;
+    }
+
+    .aj-card {
+        background: #FFFFFF;
+        border: 1px solid rgba(209, 170, 103, 0.2);
+        border-radius: 8px;
+        padding: 40px 36px;
+        position: relative;
+        box-shadow: 0 2px 20px rgba(0, 0, 0, 0.06);
+    }
+
+    .aj-step-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+        font-size: 13px;
+        font-weight: 600;
+        color: rgba(209, 170, 103, 0.7);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .aj-question-title {
+        font-size: 22px;
+        font-weight: 800;
+        line-height: 1.35;
+        margin-bottom: 24px;
+        color: #1a1a1a;
+    }
+
+    .aj-question-subtitle {
+        font-size: 14px;
+        color: #777777;
+        margin-bottom: 20px;
+        line-height: 1.5;
+    }
+
+    .aj-step {
+        display: none;
+    }
+
+    .aj-step.aj-active {
+        display: block;
+    }
+
+    .aj-radio-group {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .aj-radio-option {
+        display: flex !important;
+        align-items: center;
+        gap: 14px;
+        background: #F9F8F6;
+        border: 1px solid #E5E0D8;
+        border-radius: 12px !important;
+        padding: 16px 18px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-size: 15px;
+        font-weight: 500;
+        color: #1a1a1a;
+        user-select: none;
+    }
+
+    .aj-radio-option:hover {
+        border-color: #d1aa67;
+        background: #F5F2EC;
+    }
+
+    .aj-radio-option.aj-selected {
+        border-color: #d1aa67;
+        background: rgba(209, 170, 103, 0.1);
+    }
+
+    .aj-radio-option input[type="radio"] {
+        display: none !important;
+    }
+
+    .aj-radio-circle {
+        width: 20px !important;
+        height: 20px !important;
+        min-width: 20px;
+        border-radius: 50% !important;
+        border: 2px solid rgba(209, 170, 103, 0.3) !important;
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+    }
+
+    .aj-radio-option.aj-selected .aj-radio-circle {
+        border-color: #d1aa67 !important;
+        background: #d1aa67;
+    }
+
+    .aj-radio-circle::after {
+        content: '';
+        width: 8px;
+        height: 8px;
+        border-radius: 50% !important;
+        background: #FFFFFF;
+        transform: scale(0);
+        transition: transform 0.2s ease;
+    }
+
+    .aj-radio-option.aj-selected .aj-radio-circle::after {
+        transform: scale(1);
+    }
+
+    .aj-radio-label {
+        flex: 1;
+        line-height: 1.4;
+    }
+
+    /* Slider */
+    .aj-slider-wrapper {
+        padding: 10px 0 0;
+    }
+
+    .aj-slider-input {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 100%;
+        height: 6px;
+        border-radius: 3px;
+        background: linear-gradient(to right, #d1aa67 0%, #d1aa67 0%, #E5E0D8 0%, #E5E0D8 100%);
+        outline: none;
+        cursor: pointer;
+        margin: 0;
+    }
+
+    .aj-slider-input::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 22px;
+        height: 22px;
+        border-radius: 50% !important;
+        background: #d1aa67;
+        cursor: grab;
+        border: none !important;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+        transition: transform 0.15s ease;
+    }
+
+    .aj-slider-input::-webkit-slider-thumb:active {
+        cursor: grabbing;
+        transform: scale(1.15);
+    }
+
+    .aj-slider-input::-moz-range-thumb {
+        width: 22px;
+        height: 22px;
+        border-radius: 50% !important;
+        background: #d1aa67;
+        cursor: grab;
+        border: none !important;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .aj-slider-input::-moz-range-track {
+        height: 6px;
+        border-radius: 3px;
+        background: #E5E0D8;
+    }
+
+    .aj-slider-label {
+        margin-top: 14px;
+        font-size: 15px;
+        font-weight: 500;
+        color: #777;
+    }
+
+    .aj-slider-label span {
+        font-weight: 800;
+        color: #d1aa67;
+        font-size: 16px;
+    }
+
+    .aj-input-field {
+        width: 100%;
+        background: #F9F8F6;
+        border: 1px solid #E5E0D8;
+        border-radius: 6px;
+        padding: 16px 18px;
+        font-family: 'Inter', sans-serif;
+        font-size: 16px;
+        font-weight: 500;
+        color: #1a1a1a;
+        outline: none;
+        transition: border-color 0.2s ease;
+    }
+
+    .aj-input-field:focus {
+        border-color: #d1aa67;
+    }
+
+    .aj-input-field::placeholder {
+        color: #aaa;
+    }
+
+    textarea.aj-input-field {
+        min-height: 120px;
+        resize: vertical;
+    }
+
+    .aj-phone-wrapper {
+        display: flex;
+        gap: 10px;
+    }
+
+    .aj-phone-prefix {
+        width: 110px;
+        min-width: 110px;
+        background: #F9F8F6;
+        border: 1px solid #E5E0D8;
+        border-radius: 6px;
+        padding: 16px 12px;
+        font-family: 'Inter', sans-serif;
+        font-size: 16px;
+        font-weight: 500;
+        color: #1a1a1a;
+        outline: none;
+        appearance: none;
+        -webkit-appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23d1aa67' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        cursor: pointer;
+    }
+
+    .aj-phone-prefix:focus {
+        border-color: #d1aa67;
+    }
+
+    .aj-phone-number {
+        flex: 1;
+    }
+
+    .aj-validation-msg {
+        display: none;
+        color: #e85656;
+        font-size: 13px;
+        font-weight: 600;
+        margin-top: 10px;
+        padding-left: 4px;
+    }
+
+    .aj-validation-msg.aj-visible {
+        display: block;
+    }
+
+    .aj-nav-buttons {
+        display: flex;
+        align-items: center;
+        margin-top: 32px;
+        gap: 12px;
+    }
+
+    .aj-btn {
+        padding: 16px 24px;
+        border-radius: 6px;
+        font-family: 'Inter', sans-serif;
+        font-size: 14px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border: none;
+        outline: none;
+    }
+
+    .aj-btn-next {
+        flex: 1;
+        background: linear-gradient(135deg, #d1aa67, #c49a57);
+        color: #FFFFFF;
+        font-size: 15px;
+        font-weight: 800;
+        padding: 18px 32px;
+    }
+
+    .aj-btn-next:hover {
+        background: linear-gradient(135deg, #e0bc7a, #d1aa67);
+        transform: translateY(-1px);
+    }
+
+    .aj-btn-back {
+        background: transparent;
+        color: #666;
+        border: 1.5px solid #ddd !important;
+        padding: 16px 20px;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    .aj-btn-back:hover {
+        border-color: #bbb !important;
+        color: #1a1a1a;
+    }
+
+    .aj-intro-content {
+        text-align: center;
+    }
+
+    .aj-intro-logo {
+        margin-bottom: 20px;
+    }
+
+    .aj-intro-logo img {
+        max-height: 38px;
+        width: auto;
+    }
+
+    .aj-intro-title {
+        font-size: 26px;
+        font-weight: 800;
+        margin-bottom: 12px;
+        line-height: 1.3;
+    }
+
+    .aj-intro-desc {
+        font-size: 15px;
+        color: #777;
+        line-height: 1.6;
+        margin-bottom: 32px;
+    }
+
+    .aj-btn-cta {
+        background: linear-gradient(135deg, #d1aa67, #c49a57);
+        color: #FFFFFF;
+        padding: 18px 48px;
+        border-radius: 6px;
+        font-family: 'Inter', sans-serif;
+        font-size: 16px;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        cursor: pointer;
+        border: none;
+        transition: all 0.2s ease;
+    }
+
+    .aj-btn-cta:hover {
+        background: linear-gradient(135deg, #e0bc7a, #d1aa67);
+        transform: translateY(-1px);
+    }
+
+    .aj-thankyou-content {
+        text-align: center;
+    }
+
+    .aj-thankyou-emoji {
+        font-size: 56px;
+        margin-bottom: 20px;
+    }
+
+    .aj-thankyou-title {
+        font-size: 26px;
+        font-weight: 800;
+        margin-bottom: 12px;
+    }
+
+    .aj-thankyou-desc {
+        font-size: 15px;
+        color: #777;
+        line-height: 1.6;
+    }
+
+    @media (max-width: 600px) {
+        .aj-form-wrapper {
+            padding: 24px 16px 16px;
+        }
+
+        .aj-card {
+            padding: 28px 22px;
+        }
+
+        .aj-question-title {
+            font-size: 19px;
+        }
+
+        .aj-intro-title, .aj-thankyou-title {
+            font-size: 22px;
+        }
+    }
+</style>
+
+<div class="aj-form-wrapper">
+    <!-- Card -->
+    <div class="aj-card">
+
+        <!-- Hidden progress bar (used by JS) -->
+        <div class="aj-progress-bar-track" id="ajProgressTrack" style="display:none;">
+            <div class="aj-progress-bar-fill" id="ajProgressBar"></div>
+        </div>
+
+        <!-- Step 0: Intro -->
+        <div class="aj-step aj-active" data-step="0">
+            <div class="aj-intro-content">
+                <div class="aj-intro-logo">
+                    <img src="https://cdn.prod.website-files.com/6645d452c3b8226e2b13d10d/69d4bca655a4c6554b5ee5bf_07bda1-1d13-1fda-2ac4-6ac268ba3c5_transparent_3.png" alt="OMS Academy" style="max-height: 38px; width: auto; margin-bottom: 20px;">
+                </div>
+                <div class="aj-intro-title">Prijava za GCO Akademiju</div>
+                <div class="aj-intro-desc">Odgovori na kratka pitanja kako bismo videli da li si pravi kandidat za GCO Akademiju. Traje manje od 2 minuta.</div>
+                <button class="aj-btn-cta" id="ajStartBtn">ZAPO&Ccaron;NI PRIJAVU</button>
+            </div>
+        </div>
+
+        <!-- Step 1: Da li si pogledao video -->
+        <div class="aj-step" data-step="1">
+            <div class="aj-step-header">
+                <span>Korak 1 od 12</span>
+                <span>8% zavr&scaron;eno</span>
+            </div>
+            <div class="aj-question-title">Da li si pogledao/la PRVI VIDEO NA OVOM SAJTU? (NE APLICIRAJ AKO NISI)</div>
+            <div class="aj-radio-group">
+                <label class="aj-radio-option" onclick="ajSelectRadio(this)">
+                    <input type="radio" name="aj_video" value="Da pogledao sam od po&#269;etka do kraja">
+                    <span class="aj-radio-circle"></span>
+                    <span class="aj-radio-label">Da pogledao sam od po&ccaron;etka do kraja</span>
+                </label>
+                <label class="aj-radio-option" onclick="ajSelectRadio(this)">
+                    <input type="radio" name="aj_video" value="Nisam pogledao ceo video ali sam krenuo (NE APLICIRAJ I POGLEDAJ CEO VIDEO)">
+                    <span class="aj-radio-circle"></span>
+                    <span class="aj-radio-label">Nisam pogledao ceo video ali sam krenuo (NE APLICIRAJ I POGLEDAJ CEO VIDEO)</span>
+                </label>
+                <label class="aj-radio-option" onclick="ajSelectRadio(this)">
+                    <input type="radio" name="aj_video" value="Nisam pogledao (NE APLICIRAJ I POGLEDAJ CEO VIDEO)">
+                    <span class="aj-radio-circle"></span>
+                    <span class="aj-radio-label">Nisam pogledao (NE APLICIRAJ I POGLEDAJ CEO VIDEO)</span>
+                </label>
+            </div>
+            <div class="aj-validation-msg" id="ajVal1">Molimo izaberi jednu opciju.</div>
+            <div class="aj-nav-buttons">
+                <button class="aj-btn aj-btn-next" onclick="ajGoNext()">Nastavi &#8250;</button>
+            </div>
+        </div>
+
+        <!-- Step 2: Ime i prezime -->
+        <div class="aj-step" data-step="2">
+            <div class="aj-step-header">
+                <span>Korak 2 od 12</span>
+                <span>17% zavr&scaron;eno</span>
+            </div>
+            <div class="aj-question-title">Ime i prezime</div>
+            <input type="text" class="aj-input-field" name="aj_name" placeholder="Unesi svoje ime i prezime" autocomplete="name">
+            <div class="aj-validation-msg" id="ajVal2">Molimo unesi ime i prezime.</div>
+            <div class="aj-nav-buttons">
+                <button class="aj-btn aj-btn-back" onclick="ajGoBack()">&#8249; Nazad</button>
+                <button class="aj-btn aj-btn-next" onclick="ajGoNext()">Nastavi &#8250;</button>
+            </div>
+        </div>
+
+        <!-- Step 3: Email -->
+        <div class="aj-step" data-step="3">
+            <div class="aj-step-header">
+                <span>Korak 3 od 12</span>
+                <span>25% zavr&scaron;eno</span>
+            </div>
+            <div class="aj-question-title">Email adresa</div>
+            <input type="email" class="aj-input-field" name="aj_email" placeholder="tvoj@email.com" autocomplete="email">
+            <div class="aj-validation-msg" id="ajVal3">Molimo unesi validnu email adresu.</div>
+            <div class="aj-nav-buttons">
+                <button class="aj-btn aj-btn-back" onclick="ajGoBack()">&#8249; Nazad</button>
+                <button class="aj-btn aj-btn-next" onclick="ajGoNext()">Nastavi &#8250;</button>
+            </div>
+        </div>
+
+        <!-- Step 4: Koliko ima&scaron; godina -->
+        <div class="aj-step" data-step="4">
+            <div class="aj-step-header">
+                <span>Korak 4 od 12</span>
+                <span>33% zavr&scaron;eno</span>
+            </div>
+            <div class="aj-question-title">Koliko ima&scaron; godina?</div>
+            <input type="text" class="aj-input-field" name="aj_age" placeholder="Npr. 25" inputmode="numeric">
+            <div class="aj-validation-msg" id="ajVal4">Molimo unesi koliko ima&scaron; godina.</div>
+            <div class="aj-nav-buttons">
+                <button class="aj-btn aj-btn-back" onclick="ajGoBack()">&#8249; Nazad</button>
+                <button class="aj-btn aj-btn-next" onclick="ajGoNext()">Nastavi &#8250;</button>
+            </div>
+        </div>
+
+        <!-- Step 5: &Ccaron;ime se bavi&scaron; -->
+        <div class="aj-step" data-step="5">
+            <div class="aj-step-header">
+                <span>Korak 5 od 12</span>
+                <span>42% zavr&scaron;eno</span>
+            </div>
+            <div class="aj-question-title">&Ccaron;ime se trenutno bavi&scaron;?</div>
+            <input type="text" class="aj-input-field" name="aj_occupation" placeholder="Npr. student, zaposlen, freelancer...">
+            <div class="aj-validation-msg" id="ajVal5">Molimo unesi &ccaron;ime se bavi&scaron;.</div>
+            <div class="aj-nav-buttons">
+                <button class="aj-btn aj-btn-back" onclick="ajGoBack()">&#8249; Nazad</button>
+                <button class="aj-btn aj-btn-next" onclick="ajGoNext()">Nastavi &#8250;</button>
+            </div>
+        </div>
+
+        <!-- Step 6: Slobodno vreme -->
+        <div class="aj-step" data-step="6">
+            <div class="aj-step-header">
+                <span>Korak 6 od 12</span>
+                <span>50% zavr&scaron;eno</span>
+            </div>
+            <div class="aj-question-title">Koliko slobodnog vremena ima&scaron; dnevno?</div>
+            <div class="aj-radio-group">
+                <label class="aj-radio-option" onclick="ajSelectRadio(this)">
+                    <input type="radio" name="aj_free_time" value="Od 1 do 2 sata dnevno">
+                    <span class="aj-radio-circle"></span>
+                    <span class="aj-radio-label">Od 1 do 2 sata dnevno</span>
+                </label>
+                <label class="aj-radio-option" onclick="ajSelectRadio(this)">
+                    <input type="radio" name="aj_free_time" value="Od 2 do 4 sata dnevno">
+                    <span class="aj-radio-circle"></span>
+                    <span class="aj-radio-label">Od 2 do 4 sata dnevno</span>
+                </label>
+                <label class="aj-radio-option" onclick="ajSelectRadio(this)">
+                    <input type="radio" name="aj_free_time" value="Od 4 do 8 sati dnevno">
+                    <span class="aj-radio-circle"></span>
+                    <span class="aj-radio-label">Od 4 do 8 sati dnevno</span>
+                </label>
+                <label class="aj-radio-option" onclick="ajSelectRadio(this)">
+                    <input type="radio" name="aj_free_time" value="Vi&scaron;e od 8 sati dnevno">
+                    <span class="aj-radio-circle"></span>
+                    <span class="aj-radio-label">Vi&scaron;e od 8 sati dnevno</span>
+                </label>
+            </div>
+            <div class="aj-validation-msg" id="ajVal6">Molimo izaberi jednu opciju.</div>
+            <div class="aj-nav-buttons">
+                <button class="aj-btn aj-btn-back" onclick="ajGoBack()">&#8249; Nazad</button>
+                <button class="aj-btn aj-btn-next" onclick="ajGoNext()">Nastavi &#8250;</button>
+            </div>
+        </div>
+
+        <!-- Step 7: Online biznis iskustvo -->
+        <div class="aj-step" data-step="7">
+            <div class="aj-step-header">
+                <span>Korak 7 od 12</span>
+                <span>58% zavr&scaron;eno</span>
+            </div>
+            <div class="aj-question-title">Da li ima&scaron; neko prethodno iskustvo u online biznisu? I ako da koje?</div>
+            <textarea class="aj-input-field" name="aj_experience" placeholder="Opi&scaron;i svoje iskustvo..."></textarea>
+            <div class="aj-validation-msg" id="ajVal7">Molimo unesi odgovor.</div>
+            <div class="aj-nav-buttons">
+                <button class="aj-btn aj-btn-back" onclick="ajGoBack()">&#8249; Nazad</button>
+                <button class="aj-btn aj-btn-next" onclick="ajGoNext()">Nastavi &#8250;</button>
+            </div>
+        </div>
+
+        <!-- Step 8: Engleski 1-10 (slider) -->
+        <div class="aj-step" data-step="8">
+            <div class="aj-step-header">
+                <span>Korak 8 od 12</span>
+                <span>67% zavr&scaron;eno</span>
+            </div>
+            <div class="aj-question-title">Kako bi ocenio/la svoj engleski od 1 do 10?</div>
+            <div class="aj-slider-wrapper">
+                <input type="range" class="aj-slider-input" id="ajEnglishSlider" name="aj_english_slider" min="1" max="10" value="5" step="1">
+                <div class="aj-slider-label">Odabrana vrednost: <span id="ajSliderValue">5</span></div>
+            </div>
+            <div class="aj-nav-buttons">
+                <button class="aj-btn aj-btn-back" onclick="ajGoBack()">&#8249; Nazad</button>
+                <button class="aj-btn aj-btn-next" onclick="ajGoNext()">Nastavi &#8250;</button>
+            </div>
+        </div>
+
+        <!-- Step 9: Finansijski cilj -->
+        <div class="aj-step" data-step="9">
+            <div class="aj-step-header">
+                <span>Korak 9 od 12</span>
+                <span>75% zavr&scaron;eno</span>
+            </div>
+            <div class="aj-question-title">Koji je tvoj finansijski cilj sa ulaskom u GCO Akademiju?</div>
+            <div class="aj-radio-group">
+                <label class="aj-radio-option" onclick="ajSelectRadio(this)">
+                    <input type="radio" name="aj_financial_goal" value="Ho&#263;u da zara&#273;ujem 1000 Eur mese&#269;no">
+                    <span class="aj-radio-circle"></span>
+                    <span class="aj-radio-label">Ho&cacute;u da zara&dstrok;ujem 1000 Eur mese&ccaron;no</span>
+                </label>
+                <label class="aj-radio-option" onclick="ajSelectRadio(this)">
+                    <input type="radio" name="aj_financial_goal" value="Ho&#263;u da zara&#273;ujem 3000 Eur - 5000 Eur mese&#269;no">
+                    <span class="aj-radio-circle"></span>
+                    <span class="aj-radio-label">Ho&cacute;u da zara&dstrok;ujem 3000 Eur - 5000 Eur mese&ccaron;no</span>
+                </label>
+                <label class="aj-radio-option" onclick="ajSelectRadio(this)">
+                    <input type="radio" name="aj_financial_goal" value="Ho&#263;u da zara&#273;ujem 5000 Eur - 10000 Eur mese&#269;no">
+                    <span class="aj-radio-circle"></span>
+                    <span class="aj-radio-label">Ho&cacute;u da zara&dstrok;ujem 5000 Eur - 10000 Eur mese&ccaron;no</span>
+                </label>
+                <label class="aj-radio-option" onclick="ajSelectRadio(this)">
+                    <input type="radio" name="aj_financial_goal" value="Ho&#263;u da zara&#273;ujem preko 10000 Eur mese&#269;no">
+                    <span class="aj-radio-circle"></span>
+                    <span class="aj-radio-label">Ho&cacute;u da zara&dstrok;ujem preko 10000 Eur mese&ccaron;no</span>
+                </label>
+            </div>
+            <div class="aj-validation-msg" id="ajVal9">Molimo izaberi jednu opciju.</div>
+            <div class="aj-nav-buttons">
+                <button class="aj-btn aj-btn-back" onclick="ajGoBack()">&#8249; Nazad</button>
+                <button class="aj-btn aj-btn-next" onclick="ajGoNext()">Nastavi &#8250;</button>
+            </div>
+        </div>
+
+        <!-- Step 10: Budget -->
+        <div class="aj-step" data-step="10">
+            <div class="aj-step-header">
+                <span>Korak 10 od 12</span>
+                <span>83% zavr&scaron;eno</span>
+            </div>
+            <div class="aj-question-title">Koliki je tvoj budget da investira&scaron; u GCO Akademiju?</div>
+            <div class="aj-radio-group">
+                <label class="aj-radio-option" onclick="ajSelectRadio(this)">
+                    <input type="radio" name="aj_budget" value="0 do 500 Eur (NEMOJ DA APLICIRAJ&#352;, nema&#353; budget za ovaj program)">
+                    <span class="aj-radio-circle"></span>
+                    <span class="aj-radio-label">0 do 500 Eur (NEMOJ DA APLICIRA&Scaron;, nema&scaron; budget za ovaj program)</span>
+                </label>
+                <label class="aj-radio-option" onclick="ajSelectRadio(this)">
+                    <input type="radio" name="aj_budget" value="500 Eur do 1500 Eur">
+                    <span class="aj-radio-circle"></span>
+                    <span class="aj-radio-label">500 Eur do 1500 Eur</span>
+                </label>
+                <label class="aj-radio-option" onclick="ajSelectRadio(this)">
+                    <input type="radio" name="aj_budget" value="1500 Eur do 3000 Eur">
+                    <span class="aj-radio-circle"></span>
+                    <span class="aj-radio-label">1500 Eur do 3000 Eur</span>
+                </label>
+                <label class="aj-radio-option" onclick="ajSelectRadio(this)">
+                    <input type="radio" name="aj_budget" value="3000 Eur +">
+                    <span class="aj-radio-circle"></span>
+                    <span class="aj-radio-label">3000 Eur +</span>
+                </label>
+            </div>
+            <div class="aj-validation-msg" id="ajVal10">Molimo izaberi jednu opciju.</div>
+            <div class="aj-nav-buttons">
+                <button class="aj-btn aj-btn-back" onclick="ajGoBack()">&#8249; Nazad</button>
+                <button class="aj-btn aj-btn-next" onclick="ajGoNext()">Nastavi &#8250;</button>
+            </div>
+        </div>
+
+        <!-- Step 11: Instagram -->
+        <div class="aj-step" data-step="11">
+            <div class="aj-step-header">
+                <span>Korak 11 od 12</span>
+                <span>92% zavr&scaron;eno</span>
+            </div>
+            <div class="aj-question-title">Kako se zove&scaron; na Instagramu?</div>
+            <div class="aj-question-subtitle">Ovde &cacute;emo da te kontaktiramo</div>
+            <input type="text" class="aj-input-field" name="aj_instagram" placeholder="@tvoj_username">
+            <div class="aj-validation-msg" id="ajVal11">Molimo unesi svoj Instagram.</div>
+            <div class="aj-nav-buttons">
+                <button class="aj-btn aj-btn-back" onclick="ajGoBack()">&#8249; Nazad</button>
+                <button class="aj-btn aj-btn-next" onclick="ajGoNext()">Nastavi &#8250;</button>
+            </div>
+        </div>
+
+        <!-- Step 12: Telefon -->
+        <div class="aj-step" data-step="12">
+            <div class="aj-step-header">
+                <span>Korak 12 od 12</span>
+                <span>99% zavr&scaron;eno</span>
+            </div>
+            <div class="aj-question-title">Kako ide tvoj broj telefona?</div>
+            <div class="aj-question-subtitle">Ovde &cacute;emo da te kontaktiramo</div>
+            <div class="aj-phone-wrapper">
+                <select class="aj-phone-prefix" id="ajPhonePrefix">
+                    <option value="+381">&#x1F1F7;&#x1F1F8; +381</option>
+                    <option value="+385">&#x1F1ED;&#x1F1F7; +385</option>
+                    <option value="+387">&#x1F1E7;&#x1F1E6; +387</option>
+                    <option value="+382">&#x1F1F2;&#x1F1EA; +382</option>
+                    <option value="+389">&#x1F1F2;&#x1F1F0; +389</option>
+                    <option value="+386">&#x1F1F8;&#x1F1EE; +386</option>
+                    <option value="+43">&#x1F1E6;&#x1F1F9; +43</option>
+                    <option value="+49">&#x1F1E9;&#x1F1EA; +49</option>
+                    <option value="+41">&#x1F1E8;&#x1F1ED; +41</option>
+                    <option value="+44">&#x1F1EC;&#x1F1E7; +44</option>
+                    <option value="+1">&#x1F1FA;&#x1F1F8; +1</option>
+                    <option value="+33">&#x1F1EB;&#x1F1F7; +33</option>
+                    <option value="+39">&#x1F1EE;&#x1F1F9; +39</option>
+                    <option value="+34">&#x1F1EA;&#x1F1F8; +34</option>
+                    <option value="+31">&#x1F1F3;&#x1F1F1; +31</option>
+                    <option value="+46">&#x1F1F8;&#x1F1EA; +46</option>
+                    <option value="+47">&#x1F1F3;&#x1F1F4; +47</option>
+                    <option value="+90">&#x1F1F9;&#x1F1F7; +90</option>
+                    <option value="+30">&#x1F1EC;&#x1F1F7; +30</option>
+                    <option value="+40">&#x1F1F7;&#x1F1F4; +40</option>
+                    <option value="+36">&#x1F1ED;&#x1F1FA; +36</option>
+                    <option value="+48">&#x1F1F5;&#x1F1F1; +48</option>
+                    <option value="+420">&#x1F1E8;&#x1F1FF; +420</option>
+                    <option value="+421">&#x1F1F8;&#x1F1F0; +421</option>
+                    <option value="+359">&#x1F1E7;&#x1F1EC; +359</option>
+                    <option value="+355">&#x1F1E6;&#x1F1F1; +355</option>
+                    <option value="+383">&#x1F1FD;&#x1F1F0; +383</option>
+                    <option value="+61">&#x1F1E6;&#x1F1FA; +61</option>
+                    <option value="+971">&#x1F1E6;&#x1F1EA; +971</option>
+                </select>
+                <input type="tel" class="aj-input-field aj-phone-number" name="aj_phone" placeholder="60 123 4567" inputmode="tel">
+            </div>
+            <div class="aj-validation-msg" id="ajVal12">Molimo unesi broj telefona.</div>
+            <div class="aj-nav-buttons">
+                <button class="aj-btn aj-btn-back" onclick="ajGoBack()">&#8249; Nazad</button>
+                <button class="aj-btn aj-btn-next" onclick="ajSubmitForm()">PO&Scaron;ALJI PRIJAVU</button>
+            </div>
+        </div>
+
+        <!-- Step 13: Thank you -->
+        <div class="aj-step" data-step="13">
+            <div class="aj-thankyou-content">
+                <div class="aj-thankyou-emoji">&#x1F389;</div>
+                <div class="aj-thankyou-title">Hvala na prijavi!</div>
+                <div class="aj-thankyou-desc">Tvoja prijava je uspe&scaron;no poslata. Kontaktira&cacute;emo te uskoro putem Instagrama ili telefona. Pripremi se za promenu!</div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+(function() {
+    var ajCurrentStep = 0;
+    var ajTotalSteps = 12;
+    var ajFormSubmitted = false;
+    var ajAbandonSent = false;
+    var ajAbandonTimer = null;
+    var ajAdvancePending = false;
+
+    var AJ_SUBMIT_WEBHOOK = 'https://hook.eu1.make.com/71olvi2uga32a5pqfbhxupyehpabpxdb';
+    var AJ_ABANDON_WEBHOOK = 'https://hook.eu1.make.com/ff5xxiqikxc2ud3rnkqxrrn8412a35de';
+
+    function ajShowStep(step) {
+        var steps = document.querySelectorAll('.aj-step');
+        steps.forEach(function(s) { s.classList.remove('aj-active'); });
+        var target = document.querySelector('.aj-step[data-step="' + step + '"]');
+        if (target) target.classList.add('aj-active');
+
+        var progress = step === 0 ? 0 : Math.round((step / ajTotalSteps) * 100);
+        if (step > ajTotalSteps) progress = 100;
+        document.getElementById('ajProgressBar').style.width = progress + '%';
+
+        document.querySelectorAll('.aj-validation-msg').forEach(function(msg) {
+            msg.classList.remove('aj-visible');
+        });
+
+        if (step === 1 && !ajAbandonTimer) {
+            ajAbandonTimer = setTimeout(function() {
+                ajSendAbandon();
+            }, 600000);
+        }
+
+        if (target) {
+            var input = target.querySelector('input[type="text"], input[type="email"], input[type="tel"], textarea');
+            if (input) setTimeout(function() { input.focus(); }, 100);
+        }
+    }
+
+    window.ajSelectRadio = function(el) {
+        var group = el.closest('.aj-radio-group');
+        group.querySelectorAll('.aj-radio-option').forEach(function(opt) {
+            opt.classList.remove('aj-selected');
+        });
+        el.classList.add('aj-selected');
+        el.querySelector('input[type="radio"]').checked = true;
+
+        if (ajAdvancePending) return;
+        ajAdvancePending = true;
+        setTimeout(function() {
+            ajAdvancePending = false;
+            ajCurrentStep++;
+            ajShowStep(ajCurrentStep);
+        }, 400);
+    };
+
+    // Slider logic
+    function ajInitSlider() {
+        var slider = document.getElementById('ajEnglishSlider');
+        var display = document.getElementById('ajSliderValue');
+        if (!slider || !display) return;
+
+        function updateSlider() {
+            var val = slider.value;
+            display.textContent = val;
+            var pct = ((val - 1) / 9) * 100;
+            slider.style.background = 'linear-gradient(to right, #d1aa67 0%, #d1aa67 ' + pct + '%, #E5E0D8 ' + pct + '%, #E5E0D8 100%)';
+        }
+
+        slider.addEventListener('input', updateSlider);
+        updateSlider();
+    }
+
+    function ajValidateStep(step) {
+        var stepEl = document.querySelector('.aj-step[data-step="' + step + '"]');
+        var valMsg = document.getElementById('ajVal' + step);
+
+        // Slider step — always valid
+        if (step === 8) return true;
+
+        if ([1, 6, 9, 10].indexOf(step) !== -1) {
+            var checked = stepEl.querySelector('input[type="radio"]:checked');
+            if (!checked) {
+                if (valMsg) valMsg.classList.add('aj-visible');
+                return false;
+            }
+            return true;
+        }
+
+        if (step === 3) {
+            var email = stepEl.querySelector('input[type="email"]').value.trim();
+            var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!email || !emailRegex.test(email)) {
+                if (valMsg) valMsg.classList.add('aj-visible');
+                return false;
+            }
+            return true;
+        }
+
+        if (step === 12) {
+            var phone = stepEl.querySelector('input[type="tel"]').value.trim();
+            if (!phone) {
+                if (valMsg) valMsg.classList.add('aj-visible');
+                return false;
+            }
+            return true;
+        }
+
+        var input = stepEl.querySelector('input[type="text"], textarea');
+        if (input) {
+            if (!input.value.trim()) {
+                if (valMsg) valMsg.classList.add('aj-visible');
+                return false;
+            }
+            return true;
+        }
+
+        return true;
+    }
+
+    window.ajGoNext = function() {
+        if (ajValidateStep(ajCurrentStep)) {
+            ajCurrentStep++;
+            ajShowStep(ajCurrentStep);
+        }
+    };
+
+    window.ajGoBack = function() {
+        if (ajCurrentStep > 1) {
+            ajCurrentStep--;
+            ajShowStep(ajCurrentStep);
+        }
+    };
+
+    function ajGetFormData() {
+        return {
+            'Da li je pogledao video': (document.querySelector('input[name="aj_video"]:checked') || {}).value || '',
+            'Ime i prezime': (document.querySelector('input[name="aj_name"]') || {}).value || '',
+            'Email adresa': (document.querySelector('input[name="aj_email"]') || {}).value || '',
+            'Koliko ima godina': (document.querySelector('input[name="aj_age"]') || {}).value || '',
+            'Cime se trenutno bavi': (document.querySelector('input[name="aj_occupation"]') || {}).value || '',
+            'Slobodno vreme dnevno': (document.querySelector('input[name="aj_free_time"]:checked') || {}).value || '',
+            'Iskustvo u online biznisu': (document.querySelector('textarea[name="aj_experience"]') || {}).value || '',
+            'Ocena engleskog': (document.getElementById('ajEnglishSlider') || {}).value || '5',
+            'Finansijski cilj': (document.querySelector('input[name="aj_financial_goal"]:checked') || {}).value || '',
+            'Budget za investiciju': (document.querySelector('input[name="aj_budget"]:checked') || {}).value || '',
+            'Instagram': (document.querySelector('input[name="aj_instagram"]') || {}).value || '',
+            'Broj telefona': (document.getElementById('ajPhonePrefix') || {}).value + ' ' + ((document.querySelector('input[name="aj_phone"]') || {}).value || '')
+        };
+    }
+
+    window.ajSubmitForm = function() {
+        if (!ajValidateStep(ajCurrentStep)) return;
+
+        var formData = ajGetFormData();
+        ajFormSubmitted = true;
+        if (ajAbandonTimer) clearTimeout(ajAbandonTimer);
+
+        fetch(AJ_SUBMIT_WEBHOOK, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData)
+        }).catch(function(err) { console.error('Webhook error:', err); });
+
+        ajCurrentStep = 13;
+        ajShowStep(ajCurrentStep);
+    };
+
+    function ajSendAbandon() {
+        if (ajFormSubmitted || ajAbandonSent || ajCurrentStep === 0 || ajCurrentStep === 13) return;
+        ajAbandonSent = true;
+        var formData = ajGetFormData();
+        formData['Napustio na koraku'] = ajCurrentStep;
+
+        fetch(AJ_ABANDON_WEBHOOK, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData),
+            keepalive: true
+        }).catch(function() {});
+    }
+
+    window.addEventListener('beforeunload', ajSendAbandon);
+    window.addEventListener('pagehide', ajSendAbandon);
+
+    document.addEventListener('input', function(e) {
+        var step = e.target.closest('.aj-step');
+        if (step) {
+            var stepNum = step.getAttribute('data-step');
+            var valMsg = document.getElementById('ajVal' + stepNum);
+            if (valMsg) valMsg.classList.remove('aj-visible');
+        }
+    });
+
+    fetch('https://ipapi.co/json/')
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            var countryMap = {
+                'RS': '+381', 'HR': '+385', 'BA': '+387', 'ME': '+382',
+                'MK': '+389', 'SI': '+386', 'AT': '+43', 'DE': '+49',
+                'CH': '+41', 'GB': '+44', 'US': '+1', 'FR': '+33',
+                'IT': '+39', 'ES': '+34', 'NL': '+31', 'SE': '+46',
+                'NO': '+47', 'TR': '+90', 'GR': '+30', 'RO': '+40',
+                'HU': '+36', 'PL': '+48', 'CZ': '+420', 'SK': '+421',
+                'BG': '+359', 'AL': '+355', 'XK': '+383', 'AU': '+61',
+                'AE': '+971'
+            };
+            var prefix = countryMap[data.country_code];
+            if (prefix) {
+                document.getElementById('ajPhonePrefix').value = prefix;
+            }
+        })
+        .catch(function() {});
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            var activeStep = document.querySelector('.aj-step.aj-active');
+            if (activeStep) {
+                var stepNum = parseInt(activeStep.getAttribute('data-step'));
+                if ([2, 3, 4, 5, 7, 11].indexOf(stepNum) !== -1) {
+                    e.preventDefault();
+                    ajGoNext();
+                } else if (stepNum === 12) {
+                    e.preventDefault();
+                    ajSubmitForm();
+                }
+            }
+        }
+    });
+
+    // Start button
+    document.getElementById('ajStartBtn').addEventListener('click', function() {
+        ajCurrentStep = 1;
+        document.getElementById('ajProgressTrack').style.display = 'block';
+        ajShowStep(ajCurrentStep);
+    });
+
+    ajShowStep(0);
+    ajInitSlider();
+})();
+</script>

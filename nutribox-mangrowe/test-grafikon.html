@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="sr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Test grafikon</title>
+<style>
+  :root {
+    --dark: #101a24;
+    --text: #2a3540;
+    --text-soft: #5f6b75;
+    --line: #e6e8ec;
+    --bg: #fafaf7;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Instrument Sans', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 30px 20px;
+  }
+  .wrap { max-width: 900px; margin: 0 auto; }
+  h1 { font-size: 22px; margin: 0 0 24px; color: var(--dark); }
+
+  .controls {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 24px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+  }
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-soft); font-weight: 700; }
+  .field input, .field select {
+    padding: 9px 12px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    font-size: 15px;
+    font-family: inherit;
+    background: #fff;
+  }
+  .field input:focus, .field select:focus { outline: 2px solid #e89a3c; outline-offset: -1px; }
+  .field .hint { font-size: 11px; color: var(--text-soft); }
+
+  .preset-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+  }
+  .preset {
+    padding: 6px 12px;
+    border: 1px solid var(--line);
+    background: #fff;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    font-family: inherit;
+    color: var(--text);
+  }
+  .preset:hover { background: #f0f0eb; }
+
+  .chart-card {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 24px;
+  }
+
+  .radar-wrap { display: flex; flex-direction: column; align-items: center; }
+  .radar-svg { width: 100%; max-width: 560px; height: auto; }
+  .radar-legend { display: flex; gap: 24px; justify-content: center; margin-top: 16px; font-size: 13px; flex-wrap: wrap; }
+  .radar-legend .item { display: flex; align-items: center; gap: 8px; color: var(--text); }
+  .radar-legend .dot { width: 12px; height: 12px; border-radius: 50%; }
+  .radar-legend .dot.green { background: rgba(49,112,57,0.85); }
+  .radar-legend .dot.orange { background: #e89a3c; }
+  .radar-legend .dot.red { background: rgba(210,59,59,0.55); }
+
+  .score-gap-callout {
+    max-width: 720px;
+    margin: 18px auto 0;
+    padding: 14px 18px;
+    background: rgba(210,59,59,0.08);
+    border-left: 3px solid #d23b3b;
+    border-radius: 4px;
+    font-size: 14px;
+    color: var(--dark);
+    line-height: 1.5;
+  }
+  .score-gap-callout strong { color: #d23b3b; font-weight: 700; }
+
+  .scores-list {
+    margin-top: 18px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 8px;
+    font-size: 13px;
+  }
+  .scores-list .s { background: #f7f7f4; border-radius: 6px; padding: 8px 10px; display: flex; justify-content: space-between; }
+  .scores-list .s .k { color: var(--text-soft); }
+  .scores-list .s .v { font-weight: 700; color: var(--dark); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Test grafikon — popuni samo vrednosti koje utiču</h1>
+
+  <div class="preset-row">
+    <button class="preset" data-preset="zdrav">Zdrav mladić</button>
+    <button class="preset" data-preset="visak">Višak kg (207/110/34)</button>
+    <button class="preset" data-preset="gojazan">Gojazan, umoran</button>
+    <button class="preset" data-preset="zena-prosek">Žena prosek</button>
+  </div>
+
+  <div class="controls">
+    <div class="field">
+      <label>Pol</label>
+      <select id="pol">
+        <option value="M">Muški</option>
+        <option value="Z">Ženski</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>BMI</label>
+      <input type="number" id="bmi" step="0.1" value="25.7" />
+      <span class="hint">~22 = idealno</span>
+    </div>
+    <div class="field">
+      <label>% masti</label>
+      <input type="number" id="fatPct" step="0.1" value="23.7" />
+      <span class="hint">ideal M:15 / Ž:22</span>
+    </div>
+    <div class="field">
+      <label>% mišića (SMM)</label>
+      <input type="number" id="lbmPct" step="0.1" value="39.0" />
+      <span class="hint">ideal M:45 / Ž:35</span>
+    </div>
+    <div class="field">
+      <label>Stres (0–100)</label>
+      <input type="number" id="stres" min="0" max="100" value="40" />
+      <span class="hint">0 = nema, 100 = max</span>
+    </div>
+    <div class="field">
+      <label>Kvalitet sna (0–100)</label>
+      <input type="number" id="san" min="0" max="100" value="70" />
+    </div>
+    <div class="field">
+      <label>Dnevna energija (0–100)</label>
+      <input type="number" id="energija" min="0" max="100" value="60" />
+    </div>
+  </div>
+
+  <div class="chart-card">
+    <div class="radar-wrap">
+      <svg class="radar-svg" viewBox="0 0 480 480" id="radarSvg"></svg>
+      <div class="radar-legend">
+        <div class="item"><span class="dot green"></span>Zdrav ideal</div>
+        <div class="item"><span class="dot orange"></span>Tvoje vrednosti</div>
+        <div class="item"><span class="dot red"></span>Razmak do ideala</div>
+      </div>
+    </div>
+
+    <div class="score-gap-callout">
+      Razlika od <strong><span id="scoreGap">0</span> poena</strong> — toliko te tvoj sistem udaljava od stanja u kome telo funkcioniše optimalno.
+    </div>
+
+    <div class="scores-list" id="scoresList"></div>
+  </div>
+</div>
+
+<script>
+const PRESETS = {
+  zdrav:        { pol:'M', bmi:22.0, fatPct:14, lbmPct:46, stres:20, san:85, energija:85 },
+  visak:        { pol:'M', bmi:25.7, fatPct:23.7, lbmPct:39, stres:40, san:70, energija:60 },
+  gojazan:      { pol:'M', bmi:32,   fatPct:32, lbmPct:33, stres:70, san:40, energija:35 },
+  'zena-prosek':{ pol:'Z', bmi:24,   fatPct:28, lbmPct:32, stres:55, san:60, energija:55 }
+};
+
+const FIELDS = ['pol','bmi','fatPct','lbmPct','stres','san','energija'];
+
+function readState() {
+  return {
+    pol: document.getElementById('pol').value,
+    bmi: parseFloat(document.getElementById('bmi').value) || 0,
+    fatPct: parseFloat(document.getElementById('fatPct').value) || 0,
+    lbmPct: parseFloat(document.getElementById('lbmPct').value) || 0,
+    stres: parseFloat(document.getElementById('stres').value) || 0,
+    san: parseFloat(document.getElementById('san').value) || 0,
+    energija: parseFloat(document.getElementById('energija').value) || 0
+  };
+}
+
+function applyPreset(name) {
+  const p = PRESETS[name]; if (!p) return;
+  Object.keys(p).forEach(k => { document.getElementById(k).value = p[k]; });
+  render();
+}
+
+function buildRadarChart(state) {
+  function subjectiveCurve(raw) {
+    return Math.round(Math.pow(Math.max(0, raw) / 100, 1.4) * 75);
+  }
+
+  const bmiDeviation = Math.abs(state.bmi - 22);
+  const telesnaMasa = Math.max(0, Math.min(100, 100 - (bmiDeviation * 12)));
+
+  const isM = state.pol === 'M';
+  const idealFat = isM ? 15 : 22;
+  const idealSmm = isM ? 45 : 35;
+  const fatScore = Math.max(0, 100 - Math.abs(state.fatPct - idealFat) * 7);
+  const smmScore = Math.max(0, 100 - Math.abs(state.lbmPct - idealSmm) * 7);
+  const telesniSastav = Math.round((fatScore + smmScore) / 2);
+
+  const hormonski = subjectiveCurve(100 - state.stres);
+  const san = subjectiveCurve(state.san);
+  const energija = subjectiveCurve(state.energija);
+
+  const userScores = {
+    'Telesna masa': Math.round(telesnaMasa),
+    'Dnevna energija': energija,
+    'Telesni sastav': telesniSastav,
+    'Hormonski balans': hormonski,
+    'Kvalitet sna': san
+  };
+  const refScores = {
+    'Telesna masa': 100,
+    'Dnevna energija': 100,
+    'Telesni sastav': 100,
+    'Hormonski balans': 100,
+    'Kvalitet sna': 100
+  };
+
+  const labels = Object.keys(userScores);
+  const cx = 240, cy = 240, r = 160;
+  const angles = labels.map((_, i) => -Math.PI / 2 + (i * 2 * Math.PI / 5));
+  function pointAt(score, i) {
+    const dist = (score / 100) * r;
+    return [cx + Math.cos(angles[i]) * dist, cy + Math.sin(angles[i]) * dist];
+  }
+
+  let svg = '';
+  for (let level = 1; level <= 4; level++) {
+    const pts = labels.map((_, i) => {
+      const dist = (level / 4) * r;
+      return `${cx + Math.cos(angles[i]) * dist},${cy + Math.sin(angles[i]) * dist}`;
+    }).join(' ');
+    svg += `<polygon points="${pts}" fill="none" stroke="#ececec" stroke-width="1" />`;
+  }
+  labels.forEach((_, i) => {
+    const [x, y] = [cx + Math.cos(angles[i]) * r, cy + Math.sin(angles[i]) * r];
+    svg += `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="#ececec" stroke-width="1" />`;
+  });
+
+  const refPts = labels.map((label, i) => {
+    const [x, y] = pointAt(refScores[label], i);
+    return `${x},${y}`;
+  }).join(' ');
+  svg += `<polygon points="${refPts}" fill="rgba(210,59,59,0.14)" stroke="rgba(49,112,57,0.9)" stroke-width="2.5" stroke-linejoin="round" />`;
+
+  const userPts = labels.map((label, i) => {
+    const [x, y] = pointAt(userScores[label], i);
+    return `${x},${y}`;
+  }).join(' ');
+  svg += `<polygon points="${userPts}" fill="rgba(255,253,248,0.95)" stroke="none" />`;
+  svg += `<polygon points="${userPts}" fill="rgba(232,154,60,0.28)" stroke="#e89a3c" stroke-width="2.5" stroke-linejoin="round" />`;
+
+  labels.forEach((label, i) => {
+    const [x, y] = pointAt(userScores[label], i);
+    svg += `<circle cx="${x}" cy="${y}" r="4" fill="#e89a3c" stroke="#fff" stroke-width="1.5" />`;
+  });
+
+  labels.forEach((label, i) => {
+    const labelDist = r + 32;
+    const lx = cx + Math.cos(angles[i]) * labelDist;
+    const ly = cy + Math.sin(angles[i]) * labelDist;
+    let anchor = 'middle';
+    if (Math.cos(angles[i]) > 0.3) anchor = 'start';
+    else if (Math.cos(angles[i]) < -0.3) anchor = 'end';
+    svg += `<text x="${lx}" y="${ly}" text-anchor="${anchor}" dominant-baseline="middle" fill="#101a24" font-size="13" font-weight="600">${label}</text>`;
+    svg += `<text x="${lx}" y="${ly + 16}" text-anchor="${anchor}" dominant-baseline="middle" fill="#e89a3c" font-size="12" font-weight="600">${userScores[label]}/100</text>`;
+  });
+
+  const avg = Math.round((userScores['Telesna masa'] + userScores['Telesni sastav'] + userScores['Hormonski balans'] + userScores['Kvalitet sna'] + userScores['Dnevna energija']) / 5);
+
+  svg += `<text x="${cx}" y="${cy - 32}" text-anchor="middle" fill="#2f7a3a" font-size="32" font-weight="700" letter-spacing="-0.02em">100</text>`;
+  svg += `<text x="${cx}" y="${cy - 14}" text-anchor="middle" fill="#5f6b75" font-size="9" font-weight="700" letter-spacing="0.18em">ZDRAV PROSEK</text>`;
+  svg += `<line x1="${cx - 38}" y1="${cy - 2}" x2="${cx + 38}" y2="${cy - 2}" stroke="#d5d5d5" stroke-width="1" />`;
+  svg += `<text x="${cx}" y="${cy + 26}" text-anchor="middle" fill="#c87420" font-size="32" font-weight="700" letter-spacing="-0.02em">${avg}</text>`;
+  svg += `<text x="${cx}" y="${cy + 44}" text-anchor="middle" fill="#5f6b75" font-size="9" font-weight="700" letter-spacing="0.18em">TVOJ PROSEK</text>`;
+
+  document.getElementById('radarSvg').innerHTML = svg;
+  document.getElementById('scoreGap').textContent = (100 - avg);
+
+  const list = document.getElementById('scoresList');
+  list.innerHTML = '';
+  labels.forEach(l => {
+    const div = document.createElement('div');
+    div.className = 's';
+    div.innerHTML = `<span class="k">${l}</span><span class="v">${userScores[l]}/100</span>`;
+    list.appendChild(div);
+  });
+  const avgDiv = document.createElement('div');
+  avgDiv.className = 's';
+  avgDiv.style.background = '#fff4e6';
+  avgDiv.innerHTML = `<span class="k"><strong>Prosek</strong></span><span class="v">${avg}/100</span>`;
+  list.appendChild(avgDiv);
+}
+
+function render() { buildRadarChart(readState()); }
+
+FIELDS.forEach(id => {
+  document.getElementById(id).addEventListener('input', render);
+});
+document.querySelectorAll('.preset').forEach(b => {
+  b.addEventListener('click', () => applyPreset(b.dataset.preset));
+});
+
+render();
+</script>
+</body>
+</html>
