@@ -163,23 +163,27 @@ export async function GET(
 
     const optin = sample.total;
 
-    // Discover source suffixes: tags shaped `<optinTag>_<source>`.
+    // Discover source suffixes: tags shaped `<optinTag>_<source>`. Seed with the
+    // known sources so small ones (e.g. TikTok) always get counted even if they
+    // don't appear in the 100-contact sample, then add any extra discovered ones.
     const prefix = `${optinTag}_`;
-    const sourceKeys = new Set<string>();
+    const sourceKeys = new Set<string>(Object.keys(SOURCE_LABELS));
     for (const c of sample.contacts) {
       for (const t of c.tags || []) {
         if (t.startsWith(prefix)) sourceKeys.add(t.slice(prefix.length));
       }
     }
 
-    // Exact count per source.
-    const sources = await Promise.all(
-      Array.from(sourceKeys).map(async (key) => ({
-        key,
-        label: sourceLabel(key),
-        count: await countTag(token, locationId, `${prefix}${key}`),
-      }))
-    );
+    // Exact count per source; drop those with no contacts (seeded but unused).
+    const sources = (
+      await Promise.all(
+        Array.from(sourceKeys).map(async (key) => ({
+          key,
+          label: sourceLabel(key),
+          count: await countTag(token, locationId, `${prefix}${key}`),
+        }))
+      )
+    ).filter((s) => s.count > 0);
     // Largest first; stable for display.
     sources.sort((a, b) => b.count - a.count);
 
