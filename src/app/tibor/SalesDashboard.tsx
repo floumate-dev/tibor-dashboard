@@ -4,10 +4,15 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import DateRangePicker, { presetLabel, Range } from "./DateRangePicker";
 import { CallRow, PACKAGES, PACKAGE_FALLBACK_COLOR, Stage } from "./data";
 
-const USERS: Record<string, { name: string; vocative: string; photo: string }> = {
-  "1212": { name: "Tibor", vocative: "Tibore", photo: "/tibor.png" },
-  "3344": { name: "Matej", vocative: "Matej", photo: "/matej.png" },
-};
+type Account = { slug: string; pin: string; name: string; vocative: string; photo: string };
+
+// Nalozi. Svaki ima svoj personalizovani login URL (/tibor?u=<slug>) koji prikaže
+// njegov PFP + "Ćao, <ime>" i prima SAMO njegov PIN. Generalni login (/tibor, bez
+// ?u) nema PFP i prima bilo koji PIN.
+const ACCOUNTS: Account[] = [
+  { slug: "tibor", pin: "1212", name: "Tibor", vocative: "Tibore", photo: "/tibor.png" },
+  { slug: "matej", pin: "3344", name: "Matej", vocative: "Matej", photo: "/matej.png" },
+];
 
 type WebinarData = {
   webinar: string;
@@ -48,12 +53,18 @@ const STAGE_BADGE: Record<Stage, { cls: string; label: string }> = {
   showed_up: { cls: "badge-pending", label: "Awaiting" },
 };
 
-export default function SalesDashboard({ calls }: { calls: CallRow[] }) {
+export default function SalesDashboard({ calls, presetUser }: { calls: CallRow[]; presetUser?: string }) {
   const today = useMemo(() => startOfDay(new Date()), []);
+  // Personalizovani login: ?u=<slug> zaključa ekran na taj nalog (PFP + pozdrav,
+  // prima samo njegov PIN). Bez toga = generalni login (bez PFP, bilo koji PIN).
+  const presetAccount = useMemo(
+    () => ACCOUNTS.find((a) => a.slug === (presetUser || "").toLowerCase()) || null,
+    [presetUser]
+  );
   const [screen, setScreen] = useState<"login" | "dept" | "dashboard" | "webinar">("login");
   const [pin, setPin] = useState("");
   const [pinError, setPinError] = useState("");
-  const [user, setUser] = useState<{ name: string; vocative: string; photo: string } | null>(null);
+  const [user, setUser] = useState<Account | null>(null);
   const pinRef = useRef<HTMLInputElement>(null);
 
   const [range, setRange] = useState<Range>({
@@ -89,9 +100,11 @@ export default function SalesDashboard({ calls }: { calls: CallRow[] }) {
   }, [screen, webinarSlug]);
 
   function tryLogin() {
-    const u = USERS[pin];
-    if (u) {
-      setUser(u);
+    // Personalizovani login prima samo svoj PIN; generalni prima bilo koji.
+    const candidates = presetAccount ? [presetAccount] : ACCOUNTS;
+    const acct = candidates.find((a) => a.pin === pin);
+    if (acct) {
+      setUser(acct);
       setScreen("dept");
     } else {
       setPinError("Pogrešan PIN, pokušaj ponovo");
@@ -173,10 +186,12 @@ export default function SalesDashboard({ calls }: { calls: CallRow[] }) {
       <div className={"login-screen" + (screen !== "login" ? " hidden" : "")}>
         <div className="login-card">
           <div className="login-brand" style={{ marginBottom: 28 }}>Tibor <span>· Dashboard</span></div>
-          <div className="login-avatar">
-            <img src="/tibor.png" alt="Tibor" />
-          </div>
-          <div className="login-greeting">Ćao 👋</div>
+          {presetAccount && (
+            <div className="login-avatar">
+              <img src={presetAccount.photo} alt={presetAccount.name} />
+            </div>
+          )}
+          <div className="login-greeting">Ćao{presetAccount ? `, ${presetAccount.vocative}` : ""} 👋</div>
           <div className="login-greeting-sub">Unesi svoj PIN za pristup</div>
           <input
             ref={pinRef}

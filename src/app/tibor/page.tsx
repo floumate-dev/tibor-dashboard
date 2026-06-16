@@ -47,7 +47,7 @@ async function fetchCalls(): Promise<CallRow[]> {
 export default async function TiborSalesPage({
   searchParams,
 }: {
-  searchParams: { demo?: string };
+  searchParams: { demo?: string; u?: string };
 }) {
   let calls: CallRow[];
   if (searchParams.demo === "1") {
@@ -59,5 +59,5 @@ export default async function TiborSalesPage({
       calls = [];
     }
   }
-  return <SalesDashboard calls={calls} />;
+  return <SalesDashboard calls={calls} presetUser={searchParams.u} />;
 }
