@@ -591,6 +591,8 @@
 .badge-noshow::before { background: var(--warning); }
 .badge-pending { background: rgba(255,255,255,0.09); color: var(--text-muted); }
 .badge-pending::before { background: var(--text-muted); }
+.badge-lead { background: rgba(99,179,237,0.16); color: #63b3ed; }
+.badge-lead::before { background: #63b3ed; }
 .table-foot { padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--border); font-size: 12px; color: var(--text-muted); }
 .table-empty { padding: 40px 20px; text-align: center; color: var(--text-muted); font-size: 13px; }
 .pager { display: flex; gap: 4px; }

@@ -6,7 +6,7 @@ export interface ParsedCall {
   package: string | null;
   amount: number;
   currency: string;
-  stage: "scheduled" | "showed_up" | "won" | "lost" | "no_show";
+  stage: "lead" | "scheduled" | "showed_up" | "won" | "lost" | "no_show";
   lost_reason: string | null;
   setter: string | null;
   closer: string | null;
@@ -20,6 +20,9 @@ export interface ParsedCall {
 // GHL stage labels are configurable per pipeline; map the ones we use and
 // fall back to a normalized guess so unknown labels don't get dropped.
 const STAGE_MAP: Record<string, ParsedCall["stage"]> = {
+  // "Lead" = ušao u pipeline ali poziv NIJE zakazan → zaseban "lead" (NE poziv).
+  lead: "lead",
+  "new lead": "lead",
   scheduled: "scheduled",
   booked: "scheduled",
   "call booked": "scheduled",

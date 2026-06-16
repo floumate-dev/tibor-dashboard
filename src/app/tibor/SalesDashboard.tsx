@@ -42,6 +42,7 @@ const STAGE_BADGE: Record<Stage, { cls: string; label: string }> = {
   won: { cls: "badge-won", label: "Won" },
   lost: { cls: "badge-lost", label: "Lost" },
   no_show: { cls: "badge-noshow", label: "No-show" },
+  lead: { cls: "badge-lead", label: "Lead" },
   scheduled: { cls: "badge-pending", label: "Zakazano" },
   showed_up: { cls: "badge-pending", label: "Awaiting" },
 };
@@ -106,18 +107,23 @@ export default function SalesDashboard({ calls }: { calls: CallRow[] }) {
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   }, [calls, range]);
 
+  // Lead = lead za zakazivanje poziva (NIJE zakazan poziv) → izdvojen iz metrika
+  // poziva i prikazan zasebno. callRows = svi pravi pozivi (Call Booked +).
+  const leads = useMemo(() => filtered.filter((c) => c.stage === "lead"), [filtered]);
+  const callRows = useMemo(() => filtered.filter((c) => c.stage !== "lead"), [filtered]);
+
   const stats = useMemo(() => {
-    const won = filtered.filter((c) => c.stage === "won");
-    const noShow = filtered.filter((c) => c.stage === "no_show").length;
+    const won = callRows.filter((c) => c.stage === "won");
+    const noShow = callRows.filter((c) => c.stage === "no_show").length;
     const revenue = won.reduce((sum, c) => sum + (c.amount || 0), 0);
-    const total = filtered.length;
+    const total = callRows.length;
     const conversion = total ? (won.length / total) * 100 : 0;
     const currency = won[0]?.currency || "EUR";
-    return { total, wonCount: won.length, notClosed: total - won.length, noShow, revenue, conversion, currency };
-  }, [filtered]);
+    return { total, wonCount: won.length, notClosed: total - won.length, noShow, revenue, conversion, currency, leadCount: leads.length };
+  }, [callRows, leads]);
 
   const packages = useMemo(() => {
-    const won = filtered.filter((c) => c.stage === "won");
+    const won = callRows.filter((c) => c.stage === "won");
     const map = new Map<string, { count: number; revenue: number }>();
     for (const c of won) {
       const key = c.package || "Custom";
@@ -138,20 +144,21 @@ export default function SalesDashboard({ calls }: { calls: CallRow[] }) {
     }
     const maxVal = Math.max(1, ...ordered.map((p) => (pkgMode === "count" ? p.count : p.revenue)));
     return ordered.map((p) => ({ ...p, width: ((pkgMode === "count" ? p.count : p.revenue) / maxVal) * 100 }));
-  }, [filtered, pkgMode]);
+  }, [callRows, pkgMode]);
 
   const lostReasons = useMemo(
-    () => filtered.filter((c) => c.stage === "lost" && c.lost_reason),
-    [filtered]
+    () => callRows.filter((c) => c.stage === "lost" && c.lost_reason),
+    [callRows]
   );
 
+  // Tabela "Svi pozivi" prikazuje samo prave pozive (bez Lead-ova).
   const searched = useMemo(() => {
     const q = search.trim().toLowerCase();
-    if (!q) return filtered;
-    return filtered.filter(
+    if (!q) return callRows;
+    return callRows.filter(
       (c) => (c.contact_name || "").toLowerCase().includes(q) || (c.contact_phone || "").toLowerCase().includes(q)
     );
-  }, [filtered, search]);
+  }, [callRows, search]);
 
   const totalPages = Math.max(1, Math.ceil(searched.length / PAGE_SIZE));
   const curPage = Math.min(page, totalPages);
@@ -263,9 +270,14 @@ export default function SalesDashboard({ calls }: { calls: CallRow[] }) {
         {/* KPI */}
         <div className="kpi-grid">
           <div className="kpi-card">
+            <div className="kpi-label">Leadovi</div>
+            <div className="kpi-value">{stats.leadCount}</div>
+            <div className="kpi-sub">za zakazivanje poziva</div>
+          </div>
+          <div className="kpi-card">
             <div className="kpi-label">Pozivi</div>
             <div className="kpi-value">{stats.total}</div>
-            <div className="kpi-sub">u izabranom periodu</div>
+            <div className="kpi-sub">zakazani u periodu</div>
           </div>
           <div className="kpi-card">
             <div className="kpi-label">Zatvoreno</div>

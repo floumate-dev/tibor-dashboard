@@ -1,4 +1,6 @@
-export type Stage = "scheduled" | "showed_up" | "won" | "lost" | "no_show";
+// "lead" = ušao u pipeline ali poziv JOŠ NIJE zakazan (lead za zakazivanje);
+// NE računa se kao zakazan poziv. "scheduled" = poziv zakazan (Call Booked +).
+export type Stage = "lead" | "scheduled" | "showed_up" | "won" | "lost" | "no_show";
 
 export interface CallRow {
   id: string;
@@ -12,18 +14,12 @@ export interface CallRow {
   date: string; // ISO — scheduled_at || created_at
 }
 
-// Tiborovi proizvodi. `name` MORA da se poklapa sa labelom koju adapter (ghl.ts)
-// generiše iz GHL polja `produkt` + `paket`.
-// PRODUKT = program (Korak Ispred / Edit u Novac); PAKET = tier unutar programa.
-// "Prodaje po paketima" prikazuje zaseban red po tier-u (Edit u Novac razbijen),
-// Korak Ispred ostaje jedan red. Iznos se izvodi iz produkt+paket (vidi ghl.ts):
-// Korak Ispred=2500; Edit u Novac 1 mesec=47, 3 meseca=141, Webinar ponuda=98;
-// custom = ručno unet (monetary value).
+// U SALES dashboardu se prodaje SAMO "Korak Ispred" (high-ticket); Edit u Novac
+// se prodaje kroz webinar, ne kroz sales pozive — zato ovde nije u listi.
+// `name` MORA da se poklapa sa labelom koju adapter (ghl.ts) generiše. Iznos se
+// uzima iz GHL amount polja (vidi ghl.ts); cena ovde je samo referentna.
 export const PACKAGES: { name: string; color: string; price: number | null }[] = [
   { name: "Korak Ispred", color: "#7895ed", price: 2500 },
-  { name: "Edit u Novac · 1 mesec", color: "#a3b8f3", price: 47 },
-  { name: "Edit u Novac · 3 meseca", color: "#cdd6f9", price: 141 },
-  { name: "Edit u Novac · Webinar ponuda", color: "#6b84d9", price: 98 },
   { name: "Custom", color: "#9aa0aa", price: null },
 ];
 
