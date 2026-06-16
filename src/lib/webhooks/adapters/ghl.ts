@@ -23,11 +23,13 @@ const STAGE_MAP: Record<string, ParsedCall["stage"]> = {
   // "Lead" = ušao u pipeline ali poziv NIJE zakazan → zaseban "lead" (NE poziv).
   lead: "lead",
   "new lead": "lead",
+  // ZAKAZAN POZIV = SAMO "Call Booked" (Dusan, jun 2026). Ništa drugo nije scheduled.
   scheduled: "scheduled",
   booked: "scheduled",
   "call booked": "scheduled",
-  "follow up": "scheduled",
-  "follow-up": "scheduled",
+  // "Follow Up" je posle poziva (deal u toku), NE zakazan poziv → showed_up.
+  "follow up": "showed_up",
+  "follow-up": "showed_up",
   "showed up": "showed_up",
   showed: "showed_up",
   show: "showed_up",
@@ -64,7 +66,10 @@ function mapStage(raw: unknown): ParsedCall["stage"] {
     return "no_show";
   }
   if (key.includes("show")) return "showed_up";
-  return "scheduled";
+  if (key.includes("follow")) return "showed_up";
+  if (key.includes("book")) return "scheduled";
+  // Nepoznata faza → konzervativno "lead" (NE scheduled; scheduled je samo Call Booked).
+  return "lead";
 }
 
 // Tiborova logika cena. GHL šalje dva polja:
