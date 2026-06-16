@@ -4,8 +4,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import DateRangePicker, { presetLabel, Range } from "./DateRangePicker";
 import { CallRow, PACKAGES, PACKAGE_FALLBACK_COLOR, Stage } from "./data";
 
-const USERS: Record<string, { name: string; vocative: string }> = {
-  "1212": { name: "Tibor", vocative: "Tibore" },
+const USERS: Record<string, { name: string; vocative: string; photo: string }> = {
+  "1212": { name: "Tibor", vocative: "Tibore", photo: "/tibor.png" },
+  "3344": { name: "Matej", vocative: "Matej", photo: "/matej.png" },
 };
 
 type WebinarData = {
@@ -52,7 +53,7 @@ export default function SalesDashboard({ calls }: { calls: CallRow[] }) {
   const [screen, setScreen] = useState<"login" | "dept" | "dashboard" | "webinar">("login");
   const [pin, setPin] = useState("");
   const [pinError, setPinError] = useState("");
-  const [user, setUser] = useState<{ name: string; vocative: string } | null>(null);
+  const [user, setUser] = useState<{ name: string; vocative: string; photo: string } | null>(null);
   const pinRef = useRef<HTMLInputElement>(null);
 
   const [range, setRange] = useState<Range>({
@@ -175,7 +176,7 @@ export default function SalesDashboard({ calls }: { calls: CallRow[] }) {
           <div className="login-avatar">
             <img src="/tibor.png" alt="Tibor" />
           </div>
-          <div className="login-greeting">Ćao, Tibore 👋</div>
+          <div className="login-greeting">Ćao 👋</div>
           <div className="login-greeting-sub">Unesi svoj PIN za pristup</div>
           <input
             ref={pinRef}
@@ -199,7 +200,7 @@ export default function SalesDashboard({ calls }: { calls: CallRow[] }) {
       <div className={"dept-screen" + (screen === "dept" ? " visible" : "")}>
         <div className="dept-card">
           <div className="dept-brand">Tibor <span>· Dashboard</span></div>
-          <div className="dept-avatar"><img src="/tibor.png" alt="Tibor" /></div>
+          <div className="dept-avatar"><img src={user?.photo || "/tibor.png"} alt={user?.name || "Tibor"} /></div>
           <div className="dept-greeting">Ćao, {user?.vocative || "Tibore"} 👋</div>
           <div className="dept-greeting-sub">Izaberi departman</div>
           <div className="dept-grid">
@@ -243,7 +244,7 @@ export default function SalesDashboard({ calls }: { calls: CallRow[] }) {
       <header className="app-header">
         <div className="header-brand">Tibor<em>· Sales Dashboard</em></div>
         <div className="header-right">
-          <div className="header-user"><div className="header-avatar"><img src="/tibor.png" alt="Tibor" /></div><span>{user?.name || "Tibor"}</span></div>
+          <div className="header-user"><div className="header-avatar"><img src={user?.photo || "/tibor.png"} alt={user?.name || "Tibor"} /></div><span>{user?.name || "Tibor"}</span></div>
           <button className="btn-dept" onClick={() => setScreen("dept")}>↔ Departmani</button>
           <button className="btn-logout" onClick={() => { setScreen("login"); setPin(""); setPinError(""); }}>Odjava</button>
         </div>
@@ -431,7 +432,7 @@ export default function SalesDashboard({ calls }: { calls: CallRow[] }) {
       <header className="app-header">
         <div className="header-brand">Tibor<em>· Webinar Dashboard</em></div>
         <div className="header-right">
-          <div className="header-user"><div className="header-avatar"><img src="/tibor.png" alt="Tibor" /></div><span>{user?.name || "Tibor"}</span></div>
+          <div className="header-user"><div className="header-avatar"><img src={user?.photo || "/tibor.png"} alt={user?.name || "Tibor"} /></div><span>{user?.name || "Tibor"}</span></div>
           <button className="btn-dept" onClick={() => setScreen("dept")}>↔ Departmani</button>
           <button className="btn-logout" onClick={() => { setScreen("login"); setPin(""); setPinError(""); }}>Odjava</button>
         </div>
