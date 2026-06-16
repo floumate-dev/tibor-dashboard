@@ -221,7 +221,7 @@ export default function SalesDashboard({ calls }: { calls: CallRow[] }) {
                 </svg>
               </div>
               <div className="dept-name">Webinar</div>
-              <div className="dept-desc">Prijave, izvori dolaska i broj aplikacija po webinaru — uživo iz GHL-a.</div>
+              <div className="dept-desc">Prijave, izvori dolaska i broj aplikacija po webinaru.</div>
             </button>
           </div>
           <button className="dept-back" type="button" onClick={() => { setScreen("login"); setPin(""); setPinError(""); }}>← Odjavi se</button>
@@ -237,6 +237,7 @@ export default function SalesDashboard({ calls }: { calls: CallRow[] }) {
         <div className="header-brand">Tibor<em>· Sales Dashboard</em></div>
         <div className="header-right">
           <div className="header-user"><div className="header-avatar"><img src="/tibor.png" alt="Tibor" /></div><span>{user?.name || "Tibor"}</span></div>
+          <button className="btn-dept" onClick={() => setScreen("dept")}>↔ Departmani</button>
           <button className="btn-logout" onClick={() => { setScreen("login"); setPin(""); setPinError(""); }}>Odjava</button>
         </div>
       </header>
@@ -419,7 +420,8 @@ export default function SalesDashboard({ calls }: { calls: CallRow[] }) {
         <div className="header-brand">Tibor<em>· Webinar Dashboard</em></div>
         <div className="header-right">
           <div className="header-user"><div className="header-avatar"><img src="/tibor.png" alt="Tibor" /></div><span>{user?.name || "Tibor"}</span></div>
-          <button className="btn-logout" onClick={() => setScreen("dept")}>← Departmani</button>
+          <button className="btn-dept" onClick={() => setScreen("dept")}>↔ Departmani</button>
+          <button className="btn-logout" onClick={() => { setScreen("login"); setPin(""); setPinError(""); }}>Odjava</button>
         </div>
       </header>
 

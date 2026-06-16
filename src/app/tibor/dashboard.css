@@ -125,6 +125,19 @@
   font-family: inherit;
 }
 .btn-logout:hover { border-color: var(--danger); color: var(--danger); background: rgba(242,56,73,0.04); }
+.btn-dept {
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  background: transparent;
+  border: 1.5px solid var(--border-md);
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+.btn-dept:hover { border-color: var(--primary); color: var(--text-bright); background: var(--primary-lighter); }
 
 /* ===== TAB BAR ===== */
 .tab-bar {
