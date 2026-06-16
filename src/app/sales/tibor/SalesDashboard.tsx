@@ -1,11 +1,19 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import DateRangePicker, { presetLabel, Range } from "./DateRangePicker";
 import { CallRow, PACKAGES, PACKAGE_FALLBACK_COLOR, Stage } from "./data";
 
 const USERS: Record<string, { name: string; vocative: string }> = {
   "1212": { name: "Tibor", vocative: "Tibore" },
+};
+
+type WebinarData = {
+  webinar: string;
+  webinarLabel: string;
+  optin: number;
+  application: number;
+  sources: { key: string; label: string; count: number }[];
 };
 
 const MONTHS_SHORT = ["jan","feb","mar","apr","maj","jun","jul","avg","sep","okt","nov","dec"];
@@ -39,7 +47,7 @@ const STAGE_BADGE: Record<Stage, { cls: string; label: string }> = {
 
 export default function SalesDashboard({ calls }: { calls: CallRow[] }) {
   const today = useMemo(() => startOfDay(new Date()), []);
-  const [screen, setScreen] = useState<"login" | "dept" | "dashboard">("login");
+  const [screen, setScreen] = useState<"login" | "dept" | "dashboard" | "webinar">("login");
   const [pin, setPin] = useState("");
   const [pinError, setPinError] = useState("");
   const [user, setUser] = useState<{ name: string; vocative: string } | null>(null);
@@ -53,6 +61,24 @@ export default function SalesDashboard({ calls }: { calls: CallRow[] }) {
   const [pkgMode] = useState<"count" | "revenue">("count");
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
+
+  // ---- webinar funnel (live from GHL via /api/webinar) ----
+  const [webinar, setWebinar] = useState<WebinarData | null>(null);
+  const [webinarLoading, setWebinarLoading] = useState(false);
+  const [webinarError, setWebinarError] = useState("");
+
+  useEffect(() => {
+    if (screen !== "webinar" || webinar) return;
+    let cancelled = false;
+    setWebinarLoading(true);
+    setWebinarError("");
+    fetch("/api/webinar/tibor")
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
+      .then((d: WebinarData) => { if (!cancelled) setWebinar(d); })
+      .catch((e) => { if (!cancelled) setWebinarError(e?.message || "Greška pri učitavanju"); })
+      .finally(() => { if (!cancelled) setWebinarLoading(false); });
+    return () => { cancelled = true; };
+  }, [screen, webinar]);
 
   function tryLogin() {
     const u = USERS[pin];
@@ -181,6 +207,15 @@ export default function SalesDashboard({ calls }: { calls: CallRow[] }) {
               </div>
               <div className="dept-name">Sales</div>
               <div className="dept-desc">Pozivi, zatvoreni paketi, prihod i razlozi za izgubljene prilike.</div>
+            </button>
+            <button className="dept-btn webinar" type="button" onClick={() => setScreen("webinar")}>
+              <div className="dept-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M23 7l-7 5 7 5V7z" /><rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
+                </svg>
+              </div>
+              <div className="dept-name">Webinar</div>
+              <div className="dept-desc">Prijave, izvori dolaska i broj aplikacija po webinaru — uživo iz GHL-a.</div>
             </button>
           </div>
           <button className="dept-back" type="button" onClick={() => { setScreen("login"); setPin(""); setPinError(""); }}>← Odjavi se</button>
@@ -367,6 +402,112 @@ export default function SalesDashboard({ calls }: { calls: CallRow[] }) {
             </div>
           </div>
         </div>
+      </main>
+      </>
+      )}
+
+      {/* WEBINAR DASHBOARD */}
+      {screen === "webinar" && (
+      <>
+      <header className="app-header">
+        <div className="header-brand">Tibor<em>· Webinar Dashboard</em></div>
+        <div className="header-right">
+          <div className="header-user"><div className="header-avatar"><img src="/tibor.png" alt="Tibor" /></div><span>{user?.name || "Tibor"}</span></div>
+          <button className="btn-logout" onClick={() => setScreen("dept")}>← Departmani</button>
+        </div>
+      </header>
+
+      <main className="main-content">
+        <div className="page-title-row">
+          <div>
+            <div className="page-title">Webinar funnel</div>
+            <div className="page-subtitle">
+              {webinar ? `Webinar ${webinar.webinarLabel} · uživo iz GHL-a` : "Učitavanje…"}
+            </div>
+          </div>
+        </div>
+
+        {webinarLoading && !webinar && (
+          <div className="webinar-state">Učitavam podatke iz GHL-a…</div>
+        )}
+        {webinarError && !webinar && (
+          <div className="webinar-state error">Greška: {webinarError}</div>
+        )}
+
+        {webinar && (
+          <>
+            {/* Prijave — progres ka cilju od 10.000 */}
+            {(() => {
+              const goal = 10000;
+              const pct = Math.min(100, (webinar.optin / goal) * 100);
+              const remaining = Math.max(0, goal - webinar.optin);
+              return (
+                <div className="webinar-goal-card">
+                  <div className="webinar-goal-head">
+                    <div className="kpi-label">Prijave (optin)</div>
+                    <div className="webinar-goal-pct">{pct.toFixed(1)}%</div>
+                  </div>
+                  <div className="webinar-goal-value">
+                    <span className="goal-current">{fmtNum(webinar.optin)}</span>
+                    <span className="goal-target"> / {fmtNum(goal)}</span>
+                  </div>
+                  <div className="webinar-goal-bar">
+                    <div className="webinar-goal-fill" style={{ width: `${pct}%` }} />
+                  </div>
+                  <div className="kpi-sub">
+                    {remaining > 0 ? <>jo&scaron; <strong>{fmtNum(remaining)}</strong> do cilja od {fmtNum(goal)}</> : <>cilj od {fmtNum(goal)} dostignut 🎉</>}
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* Aplikacije */}
+            <div className="kpi-grid">
+              <div className="kpi-card">
+                <div className="kpi-label">Aplikacije</div>
+                <div className="kpi-value">{fmtNum(webinar.application)}</div>
+                <div className="kpi-sub">
+                  <strong>{webinar.optin ? ((webinar.application / webinar.optin) * 100).toFixed(1) : "0"}%</strong> od prijava
+                </div>
+              </div>
+            </div>
+
+            {/* Source breakdown */}
+            <div className="section-card">
+              <div className="section-head">
+                <div>
+                  <div className="section-title">Prijave po izvoru</div>
+                  <div className="section-sub">{fmtNum(webinar.optin)} prijava · odakle su došli</div>
+                </div>
+              </div>
+              <div className="pkg-list">
+                {webinar.sources.length === 0 && (
+                  <div className="reasons-empty">Nema taggovanih izvora za ovaj webinar.</div>
+                )}
+                {webinar.sources.map((s, i) => {
+                  const maxVal = Math.max(1, ...webinar.sources.map((x) => x.count));
+                  const colors = ["#7895ed", "#a3b8f3", "#cdd6f9", "#6b84d9", "#9aa0aa"];
+                  const color = colors[i] || PACKAGE_FALLBACK_COLOR;
+                  const pct = webinar.optin ? ((s.count / webinar.optin) * 100).toFixed(1) : "0";
+                  return (
+                    <div className="pkg-row" key={s.key}>
+                      <div className="pkg-dot" style={{ background: color }} />
+                      <div className="pkg-info">
+                        <div className="pkg-name">{s.label}</div>
+                        <div className="pkg-price-label">{pct}% od prijava</div>
+                      </div>
+                      <div className="pkg-bar-wrap"><div className="pkg-bar-fill" style={{ width: `${(s.count / maxVal) * 100}%`, background: color }} /></div>
+                      <div className="pkg-stats">
+                        <div className="pkg-count">{fmtNum(s.count)}</div>
+                        <div className="pkg-revenue">prijava</div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </>
+        )}
       </main>
       </>
       )}

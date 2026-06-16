@@ -436,6 +436,27 @@
 .dept-icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 14px; color: white; }
 .dept-btn.setting .dept-icon { background: #4a5568; }
 .dept-btn.sales .dept-icon { background: var(--primary); }
+.dept-btn.webinar { grid-column: 1 / -1; }
+.dept-btn.webinar .dept-icon { background: linear-gradient(135deg, #7895ed, #a3b8f3); }
+.webinar-state { padding: 40px 24px; text-align: center; color: var(--text-muted); font-size: 14px; border: 1px dashed var(--border-md); border-radius: var(--radius); background: var(--bg); }
+.webinar-state.error { color: var(--danger); border-color: var(--danger); }
+.webinar-goal-card {
+  background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 22px 24px; margin-bottom: 18px;
+  background-image: var(--shine); box-shadow: inset 0 1px 0 rgba(255,255,255,0.05), var(--shadow);
+}
+.webinar-goal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.webinar-goal-pct { font-size: 13px; font-weight: 600; color: var(--primary); }
+.webinar-goal-value { font-size: 34px; font-weight: 600; letter-spacing: -0.04em; margin-bottom: 14px; line-height: 1; }
+.webinar-goal-value .goal-current { background: var(--heading-gradient); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+.webinar-goal-value .goal-target { color: var(--text-muted); font-size: 22px; font-weight: 500; }
+.webinar-goal-bar { height: 12px; border-radius: var(--radius-pill); background: var(--bg-inset); border: 1px solid var(--border); overflow: hidden; margin-bottom: 12px; }
+.webinar-goal-fill {
+  height: 100%; border-radius: var(--radius-pill);
+  background: linear-gradient(90deg, #6b84d9, #7895ed 60%, #a3b8f3);
+  box-shadow: 0 0 12px rgba(120,149,237,0.5);
+  transition: width 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+}
 .dept-name { font-size: 15px; font-weight: 700; margin-bottom: 4px; color: var(--text); }
 .dept-desc { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
 .dept-back { background: transparent; border: none; font-size: 12px; color: var(--text-muted); cursor: pointer; font-family: inherit; font-weight: 500; padding: 6px 12px; }

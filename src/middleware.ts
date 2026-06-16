@@ -39,8 +39,12 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Allow webhook endpoints without auth
-  if (request.nextUrl.pathname.startsWith("/api/webhooks")) {
+  // Allow webhook + webinar funnel endpoints without auth (webinar dashboard is
+  // PIN-gated client-side, same model as /sales).
+  if (
+    request.nextUrl.pathname.startsWith("/api/webhooks") ||
+    request.nextUrl.pathname.startsWith("/api/webinar")
+  ) {
     return supabaseResponse;
   }
 
