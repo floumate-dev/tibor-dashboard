@@ -457,6 +457,16 @@
   box-shadow: 0 0 12px rgba(120,149,237,0.5);
   transition: width 0.9s cubic-bezier(0.22, 1, 0.36, 1);
 }
+.webinar-select {
+  appearance: none; -webkit-appearance: none;
+  background: var(--bg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23adb1b8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") no-repeat right 14px center;
+  border: 1px solid var(--border-md); border-radius: var(--radius-sm);
+  color: var(--text-bright); font-family: inherit; font-size: 13px; font-weight: 600;
+  padding: 10px 38px 10px 16px; cursor: pointer; transition: border-color 0.15s;
+}
+.webinar-select:hover { border-color: var(--primary); }
+.webinar-select:focus { outline: none; border-color: var(--primary); }
+.webinar-select option { background: var(--bg-inset); color: var(--text-bright); }
 .dept-name { font-size: 15px; font-weight: 700; margin-bottom: 4px; color: var(--text); }
 .dept-desc { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
 .dept-back { background: transparent; border: none; font-size: 12px; color: var(--text-muted); cursor: pointer; font-family: inherit; font-weight: 500; padding: 6px 12px; }

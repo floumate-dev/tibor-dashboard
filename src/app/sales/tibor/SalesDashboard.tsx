@@ -14,6 +14,7 @@ type WebinarData = {
   optin: number;
   application: number;
   sources: { key: string; label: string; count: number }[];
+  availableWebinars: { slug: string; label: string }[];
 };
 
 const MONTHS_SHORT = ["jan","feb","mar","apr","maj","jun","jul","avg","sep","okt","nov","dec"];
@@ -66,19 +67,24 @@ export default function SalesDashboard({ calls }: { calls: CallRow[] }) {
   const [webinar, setWebinar] = useState<WebinarData | null>(null);
   const [webinarLoading, setWebinarLoading] = useState(false);
   const [webinarError, setWebinarError] = useState("");
+  // null = pusti API da auto-detektuje aktivni webinar; inače izabrani slug.
+  const [webinarSlug, setWebinarSlug] = useState<string | null>(null);
 
   useEffect(() => {
-    if (screen !== "webinar" || webinar) return;
+    if (screen !== "webinar") return;
     let cancelled = false;
     setWebinarLoading(true);
     setWebinarError("");
-    fetch("/api/webinar/tibor")
+    const url = webinarSlug
+      ? `/api/webinar/tibor?webinar=${encodeURIComponent(webinarSlug)}`
+      : "/api/webinar/tibor";
+    fetch(url)
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
       .then((d: WebinarData) => { if (!cancelled) setWebinar(d); })
       .catch((e) => { if (!cancelled) setWebinarError(e?.message || "Greška pri učitavanju"); })
       .finally(() => { if (!cancelled) setWebinarLoading(false); });
     return () => { cancelled = true; };
-  }, [screen, webinar]);
+  }, [screen, webinarSlug]);
 
   function tryLogin() {
     const u = USERS[pin];
@@ -421,10 +427,20 @@ export default function SalesDashboard({ calls }: { calls: CallRow[] }) {
         <div className="page-title-row">
           <div>
             <div className="page-title">Webinar funnel</div>
-            <div className="page-subtitle">
-              {webinar ? `Webinar ${webinar.webinarLabel} · uživo iz GHL-a` : "Učitavanje…"}
-            </div>
           </div>
+          {webinar && webinar.availableWebinars?.length > 0 && (
+            <select
+              className="webinar-select"
+              value={webinarSlug ?? webinar.webinar}
+              onChange={(e) => setWebinarSlug(e.target.value)}
+            >
+              {webinar.availableWebinars.map((w) => (
+                <option key={w.slug} value={w.slug}>
+                  Webinar {w.label}
+                </option>
+              ))}
+            </select>
+          )}
         </div>
 
         {webinarLoading && !webinar && (

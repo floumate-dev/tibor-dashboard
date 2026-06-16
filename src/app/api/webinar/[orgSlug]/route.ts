@@ -15,6 +15,19 @@ const FALLBACK_WEBINAR = "17_06_26";
 // Tiborov GHL location (isti kao u sales webhook-u).
 const FALLBACK_LOCATION = "Zyilin5HFiDuC461lVdk";
 
+// GHL ne nudi listu tagova preko API-ja, a skeniranje skorijih kontakata otkriva
+// samo AKTIVAN webinar (najnoviji kontakti su sve same nove prijave). Zato za
+// selektor držimo listu poznatih prošlih webinara ovde + spajamo sa auto-
+// detektovanim aktivnim. Kad se desi nov webinar, dodaj njegov slug ovde.
+const KNOWN_WEBINARS = ["17_06_26", "03_06_26"];
+
+// "17_06_26" → uporedivi broj 260617 (YYMMDD) za sortiranje (najnoviji prvi).
+function webinarSortKey(slug: string): number {
+  const [dd, mm, yy] = slug.split("_").map((x) => parseInt(x, 10));
+  if ([dd, mm, yy].some(Number.isNaN)) return 0;
+  return yy * 10000 + mm * 100 + dd;
+}
+
 // Human labels for known optin sources; unknown ones get title-cased.
 const SOURCE_LABELS: Record<string, string> = {
   meta: "Meta",
@@ -187,6 +200,15 @@ export async function GET(
     // Largest first; stable for display.
     sources.sort((a, b) => b.count - a.count);
 
+    // Lista webinara za selektor: poznati + auto-detektovan aktivni, sortirano
+    // (najnoviji prvi). Aktivni `webinar` je uvek uključen makar nije u listi.
+    const availableSlugs = Array.from(new Set([...KNOWN_WEBINARS, webinar]));
+    availableSlugs.sort((a, b) => webinarSortKey(b) - webinarSortKey(a));
+    const availableWebinars = availableSlugs.map((slug) => ({
+      slug,
+      label: formatWebinarDate(slug),
+    }));
+
     return NextResponse.json({
       org: params.orgSlug,
       webinar,
@@ -194,6 +216,7 @@ export async function GET(
       optin,
       application,
       sources,
+      availableWebinars,
     });
   } catch (e) {
     return NextResponse.json(
