@@ -48,8 +48,12 @@ export async function middleware(request: NextRequest) {
     return supabaseResponse;
   }
 
-  // Sales dashboards are PIN-gated (client-side), not Supabase-authed
-  if (request.nextUrl.pathname.startsWith("/sales")) {
+  // Tibor dashboard (/tibor) + legacy sales dashboards (/sales) are PIN-gated
+  // client-side, not Supabase-authed.
+  if (
+    request.nextUrl.pathname.startsWith("/tibor") ||
+    request.nextUrl.pathname.startsWith("/sales")
+  ) {
     return supabaseResponse;
   }
 
