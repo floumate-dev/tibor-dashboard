@@ -34,6 +34,7 @@ const SOURCE_LABELS: Record<string, string> = {
   referral: "Referral",
   instagram: "Instagram",
   tiktok: "TikTok",
+  email: "Email",
   google: "Google",
   youtube: "YouTube",
   organic: "Organski",
