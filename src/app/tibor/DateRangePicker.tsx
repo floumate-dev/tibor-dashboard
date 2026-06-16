@@ -2,8 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 
-const MONTHS = ["Januar","Februar","Mart","April","Maj","Jun","Jul","Avgust","Septembar","Oktobar","Novembar","Decembar"];
-const MONTHS_SHORT = ["jan","feb","mar","apr","maj","jun","jul","avg","sep","okt","nov","dec"];
+const MONTHS = ["Siječanj","Veljača","Ožujak","Travanj","Svibanj","Lipanj","Srpanj","Kolovoz","Rujan","Listopad","Studeni","Prosinac"];
+const MONTHS_SHORT = ["sij","velj","ožu","tra","svi","lip","srp","kol","ruj","lis","stu","pro"];
 const DOW = ["Ne","Po","Ut","Sr","Če","Pe","Su"];
 
 function ymd(d: Date) { return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
@@ -20,16 +20,16 @@ interface Preset { id: string; label: string; range: () => [Date, Date]; }
 function buildPresets(today: Date): Preset[] {
   return [
     { id: "today", label: "Danas", range: () => [today, today] },
-    { id: "yesterday", label: "Juče", range: () => { const y = addDays(today, -1); return [y, y]; } },
-    { id: "this_month", label: "Ovaj mesec", range: () => [startOfMonth(today), today] },
-    { id: "last_7", label: "Poslednjih 7 dana", range: () => [addDays(today, -6), today] },
-    { id: "last_14", label: "Poslednjih 14 dana", range: () => [addDays(today, -13), today] },
-    { id: "last_30", label: "Poslednjih 30 dana", range: () => [addDays(today, -29), today] },
-    { id: "last_3m", label: "Poslednja 3 meseca", range: () => [addMonthsD(today, -3), today] },
-    { id: "last_6m", label: "Poslednjih 6 meseci", range: () => [addMonthsD(today, -6), today] },
-    { id: "last_year", label: "Poslednja godina", range: () => [addMonthsD(today, -12), today] },
+    { id: "yesterday", label: "Jučer", range: () => { const y = addDays(today, -1); return [y, y]; } },
+    { id: "this_month", label: "Ovaj mjesec", range: () => [startOfMonth(today), today] },
+    { id: "last_7", label: "Posljednjih 7 dana", range: () => [addDays(today, -6), today] },
+    { id: "last_14", label: "Posljednjih 14 dana", range: () => [addDays(today, -13), today] },
+    { id: "last_30", label: "Posljednjih 30 dana", range: () => [addDays(today, -29), today] },
+    { id: "last_3m", label: "Posljednja 3 mjeseca", range: () => [addMonthsD(today, -3), today] },
+    { id: "last_6m", label: "Posljednjih 6 mjeseci", range: () => [addMonthsD(today, -6), today] },
+    { id: "last_year", label: "Posljednja godina", range: () => [addMonthsD(today, -12), today] },
     { id: "ytd", label: "Od početka godine", range: () => [new Date(today.getFullYear(), 0, 1), today] },
-    { id: "all_time", label: "Sve vreme", range: () => [new Date(2025, 0, 1), today] },
+    { id: "all_time", label: "Sve vrijeme", range: () => [new Date(2025, 0, 1), today] },
   ];
 }
 
@@ -182,11 +182,11 @@ export default function DateRangePicker({
               {draftStart && draftEnd ? (
                 <><strong>{fmt(draftStart)}</strong> — <strong>{fmt(draftEnd)}</strong></>
               ) : draftStart ? (
-                <><strong>{fmt(draftStart)}</strong> — izaberi krajnji datum</>
-              ) : ("Izaberi datum")}
+                <><strong>{fmt(draftStart)}</strong> — odaberi krajnji datum</>
+              ) : ("Odaberi datum")}
             </div>
             <div className="dp-actions">
-              <button type="button" className="dp-btn dp-btn-cancel" onClick={() => setOpen(false)}>Otkaži</button>
+              <button type="button" className="dp-btn dp-btn-cancel" onClick={() => setOpen(false)}>Odustani</button>
               <button
                 type="button"
                 className="dp-btn dp-btn-apply"
@@ -196,7 +196,7 @@ export default function DateRangePicker({
                   onApply({ start: draftStart, end: draftEnd, presetId: draftPreset });
                   setOpen(false);
                 }}
-              >Primeni</button>
+              >Primijeni</button>
             </div>
           </div>
         </div>

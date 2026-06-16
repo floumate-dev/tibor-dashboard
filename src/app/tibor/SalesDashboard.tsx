@@ -23,7 +23,7 @@ type WebinarData = {
   availableWebinars: { slug: string; label: string }[];
 };
 
-const MONTHS_SHORT = ["jan","feb","mar","apr","maj","jun","jul","avg","sep","okt","nov","dec"];
+const MONTHS_SHORT = ["sij","velj","ožu","tra","svi","lip","srp","kol","ruj","lis","stu","pro"];
 const PAGE_SIZE = 10;
 
 function fmtNum(n: number) { return n.toLocaleString("de-DE"); }
@@ -33,8 +33,8 @@ function dayDiff(a: Date, b: Date) { return Math.round((startOfDay(a).getTime() 
 function relativeLabel(d: Date, today: Date) {
   const diff = dayDiff(today, d);
   if (diff <= 0) return "danas";
-  if (diff === 1) return "juče";
-  return `pre ${diff} dana`;
+  if (diff === 1) return "jučer";
+  return `prije ${diff} dana`;
 }
 
 function dateCell(iso: string) {
@@ -50,7 +50,7 @@ const STAGE_BADGE: Record<Stage, { cls: string; label: string }> = {
   no_show: { cls: "badge-noshow", label: "No-show" },
   lead: { cls: "badge-lead", label: "Lead" },
   scheduled: { cls: "badge-pending", label: "Zakazano" },
-  showed_up: { cls: "badge-pending", label: "Awaiting" },
+  showed_up: { cls: "badge-pending", label: "Na čekanju" },
 };
 
 export default function SalesDashboard({ calls, presetUser }: { calls: CallRow[]; presetUser?: string }) {
@@ -206,7 +206,7 @@ export default function SalesDashboard({ calls, presetUser }: { calls: CallRow[]
             onKeyDown={(e) => { if (e.key === "Enter" && pin.length === 4) tryLogin(); }}
           />
           <div className="pin-error-msg">{pinError}</div>
-          <button className="login-btn-primary" disabled={pin.length !== 4} onClick={tryLogin}>Uloguj se</button>
+          <button className="login-btn-primary" disabled={pin.length !== 4} onClick={tryLogin}>Prijavi se</button>
           <div className="login-footer">powered by Floumate</div>
         </div>
       </div>
@@ -217,7 +217,7 @@ export default function SalesDashboard({ calls, presetUser }: { calls: CallRow[]
           <div className="dept-brand">Tibor <span>· Dashboard</span></div>
           <div className="dept-avatar"><img src={user?.photo || "/tibor.png"} alt={user?.name || "Tibor"} /></div>
           <div className="dept-greeting">Ćao, {user?.vocative || "Tibore"} 👋</div>
-          <div className="dept-greeting-sub">Izaberi departman</div>
+          <div className="dept-greeting-sub">Odaberi odjel</div>
           <div className="dept-grid">
             <button className="dept-btn setting" type="button" onClick={() => alert("Appointment Setting Department\n\nOvo bi otvorilo postojeći setter tracker. U ovoj verziji aktivan je samo Sales dashboard.")}>
               <div className="dept-icon">
@@ -226,7 +226,7 @@ export default function SalesDashboard({ calls, presetUser }: { calls: CallRow[]
                 </svg>
               </div>
               <div className="dept-name">Appointment Setting</div>
-              <div className="dept-desc">Booked calls, conversations, follow-up-ovi, conversion rate. Postojeća platforma.</div>
+              <div className="dept-desc">Zakazani pozivi, razgovori, follow-up-ovi, conversion rate. Postojeća platforma.</div>
             </button>
             <button className="dept-btn sales" type="button" onClick={() => setScreen("dashboard")}>
               <div className="dept-icon">
@@ -260,7 +260,7 @@ export default function SalesDashboard({ calls, presetUser }: { calls: CallRow[]
         <div className="header-brand">Tibor<em>· Sales Dashboard</em></div>
         <div className="header-right">
           <div className="header-user"><div className="header-avatar"><img src={user?.photo || "/tibor.png"} alt={user?.name || "Tibor"} /></div><span>{user?.name || "Tibor"}</span></div>
-          <button className="btn-dept" onClick={() => setScreen("dept")}>↔ Departmani</button>
+          <button className="btn-dept" onClick={() => setScreen("dept")}>↔ Odjeli</button>
           <button className="btn-logout" onClick={() => { setScreen("login"); setPin(""); setPinError(""); }}>Odjava</button>
         </div>
       </header>
@@ -268,7 +268,7 @@ export default function SalesDashboard({ calls, presetUser }: { calls: CallRow[]
       {/* TAB BAR (decorative) */}
       <nav className="tab-bar">
         <button className="tab-btn active">Pregled</button>
-        <button className="tab-btn">Grafici</button>
+        <button className="tab-btn">Grafikoni</button>
         <button className="tab-btn">Po paketima</button>
         <button className="tab-btn">Razlozi za lost</button>
         <button className="tab-btn">Svi pozivi</button>
@@ -293,7 +293,7 @@ export default function SalesDashboard({ calls, presetUser }: { calls: CallRow[]
           <div className="kpi-card">
             <div className="kpi-label">Pozivi</div>
             <div className="kpi-value">{stats.total}</div>
-            <div className="kpi-sub">zakazani u periodu</div>
+            <div className="kpi-sub">zakazani u razdoblju</div>
           </div>
           <div className="kpi-card">
             <div className="kpi-label">Zatvoreno</div>
@@ -327,7 +327,7 @@ export default function SalesDashboard({ calls, presetUser }: { calls: CallRow[]
                   <div className="pkg-dot" style={{ background: p.color }} />
                   <div className="pkg-info">
                     <div className="pkg-name">{p.name}</div>
-                    <div className="pkg-price-label">{p.price ? `${fmtNum(p.price)} € / kom` : "manuelna cena"}</div>
+                    <div className="pkg-price-label">{p.price ? `${fmtNum(p.price)} € / kom` : "manualna cijena"}</div>
                   </div>
                   <div className="pkg-bar-wrap"><div className="pkg-bar-fill" style={{ width: `${p.width}%`, background: p.color }} /></div>
                   <div className="pkg-stats">
@@ -347,7 +347,7 @@ export default function SalesDashboard({ calls, presetUser }: { calls: CallRow[]
               </div>
             </div>
             <div className="reasons-wrap">
-              {lostReasons.length === 0 && <div className="reasons-empty">Nema izgubljenih poziva u ovom periodu.</div>}
+              {lostReasons.length === 0 && <div className="reasons-empty">Nema izgubljenih poziva u ovom razdoblju.</div>}
               {lostReasons.map((c) => (
                 <div className="reason-item" key={c.id}>
                   <div className="reason-quote-mark">&ldquo;</div>
@@ -363,7 +363,7 @@ export default function SalesDashboard({ calls, presetUser }: { calls: CallRow[]
                 <div className="reasons-footer-icon">
                   <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 11 12 14 22 4" /><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" /></svg>
                 </div>
-                <span>Svaki razlog je tekst koji prodavac ručno upiše posle poziva</span>
+                <span>Svaki razlog je tekst koji prodavač ručno upiše nakon poziva</span>
               </div>
               <span className="reasons-footer-count">Prikazano {lostReasons.length} od {lostReasons.length}</span>
             </div>
@@ -375,7 +375,7 @@ export default function SalesDashboard({ calls, presetUser }: { calls: CallRow[]
           <div className="calls-table-head">
             <div>
               <div className="section-title">Svi pozivi</div>
-              <div className="section-sub">{searched.length} zapisa · klik na red za detalje</div>
+              <div className="section-sub">{searched.length} zapisa · klik na redak za detalje</div>
             </div>
             <input
               className="search-input"
@@ -448,7 +448,7 @@ export default function SalesDashboard({ calls, presetUser }: { calls: CallRow[]
         <div className="header-brand">Tibor<em>· Webinar Dashboard</em></div>
         <div className="header-right">
           <div className="header-user"><div className="header-avatar"><img src={user?.photo || "/tibor.png"} alt={user?.name || "Tibor"} /></div><span>{user?.name || "Tibor"}</span></div>
-          <button className="btn-dept" onClick={() => setScreen("dept")}>↔ Departmani</button>
+          <button className="btn-dept" onClick={() => setScreen("dept")}>↔ Odjeli</button>
           <button className="btn-logout" onClick={() => { setScreen("login"); setPin(""); setPinError(""); }}>Odjava</button>
         </div>
       </header>
@@ -501,7 +501,7 @@ export default function SalesDashboard({ calls, presetUser }: { calls: CallRow[]
                     <div className="webinar-goal-fill" style={{ width: `${pct}%` }} />
                   </div>
                   <div className="kpi-sub">
-                    {remaining > 0 ? <>jo&scaron; <strong>{fmtNum(remaining)}</strong> do cilja od {fmtNum(goal)}</> : <>cilj od {fmtNum(goal)} dostignut 🎉</>}
+                    {remaining > 0 ? <>jo&scaron; <strong>{fmtNum(remaining)}</strong> do cilja od {fmtNum(goal)}</> : <>cilj od {fmtNum(goal)} postignut 🎉</>}
                   </div>
                 </div>
               );
@@ -528,7 +528,7 @@ export default function SalesDashboard({ calls, presetUser }: { calls: CallRow[]
               </div>
               <div className="pkg-list">
                 {webinar.sources.length === 0 && (
-                  <div className="reasons-empty">Nema taggovanih izvora za ovaj webinar.</div>
+                  <div className="reasons-empty">Nema tagiranih izvora za ovaj webinar.</div>
                 )}
                 {webinar.sources.map((s, i) => {
                   const maxVal = Math.max(1, ...webinar.sources.map((x) => x.count));
