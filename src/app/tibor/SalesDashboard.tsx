@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import DateRangePicker, { presetLabel, Range } from "./DateRangePicker";
-import { CallRow, PACKAGES, PACKAGE_FALLBACK_COLOR, Stage } from "./data";
+import { CallRow, EvergreenDay, PACKAGES, PACKAGE_FALLBACK_COLOR, Stage } from "./data";
 
 type Account = { slug: string; pin: string; name: string; vocative: string; photo: string };
 
@@ -53,7 +54,20 @@ const STAGE_BADGE: Record<Stage, { cls: string; label: string }> = {
   showed_up: { cls: "badge-pending", label: "Na čekanju" },
 };
 
-export default function SalesDashboard({ calls, presetUser }: { calls: CallRow[]; presetUser?: string }) {
+// Segment metadata — increasing watch depth, increasing colour intensity.
+const EVG_SEGMENTS = [
+  { key: "noShow" as const, label: "No-show", color: "#454b57" },
+  { key: "beforePitch" as const, label: "Otišli pre pitcha", color: "#6b84d9" },
+  { key: "reachedPitch" as const, label: "Dočekali pitch", color: "#7895ed" },
+  { key: "fullPitch" as const, label: "Full pitch", color: "#a3b8f3" },
+];
+
+function fmtDay(iso: string) {
+  const [, mm, dd] = iso.split("-");
+  return `${dd}.${mm}`;
+}
+
+export default function SalesDashboard({ calls, evergreen = [], presetUser }: { calls: CallRow[]; evergreen?: EvergreenDay[]; presetUser?: string }) {
   const today = useMemo(() => startOfDay(new Date()), []);
   // Personalizovani login: ?u=<slug> zaključa ekran na taj nalog (PFP + pozdrav,
   // prima samo njegov PIN). Bez toga = generalni login (bez PFP, bilo koji PIN).
@@ -61,7 +75,8 @@ export default function SalesDashboard({ calls, presetUser }: { calls: CallRow[]
     () => ACCOUNTS.find((a) => a.slug === (presetUser || "").toLowerCase()) || null,
     [presetUser]
   );
-  const [screen, setScreen] = useState<"login" | "dept" | "dashboard" | "webinar">("login");
+  const router = useRouter();
+  const [screen, setScreen] = useState<"login" | "dept" | "dashboard" | "webinar" | "evergreen">("login");
   const [pin, setPin] = useState("");
   const [pinError, setPinError] = useState("");
   const [user, setUser] = useState<Account | null>(null);
@@ -82,6 +97,56 @@ export default function SalesDashboard({ calls, presetUser }: { calls: CallRow[]
   const [webinarError, setWebinarError] = useState("");
   // null = pusti API da auto-detektuje aktivni webinar; inače izabrani slug.
   const [webinarSlug, setWebinarSlug] = useState<string | null>(null);
+  // ---- evergreen: date-range filter + izbor pojedinačnog webinara ----
+  const [evgRange, setEvgRange] = useState<Range>({
+    start: new Date(today.getFullYear(), today.getMonth(), today.getDate() - 29),
+    // end = sutra, da se vidi i webinar u toku (npr. optini za sutra koji već teku)
+    end: new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1),
+    presetId: null,
+  });
+  const [evgSelected, setEvgSelected] = useState<string>("all"); // "all" (zbirno) ili webinar_date
+
+  const evgAll = useMemo(() => [...evergreen].sort((a, b) => a.date.localeCompare(b.date)), [evergreen]);
+  const evgInRange = useMemo(() => {
+    const s = evgRange.start.getTime();
+    const e = evgRange.end.getTime() + 86400000 - 1;
+    return evgAll.filter((d) => { const t = new Date(d.date + "T12:00:00").getTime(); return t >= s && t <= e; });
+  }, [evgAll, evgRange]);
+  // prikazani dani: pojedinačan izbor (ako je u periodu) ili svi iz perioda
+  const evgShown = useMemo(() => {
+    if (evgSelected !== "all") {
+      const one = evgInRange.find((d) => d.date === evgSelected);
+      if (one) return [one];
+    }
+    return evgInRange;
+  }, [evgInRange, evgSelected]);
+  const evgSingle = evgShown.length === 1;
+
+  const evg = useMemo(() => {
+    const days = evgShown;
+    const sum = (f: (d: EvergreenDay) => number) => days.reduce((s, d) => s + f(d), 0);
+    const registrants = sum((d) => d.registrants);
+    const attendees = sum((d) => d.attendees);
+    const noShow = sum((d) => d.noShow);
+    const beforePitch = sum((d) => d.beforePitch);
+    const reachedPitch = sum((d) => d.reachedPitch);
+    const reachedPlus = sum((d) => d.reachedPitch + d.fullPitch);
+    const fullPitch = sum((d) => d.fullPitch);
+    const conversions = sum((d) => d.conversions);
+    // Show-rate/funnel racunaju se SAMO preko odrzanih webinara — predstojeci
+    // dan nema attendance (generic segment tagovi bi ga lazno naduvali).
+    const occDays = days.filter((d) => d.occurred);
+    const occReg = occDays.reduce((s, d) => s + d.registrants, 0);
+    const hasOccurred = occDays.length > 0;
+    const allUpcoming = days.length > 0 && !hasOccurred;
+    const showRate = occReg ? (attendees / occReg) * 100 : 0;
+    const withRate = days.map((d) => ({ ...d, rate: d.occurred && d.registrants ? (d.attendees / d.registrants) * 100 : null as number | null }));
+    const rated = withRate.filter((d) => d.rate != null);
+    const best = rated.length ? rated.reduce((a, b) => (b.rate! > a.rate! ? b : a)) : null;
+    const worst = rated.length ? rated.reduce((a, b) => (b.rate! < a.rate! ? b : a)) : null;
+    const maxReg = Math.max(1, ...days.map((d) => d.registrants));
+    return { days, withRate, registrants, attendees, noShow, beforePitch, reachedPitch, reachedPlus, fullPitch, conversions, occReg, hasOccurred, allUpcoming, showRate, best, worst, maxReg };
+  }, [evgShown]);
 
   useEffect(() => {
     if (screen !== "webinar") return;
@@ -98,6 +163,24 @@ export default function SalesDashboard({ calls, presetUser }: { calls: CallRow[]
       .finally(() => { if (!cancelled) setWebinarLoading(false); });
     return () => { cancelled = true; };
   }, [screen, webinarSlug]);
+
+  // Auto-refresh: server vuce GHL/Supabase live (revalidate 60s), ali klijent to
+  // ne vidi bez novog zahteva. Dok je korisnik ulogovan i tab vidljiv, osvezavaj
+  // server podatke svakih 60s (+ odmah kad se vratis na tab). router.refresh()
+  // ponovo povlaci props, a cuva klijentsko stanje (ekran, izabrani period).
+  const authed = screen !== "login";
+  useEffect(() => {
+    if (!authed) return;
+    const refreshIfVisible = () => {
+      if (document.visibilityState === "visible") router.refresh();
+    };
+    const id = setInterval(refreshIfVisible, 60000);
+    document.addEventListener("visibilitychange", refreshIfVisible);
+    return () => {
+      clearInterval(id);
+      document.removeEventListener("visibilitychange", refreshIfVisible);
+    };
+  }, [authed, router]);
 
   function tryLogin() {
     // Personalizovani login prima samo svoj PIN; generalni prima bilo koji.
@@ -244,7 +327,16 @@ export default function SalesDashboard({ calls, presetUser }: { calls: CallRow[]
                 </svg>
               </div>
               <div className="dept-name">Webinar</div>
-              <div className="dept-desc">Prijave, izvori dolaska i broj aplikacija po webinaru.</div>
+              <div className="dept-desc">Launch funnel: prijave, izvori dolaska i broj aplikacija.</div>
+            </button>
+            <button className="dept-btn evergreen" type="button" onClick={() => setScreen("evergreen")}>
+              <div className="dept-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="23 4 23 10 17 10" /><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+                </svg>
+              </div>
+              <div className="dept-name">Evergreen webinari</div>
+              <div className="dept-desc">Dnevni webinari: show-rate, watch-depth segmenti, po danu i za period.</div>
             </button>
           </div>
           <button className="dept-back" type="button" onClick={() => { setScreen("login"); setPin(""); setPinError(""); }}>← Odjavi se</button>
@@ -441,7 +533,7 @@ export default function SalesDashboard({ calls, presetUser }: { calls: CallRow[]
       </>
       )}
 
-      {/* WEBINAR DASHBOARD */}
+      {/* WEBINAR DASHBOARD (launch funnel) */}
       {screen === "webinar" && (
       <>
       <header className="app-header">
@@ -456,7 +548,8 @@ export default function SalesDashboard({ calls, presetUser }: { calls: CallRow[]
       <main className="main-content">
         <div className="page-title-row">
           <div>
-            <div className="page-title">Webinar funnel</div>
+            <div className="page-title">Launch funnel</div>
+            <div className="page-subtitle">velike prijave (GHL tagovi)</div>
           </div>
           {webinar && webinar.availableWebinars?.length > 0 && (
             <select
@@ -552,6 +645,247 @@ export default function SalesDashboard({ calls, presetUser }: { calls: CallRow[]
                 })}
               </div>
             </div>
+          </>
+        )}
+      </main>
+      </>
+      )}
+
+      {/* EVERGREEN DASHBOARD */}
+      {screen === "evergreen" && (
+      <>
+      <header className="app-header">
+        <div className="header-brand">Tibor<em>· Evergreen</em></div>
+        <div className="header-right">
+          <div className="header-user"><div className="header-avatar"><img src={user?.photo || "/tibor.png"} alt={user?.name || "Tibor"} /></div><span>{user?.name || "Tibor"}</span></div>
+          <button className="btn-dept" onClick={() => setScreen("dept")}>↔ Odjeli</button>
+          <button className="btn-logout" onClick={() => { setScreen("login"); setPin(""); setPinError(""); }}>Odjava</button>
+        </div>
+      </header>
+
+      <main className="main-content">
+        <div className="page-title-row">
+          <div>
+            <div className="page-title">{evgSingle && evg.days.length ? `Webinar ${fmtDay(evg.days[0].date)}` : "Evergreen webinari"}</div>
+            <div className="page-subtitle">
+              {evgShown.length === 0
+                ? "nema webinara u periodu"
+                : evgSingle
+                  ? `pojedinačan webinar · snimak: ${evg.days[0].recording}`
+                  : `${fmtDay(evg.days[0].date)}–${fmtDay(evg.days[evg.days.length - 1].date)} · ${evg.days.length} webinara`}
+            </div>
+          </div>
+          <div className="evg-controls">
+            <select className="webinar-select" value={evgSelected} onChange={(e) => setEvgSelected(e.target.value)}>
+              <option value="all">Svi (zbirno)</option>
+              {evgInRange.map((d) => (
+                <option key={d.date} value={d.date}>Webinar {fmtDay(d.date)}</option>
+              ))}
+            </select>
+            <DateRangePicker today={today} committed={evgRange} onApply={(r) => { setEvgRange(r); setEvgSelected("all"); }} />
+          </div>
+        </div>
+
+        {evgAll.length === 0 ? (
+          <div className="webinar-state">Nema evergreen podataka još.</div>
+        ) : evgShown.length === 0 ? (
+          <div className="webinar-state">Nema webinara u izabranom periodu. Proširi period.</div>
+        ) : (
+          <>
+            <div className="kpi-grid">
+              <div className="kpi-card">
+                <div className="kpi-label">Registranti</div>
+                <div className="kpi-value">{fmtNum(evg.registrants)}</div>
+                <div className="kpi-sub">{evgSingle ? "1 webinar" : `${evg.days.length} webinara`}</div>
+              </div>
+              <div className="kpi-card">
+                <div className="kpi-label">Show-rate</div>
+                <div className="kpi-value">{evg.hasOccurred ? evg.showRate.toFixed(1) + "%" : "—"}</div>
+                <div className="kpi-sub">{evg.hasOccurred ? `${fmtNum(evg.attendees)} došlo` : "webinar predstoji"}</div>
+              </div>
+              <div className="kpi-card">
+                <div className="kpi-label">Dočekali pitch</div>
+                <div className="kpi-value">{fmtNum(evg.reachedPlus)}</div>
+                <div className="kpi-sub"><strong>{evg.attendees ? ((evg.reachedPlus / evg.attendees) * 100).toFixed(1) : "0"}%</strong> od došlih</div>
+              </div>
+              <div className="kpi-card">
+                <div className="kpi-label">Full pitch</div>
+                <div className="kpi-value green">{fmtNum(evg.fullPitch)}</div>
+                <div className="kpi-sub"><strong>{evg.attendees ? ((evg.fullPitch / evg.attendees) * 100).toFixed(1) : "0"}%</strong> od došlih</div>
+              </div>
+              <div className="kpi-card">
+                <div className="kpi-label">Kupili</div>
+                <div className="kpi-value green">{fmtNum(evg.conversions)}</div>
+                <div className="kpi-sub"><strong>{evg.attendees ? ((evg.conversions / evg.attendees) * 100).toFixed(1) : "0"}%</strong> od došlih</div>
+              </div>
+            </div>
+
+            {!evgSingle ? (
+              <div className="section-card">
+                <div className="section-head">
+                  <div>
+                    <div className="section-title">Dnevni pregled</div>
+                    <div className="section-sub">registranti po segmentu · show-rate po danu · klik na dan za detalje</div>
+                  </div>
+                  <div className="evg-legend">
+                    {EVG_SEGMENTS.map((s) => (
+                      <span className="evg-leg" key={s.key}><i style={{ background: s.color }} />{s.label}</span>
+                    ))}
+                  </div>
+                </div>
+                <div className="evg-chart">
+                  {evg.withRate.map((d) => {
+                    const upcoming = !d.occurred;
+                    const segs = upcoming
+                      ? [{ c: "#3a3f4a", v: 1, l: "Predstoji" }]
+                      : [
+                          { c: EVG_SEGMENTS[3].color, v: d.fullPitch, l: "Full pitch" },
+                          { c: EVG_SEGMENTS[2].color, v: d.reachedPitch, l: "Dočekali pitch" },
+                          { c: EVG_SEGMENTS[1].color, v: d.beforePitch, l: "Otišli pre pitcha" },
+                          { c: EVG_SEGMENTS[0].color, v: d.noShow, l: "No-show" },
+                        ];
+                    const h = (d.registrants / evg.maxReg) * 100;
+                    return (
+                      <div className="evg-col" key={d.date} onClick={() => setEvgSelected(d.date)} style={{ cursor: "pointer" }}>
+                        <div className="evg-rate" title={upcoming ? "webinar predstoji" : undefined}>{upcoming ? "•" : d.rate!.toFixed(0) + "%"}</div>
+                        <div className="evg-bar-track">
+                          <div className="evg-bar" style={{ height: `${h}%`, opacity: upcoming ? 0.5 : 1 }}>
+                            {segs.map((s, i) => (
+                              <div key={i} className="evg-seg" style={{ background: s.c, flexGrow: s.v }} title={`${s.l}: ${s.v}`} />
+                            ))}
+                          </div>
+                        </div>
+                        <div className="evg-x">{fmtDay(d.date)}</div>
+                        <div className="evg-x-sub">{fmtNum(d.registrants)}</div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ) : (
+              <div className="section-card">
+                <div className="section-head"><div><div className="section-title">Segmenti (watch-depth)</div><div className="section-sub">{fmtNum(evg.registrants)} registranata · gde su otišli</div></div></div>
+                {evg.hasOccurred ? (
+                  <div className="pkg-list">
+                    {[
+                      { label: EVG_SEGMENTS[0].label, v: evg.noShow, color: EVG_SEGMENTS[0].color },
+                      { label: EVG_SEGMENTS[1].label, v: evg.beforePitch, color: EVG_SEGMENTS[1].color },
+                      { label: EVG_SEGMENTS[2].label, v: evg.reachedPitch, color: EVG_SEGMENTS[2].color },
+                      { label: EVG_SEGMENTS[3].label, v: evg.fullPitch, color: EVG_SEGMENTS[3].color },
+                    ].map((s) => (
+                      <div className="pkg-row" key={s.label}>
+                        <div className="pkg-dot" style={{ background: s.color }} />
+                        <div className="pkg-info">
+                          <div className="pkg-name">{s.label}</div>
+                          <div className="pkg-price-label">{evg.registrants ? ((s.v / evg.registrants) * 100).toFixed(1) : "0"}% od registranata</div>
+                        </div>
+                        <div className="pkg-bar-wrap"><div className="pkg-bar-fill" style={{ width: `${evg.registrants ? (s.v / evg.registrants) * 100 : 0}%`, background: s.color }} /></div>
+                        <div className="pkg-stats"><div className="pkg-count">{fmtNum(s.v)}</div></div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="reasons-empty">Webinar još nije počeo (20:00) — attendance i segmenti biće dostupni po početku. Za sada: <strong>{fmtNum(evg.registrants)}</strong> prijava.</div>
+                )}
+              </div>
+            )}
+
+            <div className="grid-2">
+              <div className="section-card">
+                <div className="section-head"><div><div className="section-title">Funnel{evgSingle ? "" : " (zbirno)"}</div><div className="section-sub">{evgSingle ? `webinar ${fmtDay(evg.days[0].date)}` : `${evg.days.length} webinara u periodu`}</div></div></div>
+                <div className="pkg-list">
+                  {[
+                    { label: "Registranti", v: evg.registrants, color: "#6b84d9" },
+                    { label: "Došli", v: evg.attendees, color: "#7895ed" },
+                    { label: "Dočekali pitch", v: evg.reachedPlus, color: "#8ea4f0" },
+                    { label: "Full pitch", v: evg.fullPitch, color: "#a3b8f3" },
+                    { label: "Kupili", v: evg.conversions, color: "#5fb59a" },
+                  ].map((step) => (
+                    <div className="pkg-row" key={step.label}>
+                      <div className="pkg-dot" style={{ background: step.color }} />
+                      <div className="pkg-info">
+                        <div className="pkg-name">{step.label}</div>
+                        <div className="pkg-price-label">{evg.registrants ? ((step.v / evg.registrants) * 100).toFixed(1) : "0"}% od registranata</div>
+                      </div>
+                      <div className="pkg-bar-wrap"><div className="pkg-bar-fill" style={{ width: `${evg.registrants ? (step.v / evg.registrants) * 100 : 0}%`, background: step.color }} /></div>
+                      <div className="pkg-stats"><div className="pkg-count">{fmtNum(step.v)}</div></div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {!evgSingle && evg.best && evg.worst ? (
+                <div className="section-card">
+                  <div className="section-head"><div><div className="section-title">Najbolji / najslabiji dan</div><div className="section-sub">po show-rate-u</div></div></div>
+                  <div className="evg-bw">
+                    <div className="evg-bw-item best">
+                      <div className="evg-bw-tag">Najbolji</div>
+                      <div className="evg-bw-day">{fmtDay(evg.best.date)}</div>
+                      <div className="evg-bw-rate">{evg.best.rate!.toFixed(1)}%</div>
+                      <div className="evg-bw-sub">{fmtNum(evg.best.attendees)}/{fmtNum(evg.best.registrants)} · {evg.best.fullPitch} full</div>
+                    </div>
+                    <div className="evg-bw-item worst">
+                      <div className="evg-bw-tag">Najslabiji</div>
+                      <div className="evg-bw-day">{fmtDay(evg.worst.date)}</div>
+                      <div className="evg-bw-rate">{evg.worst.rate!.toFixed(1)}%</div>
+                      <div className="evg-bw-sub">{fmtNum(evg.worst.attendees)}/{fmtNum(evg.worst.registrants)} · {evg.worst.fullPitch} full</div>
+                    </div>
+                  </div>
+                  <div className="reasons-footer">
+                    <div className="reasons-footer-info"><span>Kupili = broj bought_eun tagova po webinaru (GHL).</span></div>
+                  </div>
+                </div>
+              ) : (
+                <div className="section-card">
+                  <div className="section-head"><div><div className="section-title">Detalji webinara</div><div className="section-sub">{fmtDay(evg.days[0].date)}</div></div></div>
+                  <div className="evg-detail">
+                    <div className="evg-detail-row"><span>Snimak</span><strong>{evg.days[0].recording || "—"}</strong></div>
+                    <div className="evg-detail-row"><span>Show-rate</span><strong>{evg.hasOccurred ? evg.showRate.toFixed(1) + "%" : "predstoji"}</strong></div>
+                    <div className="evg-detail-row"><span>Full pitch od došlih</span><strong>{evg.attendees ? ((evg.fullPitch / evg.attendees) * 100).toFixed(1) : "0"}%</strong></div>
+                    <div className="evg-detail-row"><span>Kupili</span><strong>{fmtNum(evg.conversions)} · {evg.attendees ? ((evg.conversions / evg.attendees) * 100).toFixed(1) : "0"}% od došlih</strong></div>
+                  </div>
+                  <div className="reasons-footer">
+                    <div className="reasons-footer-info"><span>Kupili = broj bought_eun tagova po webinaru (GHL).</span></div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {!evgSingle && (
+              <div className="calls-table-wrap">
+                <div className="calls-table-head"><div><div className="section-title">Po danu</div><div className="section-sub">{evg.days.length} webinara · klik na red za pojedinačan webinar</div></div></div>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Datum</th>
+                      <th style={{ textAlign: "right" }}>Reg</th>
+                      <th style={{ textAlign: "right" }}>Došli</th>
+                      <th style={{ textAlign: "right" }}>Show</th>
+                      <th style={{ textAlign: "right" }}>&lt;pitch</th>
+                      <th style={{ textAlign: "right" }}>Pitch</th>
+                      <th style={{ textAlign: "right" }}>Full</th>
+                      <th style={{ textAlign: "right" }}>Kupili</th>
+                      <th>Snimak</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {[...evg.withRate].reverse().map((d) => (
+                      <tr key={d.date} onClick={() => setEvgSelected(d.date)} style={{ cursor: "pointer" }}>
+                        <td><div className="cell-primary">{fmtDay(d.date)}</div></td>
+                        <td style={{ textAlign: "right" }}>{fmtNum(d.registrants)}</td>
+                        <td style={{ textAlign: "right" }}>{fmtNum(d.attendees)}</td>
+                        <td style={{ textAlign: "right" }} className={d.rate == null ? "cell-muted" : "cell-revenue"}>{d.rate == null ? "predstoji" : d.rate.toFixed(1) + "%"}</td>
+                        <td style={{ textAlign: "right" }} className="cell-muted">{d.beforePitch}</td>
+                        <td style={{ textAlign: "right" }} className="cell-muted">{d.reachedPitch}</td>
+                        <td style={{ textAlign: "right" }} className="cell-revenue">{d.fullPitch}</td>
+                        <td style={{ textAlign: "right" }} className="cell-revenue">{d.conversions}</td>
+                        <td className="cell-muted">{d.recording}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </>
         )}
       </main>

@@ -25,6 +25,21 @@ export const PACKAGES: { name: string; color: string; price: number | null }[] =
 
 export const PACKAGE_FALLBACK_COLOR = "#9aa0aa";
 
+// One evergreen webinar day (precomputed aggregate from evergreen_webinars).
+// Segments: no-show → <pitch → reached-pitch → full-pitch (increasing watch depth).
+export interface EvergreenDay {
+  date: string;          // ISO date (YYYY-MM-DD)
+  registrants: number;
+  attendees: number;
+  noShow: number;
+  beforePitch: number;
+  reachedPitch: number;
+  fullPitch: number;
+  conversions: number;
+  recording: string;
+  occurred: boolean;     // webinar (20:00 Belgrade) already started? if not, attendance is N/A
+}
+
 // Sample dataset for visual verification before the Supabase calls table is
 // wired. Dates land inside the last-30-days window relative to 2026-06-08.
 export const DEMO_CALLS: CallRow[] = [
