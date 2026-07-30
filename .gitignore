@@ -30,3 +30,21 @@ next-env.d.ts
 .vercel-token
 
 scripts/.dbpass
+
+# Legacy sub-projects (not part of dashboard)
+aleksa-forma/
+edumena-forma/
+hormozi-timer/
+internet-intranet-prezentacija/
+kraba-clone/
+nauci-dizajnu-giveaway/
+nauci-dizajnu-referral/
+nutribox-mangrowe/
+nutribox-sales-preview.html
+quiz/
+setter-tracker/
+stripe-ghl-invoice-blueprint.json
+sven-mentorship-form.html
+sven-mentorship-webflow-embed.html
+teodora-forma/
+watchtime-agency/
