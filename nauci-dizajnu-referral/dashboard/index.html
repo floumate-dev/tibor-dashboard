@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="robots" content="noindex, nofollow" />
-<title>Moj referral · Nauči Dizajn — Giveaway maj 2026</title>
+<title>Moj referral · Nauči Dizajn</title>
 <style>
   @font-face {
     font-family: 'Raptor';
@@ -425,6 +425,28 @@
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJmbnV0Z2VqY3BxeGdoeXNseHVyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4NDkxNjQsImV4cCI6MjA5MjQyNTE2NH0.Vl1bYS1FsPp7RZR2ne6LJgbnlpL9-YiWs7yBLlIOYhA';
   const WEBINAR_LANDING_URL = 'https://naucidizajn.com/giveaway-maj-2026';
 
+  // Vokativ (srpski) — inline, isto kao na landing-u. Mora pre init-a (render ga zove).
+  const VOK_DICT = {
+    'petar':'Petre','aleksandar':'Aleksandre','vuk':'Vuk','novak':'Novak','tarik':'Tarik','faruk':'Faruk',
+    'daniel':'Daniel','gabriel':'Gabriel','mihael':'Mihael','rafael':'Rafael','samuel':'Samuel','manuel':'Manuel','noel':'Noel',
+    'kevin':'Kevin','brajan':'Brajan','dilan':'Dilan','denis':'Denis',
+    'ines':'Ines','nives':'Nives','karmen':'Karmen','doris':'Doris','iris':'Iris','ingrid':'Ingrid',
+    'dolores':'Dolores','nikol':'Nikol','merjem':'Merjem'
+  };
+  function vokativ(raw){
+    if(!raw) return '';
+    let nm = String(raw).trim().split(/\s+/)[0];
+    if(!nm) return '';
+    nm = nm.charAt(0).toLocaleUpperCase('sr') + nm.slice(1).toLocaleLowerCase('sr');
+    const key = nm.toLocaleLowerCase('sr');
+    if(VOK_DICT[key]) return VOK_DICT[key];
+    const last = nm.slice(-1).toLowerCase();
+    if('aeiou'.indexOf(last)!==-1) return nm;   // samoglasnik -> nominativ
+    if('kgh'.indexOf(last)!==-1) return nm;     // -k/-g/-h
+    if(last==='j') return nm;                   // -j -> nominativ
+    return nm + 'e';                            // ostali suglasnici -> Stefan->Stefane
+  }
+
   const params = new URLSearchParams(location.search);
   const token = params.get('t');
   const app = document.getElementById('app');
@@ -506,10 +528,10 @@
     const myRank = data.my_rank;
     const totalActive = Number(data.total_with_referrals || 0);
 
-    const greeting = firstName ? `Pozdrav, ${escapeHtml(firstName)}!` : 'Pozdrav!';
+    const greeting = firstName ? `Pozdrav, ${escapeHtml(vokativ(firstName))}!` : 'Pozdrav!';
     const subtitle = count === 0
       ? 'Pozovi prijatelje. Ako neko ko se prijavi preko tvog linka bude izvučen, pobeđuješ i ti.'
-      : `Već si pozvao/la ${count} ${plural(count)}. Što više ljudi, veće su tvoje šanse u izvlačenju.`;
+      : `Već imaš ${count} ${plural(count)} preko svog linka. Što više ljudi, veće su tvoje šanse u izvlačenju.`;
 
     const rankBlock = myRank
       ? `<div class="progress-rank">
@@ -520,8 +542,6 @@
     const leaderboardBlock = renderLeaderboard(board, refCode, myRank, count);
 
     app.innerHTML = `
-      <div class="brand">Nauči Dizajn · Giveaway maj 2026</div>
-
       <div class="hero">
         <h1>${greeting}</h1>
         <p>${subtitle}</p>
