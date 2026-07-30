@@ -1,0 +1,4 @@
+.env.local
+.env*.local
+.vercel-token
+scripts/.dbpass
