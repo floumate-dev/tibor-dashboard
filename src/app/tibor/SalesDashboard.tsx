@@ -801,13 +801,17 @@ export default function SalesDashboard({ calls, evergreen = [], presetUser }: { 
                     <div className="section-title">Conversion rate po danu</div>
                     <div className="section-sub">kupili / došli · po webinaru · prosek {evg.convRate.toFixed(1)}%</div>
                   </div>
+                  <div className="evg-legend">
+                    <span className="evg-leg"><i style={{ background: "var(--text-light)" }} />prijave</span>
+                    <span className="evg-leg"><i style={{ background: "#5fb59a" }} />kupovine</span>
+                  </div>
                 </div>
                 {(() => {
                   const pts = evg.withRate.map((d, i) => ({
-                    i, date: d.date, kup: d.conversions,
+                    i, date: d.date, kup: d.conversions, reg: d.registrants,
                     rate: d.occurred && d.attendees ? (d.conversions / d.attendees) * 100 : null as number | null,
                   }));
-                  const dx = 62, padT = 30, plotH = 150, padB = 42, sidePad = dx / 2;
+                  const dx = 62, padT = 30, plotH = 150, padB = 58, sidePad = dx / 2;
                   const W = Math.max(pts.length, 1) * dx;
                   const H = padT + plotH + padB;
                   const maxY = evg.maxConv;
@@ -841,7 +845,8 @@ export default function SalesDashboard({ calls, evergreen = [], presetUser }: { 
                             {p.rate != null && <circle cx={xOf(p.i)} cy={yOf(p.rate)} r={3.5} fill="var(--bg)" stroke="#5fb59a" strokeWidth={2} />}
                             {p.rate != null && <text x={xOf(p.i)} y={yOf(p.rate) - 10} textAnchor="middle" className="evg-line-val">{p.rate.toFixed(1)}%</text>}
                             <text x={xOf(p.i)} y={baseY + 20} textAnchor="middle" className="evg-line-x">{fmtDay(p.date)}</text>
-                            <text x={xOf(p.i)} y={baseY + 34} textAnchor="middle" className="evg-line-xsub">{p.rate == null ? "•" : p.kup}</text>
+                            <text x={xOf(p.i)} y={baseY + 35} textAnchor="middle" className="evg-line-reg">{fmtNum(p.reg)}</text>
+                            <text x={xOf(p.i)} y={baseY + 50} textAnchor="middle" className="evg-line-kup">{p.rate == null ? "—" : p.kup}</text>
                             <rect x={xOf(p.i) - dx / 2} y={padT} width={dx} height={plotH + padB} fill="transparent" style={{ cursor: "pointer" }} onClick={() => setEvgSelected(p.date)}>
                               <title>{p.rate == null ? `${fmtDay(p.date)} — predstoji` : `${fmtDay(p.date)}: ${p.rate.toFixed(1)}% · ${p.kup} kupili`}</title>
                             </rect>
