@@ -145,7 +145,11 @@ export default function SalesDashboard({ calls, evergreen = [], presetUser }: { 
     const best = rated.length ? rated.reduce((a, b) => (b.rate! > a.rate! ? b : a)) : null;
     const worst = rated.length ? rated.reduce((a, b) => (b.rate! < a.rate! ? b : a)) : null;
     const maxReg = Math.max(1, ...days.map((d) => d.registrants));
-    return { days, withRate, registrants, attendees, noShow, beforePitch, reachedPitch, reachedPlus, fullPitch, conversions, occReg, hasOccurred, allUpcoming, showRate, best, worst, maxReg };
+    // conversion rate = kupili / došli, po danu (samo održani sa attendance)
+    const convRates = withRate.filter((d) => d.occurred && d.attendees).map((d) => (d.conversions / d.attendees) * 100);
+    const maxConv = Math.max(0.1, ...convRates);
+    const convRate = attendees ? (conversions / attendees) * 100 : 0;
+    return { days, withRate, registrants, attendees, noShow, beforePitch, reachedPitch, reachedPlus, fullPitch, conversions, occReg, hasOccurred, allUpcoming, showRate, convRate, maxConv, best, worst, maxReg };
   }, [evgShown]);
 
   useEffect(() => {
@@ -787,6 +791,33 @@ export default function SalesDashboard({ calls, evergreen = [], presetUser }: { 
                 ) : (
                   <div className="reasons-empty">Webinar još nije počeo (20:00) — attendance i segmenti biće dostupni po početku. Za sada: <strong>{fmtNum(evg.registrants)}</strong> prijava.</div>
                 )}
+              </div>
+            )}
+
+            {!evgSingle && (
+              <div className="section-card">
+                <div className="section-head">
+                  <div>
+                    <div className="section-title">Conversion rate po danu</div>
+                    <div className="section-sub">kupili / došli · po webinaru · prosek {evg.convRate.toFixed(1)}%</div>
+                  </div>
+                </div>
+                <div className="evg-chart">
+                  {evg.withRate.map((d) => {
+                    const cr = d.occurred && d.attendees ? (d.conversions / d.attendees) * 100 : null;
+                    const h = cr == null ? 0 : Math.max((cr / evg.maxConv) * 100, 3);
+                    return (
+                      <div className="evg-col" key={d.date} onClick={() => setEvgSelected(d.date)} style={{ cursor: "pointer" }}>
+                        <div className="evg-rate" title={cr == null ? "predstoji" : `${d.conversions} kupili / ${d.attendees} došli`}>{cr == null ? "•" : cr.toFixed(1) + "%"}</div>
+                        <div className="evg-bar-track">
+                          <div className="evg-bar" style={{ height: `${h}%`, background: "#5fb59a", opacity: cr == null ? 0.25 : 1 }} />
+                        </div>
+                        <div className="evg-x">{fmtDay(d.date)}</div>
+                        <div className="evg-x-sub">{d.conversions} kup.</div>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             )}
 
