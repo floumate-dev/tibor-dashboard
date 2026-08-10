@@ -802,22 +802,55 @@ export default function SalesDashboard({ calls, evergreen = [], presetUser }: { 
                     <div className="section-sub">kupili / došli · po webinaru · prosek {evg.convRate.toFixed(1)}%</div>
                   </div>
                 </div>
-                <div className="evg-chart">
-                  {evg.withRate.map((d) => {
-                    const cr = d.occurred && d.attendees ? (d.conversions / d.attendees) * 100 : null;
-                    const h = cr == null ? 0 : Math.max((cr / evg.maxConv) * 100, 3);
-                    return (
-                      <div className="evg-col" key={d.date} onClick={() => setEvgSelected(d.date)} style={{ cursor: "pointer" }}>
-                        <div className="evg-rate" title={cr == null ? "predstoji" : `${d.conversions} kupili / ${d.attendees} došli`}>{cr == null ? "•" : cr.toFixed(1) + "%"}</div>
-                        <div className="evg-bar-track">
-                          <div className="evg-bar" style={{ height: `${h}%`, background: "#5fb59a", opacity: cr == null ? 0.25 : 1 }} />
-                        </div>
-                        <div className="evg-x">{fmtDay(d.date)}</div>
-                        <div className="evg-x-sub">{d.conversions} kup.</div>
-                      </div>
-                    );
-                  })}
-                </div>
+                {(() => {
+                  const pts = evg.withRate.map((d, i) => ({
+                    i, date: d.date, kup: d.conversions,
+                    rate: d.occurred && d.attendees ? (d.conversions / d.attendees) * 100 : null as number | null,
+                  }));
+                  const dx = 62, padT = 30, plotH = 150, padB = 42, sidePad = dx / 2;
+                  const W = Math.max(pts.length, 1) * dx;
+                  const H = padT + plotH + padB;
+                  const maxY = evg.maxConv;
+                  const baseY = padT + plotH;
+                  const xOf = (i: number) => sidePad + i * dx;
+                  const yOf = (r: number) => baseY - (r / maxY) * plotH;
+                  const line = pts.filter((p) => p.rate != null);
+                  const dLine = line.map((p, k) => `${k === 0 ? "M" : "L"} ${xOf(p.i)} ${yOf(p.rate!)}`).join(" ");
+                  const dArea = line.length ? `${dLine} L ${xOf(line[line.length - 1].i)} ${baseY} L ${xOf(line[0].i)} ${baseY} Z` : "";
+                  const avgY = yOf(Math.min(evg.convRate, maxY));
+                  return (
+                    <div className="evg-line-wrap">
+                      <svg className="evg-line-svg" width={W} height={H} viewBox={`0 0 ${W} ${H}`} role="img">
+                        <defs>
+                          <linearGradient id="convgrad" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor="#5fb59a" stopOpacity="0.28" />
+                            <stop offset="100%" stopColor="#5fb59a" stopOpacity="0" />
+                          </linearGradient>
+                        </defs>
+                        <line x1={0} y1={baseY} x2={W} y2={baseY} stroke="rgba(255,255,255,0.10)" />
+                        {evg.convRate > 0 && (
+                          <>
+                            <line x1={0} y1={avgY} x2={W} y2={avgY} stroke="rgba(95,181,154,0.45)" strokeWidth={1} strokeDasharray="4 4" />
+                            <text x={W - 6} y={avgY - 5} textAnchor="end" className="evg-line-avg">prosek {evg.convRate.toFixed(1)}%</text>
+                          </>
+                        )}
+                        {dArea && <path d={dArea} fill="url(#convgrad)" />}
+                        {dLine && <path d={dLine} fill="none" stroke="#5fb59a" strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />}
+                        {pts.map((p) => (
+                          <g key={p.date}>
+                            {p.rate != null && <circle cx={xOf(p.i)} cy={yOf(p.rate)} r={3.5} fill="var(--bg)" stroke="#5fb59a" strokeWidth={2} />}
+                            {p.rate != null && <text x={xOf(p.i)} y={yOf(p.rate) - 10} textAnchor="middle" className="evg-line-val">{p.rate.toFixed(1)}%</text>}
+                            <text x={xOf(p.i)} y={baseY + 20} textAnchor="middle" className="evg-line-x">{fmtDay(p.date)}</text>
+                            <text x={xOf(p.i)} y={baseY + 34} textAnchor="middle" className="evg-line-xsub">{p.rate == null ? "•" : p.kup}</text>
+                            <rect x={xOf(p.i) - dx / 2} y={padT} width={dx} height={plotH + padB} fill="transparent" style={{ cursor: "pointer" }} onClick={() => setEvgSelected(p.date)}>
+                              <title>{p.rate == null ? `${fmtDay(p.date)} — predstoji` : `${fmtDay(p.date)}: ${p.rate.toFixed(1)}% · ${p.kup} kupili`}</title>
+                            </rect>
+                          </g>
+                        ))}
+                      </svg>
+                    </div>
+                  );
+                })()}
               </div>
             )}
 
