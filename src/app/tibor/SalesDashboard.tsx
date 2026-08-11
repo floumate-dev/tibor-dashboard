@@ -798,57 +798,73 @@ export default function SalesDashboard({ calls, evergreen = [], presetUser }: { 
               <div className="section-card">
                 <div className="section-head">
                   <div>
-                    <div className="section-title">Conversion rate po danu</div>
-                    <div className="section-sub">kupili / došli · po webinaru · prosek {evg.convRate.toFixed(1)}%</div>
+                    <div className="section-title">Conversion rate — trend</div>
+                    <div className="section-sub">7-dnevni težinski prosjek (Σ kupovine / Σ došli) · tačke = dnevni rate · brojevi ispod: prijave / kupovine</div>
                   </div>
                   <div className="evg-legend">
-                    <span className="evg-leg"><i style={{ background: "var(--text-light)" }} />prijave</span>
-                    <span className="evg-leg"><i style={{ background: "#5fb59a" }} />kupovine</span>
+                    <span className="evg-leg"><i style={{ background: "#5fb59a" }} />7-dnevni prosjek</span>
+                    <span className="evg-leg"><i style={{ background: "rgba(255,255,255,0.35)", borderRadius: "50%" }} />dnevno</span>
                   </div>
                 </div>
                 {(() => {
+                  const DAY = 86400000;
+                  const tOf = (s: string) => new Date(s + "T12:00:00Z").getTime();
                   const pts = evg.withRate.map((d, i) => ({
-                    i, date: d.date, kup: d.conversions, reg: d.registrants,
+                    i, date: d.date, kup: d.conversions, reg: d.registrants, att: d.attendees,
+                    occ: !!(d.occurred && d.attendees),
                     rate: d.occurred && d.attendees ? (d.conversions / d.attendees) * 100 : null as number | null,
                   }));
+                  // 7-dnevni TEŽINSKI pokretni prosjek: Σ kupovine / Σ došli (zadnjih 7 dana)
+                  const roll = pts.map((p) => {
+                    if (!p.occ) return null as number | null;
+                    let sc = 0, sa = 0;
+                    for (const q of pts) {
+                      if (!q.occ) continue;
+                      const dt = tOf(p.date) - tOf(q.date);
+                      if (dt >= 0 && dt < 7 * DAY) { sc += q.kup; sa += q.att; }
+                    }
+                    return sa ? (sc / sa) * 100 : null;
+                  });
                   const dx = 62, padT = 30, plotH = 150, padB = 58, sidePad = dx / 2;
                   const W = Math.max(pts.length, 1) * dx;
                   const H = padT + plotH + padB;
-                  const maxY = evg.maxConv;
                   const baseY = padT + plotH;
+                  const rollVals = roll.filter((r): r is number => r != null);
+                  // skala vezana za rolling raspon (dnevni outlieri se clip-uju na vrh)
+                  const maxY = Math.max(0.5, ...rollVals) * 1.7;
                   const xOf = (i: number) => sidePad + i * dx;
-                  const yOf = (r: number) => baseY - (r / maxY) * plotH;
-                  const line = pts.filter((p) => p.rate != null);
-                  const dLine = line.map((p, k) => `${k === 0 ? "M" : "L"} ${xOf(p.i)} ${yOf(p.rate!)}`).join(" ");
-                  const dArea = line.length ? `${dLine} L ${xOf(line[line.length - 1].i)} ${baseY} L ${xOf(line[0].i)} ${baseY} Z` : "";
-                  const avgY = yOf(Math.min(evg.convRate, maxY));
+                  const yOf = (r: number) => baseY - (Math.min(r, maxY) / maxY) * plotH;
+                  const rp = pts.map((p) => ({ i: p.i, y: roll[p.i] })).filter((p): p is { i: number; y: number } => p.y != null);
+                  const dRoll = rp.map((p, k) => `${k === 0 ? "M" : "L"} ${xOf(p.i)} ${yOf(p.y)}`).join(" ");
+                  const dArea = rp.length ? `${dRoll} L ${xOf(rp[rp.length - 1].i)} ${baseY} L ${xOf(rp[0].i)} ${baseY} Z` : "";
                   return (
                     <div className="evg-line-wrap">
                       <svg className="evg-line-svg" width={W} height={H} viewBox={`0 0 ${W} ${H}`} role="img">
                         <defs>
                           <linearGradient id="convgrad" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stopColor="#5fb59a" stopOpacity="0.28" />
+                            <stop offset="0%" stopColor="#5fb59a" stopOpacity="0.24" />
                             <stop offset="100%" stopColor="#5fb59a" stopOpacity="0" />
                           </linearGradient>
                         </defs>
                         <line x1={0} y1={baseY} x2={W} y2={baseY} stroke="rgba(255,255,255,0.10)" />
-                        {evg.convRate > 0 && (
-                          <>
-                            <line x1={0} y1={avgY} x2={W} y2={avgY} stroke="rgba(95,181,154,0.45)" strokeWidth={1} strokeDasharray="4 4" />
-                            <text x={W - 6} y={avgY - 5} textAnchor="end" className="evg-line-avg">prosek {evg.convRate.toFixed(1)}%</text>
-                          </>
-                        )}
+                        {/* dnevni rate — sekundarno, slabe tačke */}
+                        {pts.map((p) => p.rate == null ? null : (
+                          <circle key={"d" + p.date} cx={xOf(p.i)} cy={yOf(p.rate)} r={2.3} fill="rgba(255,255,255,0.30)" />
+                        ))}
+                        {/* 7-dnevni težinski prosjek — GLAVNA linija */}
                         {dArea && <path d={dArea} fill="url(#convgrad)" />}
-                        {dLine && <path d={dLine} fill="none" stroke="#5fb59a" strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />}
+                        {dRoll && <path d={dRoll} fill="none" stroke="#5fb59a" strokeWidth={2.75} strokeLinejoin="round" strokeLinecap="round" />}
+                        {rp.map((p) => (
+                          <circle key={"r" + p.i} cx={xOf(p.i)} cy={yOf(p.y)} r={3} fill="var(--bg)" stroke="#5fb59a" strokeWidth={2} />
+                        ))}
+                        {/* labeli ispod */}
                         {pts.map((p) => (
                           <g key={p.date}>
-                            {p.rate != null && <circle cx={xOf(p.i)} cy={yOf(p.rate)} r={3.5} fill="var(--bg)" stroke="#5fb59a" strokeWidth={2} />}
-                            {p.rate != null && <text x={xOf(p.i)} y={yOf(p.rate) - 10} textAnchor="middle" className="evg-line-val">{p.rate.toFixed(1)}%</text>}
                             <text x={xOf(p.i)} y={baseY + 20} textAnchor="middle" className="evg-line-x">{fmtDay(p.date)}</text>
                             <text x={xOf(p.i)} y={baseY + 35} textAnchor="middle" className="evg-line-reg">{fmtNum(p.reg)}</text>
                             <text x={xOf(p.i)} y={baseY + 50} textAnchor="middle" className="evg-line-kup">{p.rate == null ? "—" : p.kup}</text>
                             <rect x={xOf(p.i) - dx / 2} y={padT} width={dx} height={plotH + padB} fill="transparent" style={{ cursor: "pointer" }} onClick={() => setEvgSelected(p.date)}>
-                              <title>{p.rate == null ? `${fmtDay(p.date)} — predstoji` : `${fmtDay(p.date)}: ${p.rate.toFixed(1)}% · ${p.kup} kupili`}</title>
+                              <title>{p.rate == null ? `${fmtDay(p.date)} — predstoji` : `${fmtDay(p.date)}: dnevno ${p.rate.toFixed(1)}%${roll[p.i] != null ? ` · 7-dnevni ${roll[p.i]!.toFixed(1)}%` : ""} · ${p.kup} kupili / ${p.att} došli`}</title>
                             </rect>
                           </g>
                         ))}
