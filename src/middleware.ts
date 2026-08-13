@@ -39,11 +39,13 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Allow webhook + webinar funnel endpoints without auth (webinar dashboard is
-  // PIN-gated client-side, same model as /sales).
+  // Allow webhook + webinar funnel + cron endpoints without Supabase auth. The
+  // cron route (/api/cron) guards itself with CRON_SECRET; the webinar dashboard
+  // is PIN-gated client-side (same model as /sales).
   if (
     request.nextUrl.pathname.startsWith("/api/webhooks") ||
-    request.nextUrl.pathname.startsWith("/api/webinar")
+    request.nextUrl.pathname.startsWith("/api/webinar") ||
+    request.nextUrl.pathname.startsWith("/api/cron")
   ) {
     return supabaseResponse;
   }

@@ -1,14 +1,9 @@
-import { unstable_cache } from "next/cache";
 import { createClient } from "@supabase/supabase-js";
 import SalesDashboard from "./SalesDashboard";
 import { CallRow, DEMO_CALLS, EvergreenDay, Stage } from "./data";
-import { pullEvergreenLive } from "../../lib/evergreen-ghl";
 import "./dashboard.css";
 
 export const dynamic = "force-dynamic";
-// The evergreen view fans out ~80 GHL calls; give the serverless function room
-// so a slow pull completes instead of timing out to an empty dashboard.
-export const maxDuration = 60;
 
 // Shared supabase client (service role, no-store so data is fresh each load).
 function serviceClient() {
@@ -23,26 +18,39 @@ function serviceClient() {
   });
 }
 
-// Evergreen webinar metrics — pulled LIVE from GHL tags on load (no CSV, no
-// storage; auto-discovers new webinar days incl. tomorrow's as its optins
-// arrive). Cached ~60s so rapid re-opens don't re-hit GHL; each open past that
-// re-pulls fresh. See src/lib/evergreen-ghl.ts.
-const getEvergreenLive = unstable_cache(
-  async (): Promise<EvergreenDay[]> => {
-    const token = process.env.GHL_TIBOR_TOKEN;
-    if (!token) return [];
-    return pullEvergreenLive(token);
-  },
-  ["evergreen-live-v3"],
-  { revalidate: 60 }
-);
+// Webinar (20:00 Europe/Belgrade = 18:00 UTC) already started? Before it starts,
+// attendance is N/A (the UI shows "predstoji"). Derived at read time.
+function evgOccurred(dateISO: string): boolean {
+  return Date.now() >= new Date(dateISO + "T18:00:00Z").getTime();
+}
 
+// Evergreen webinar metrics — read from the precomputed `evergreen_webinars`
+// store, kept fresh by the /api/cron/evergreen cron (GHL pull off the user path).
+// One fast query; no live GHL fan-out on load. See src/lib/evergreen-ghl.ts for
+// the pull the cron runs.
 async function fetchEvergreen(): Promise<EvergreenDay[]> {
-  try {
-    return await getEvergreenLive();
-  } catch {
-    return [];
-  }
+  const supabase = serviceClient();
+  if (!supabase) return [];
+  const { data: org } = await supabase.from("organizations").select("id").eq("slug", "tibor").single();
+  if (!org) return [];
+  const { data, error } = await supabase
+    .from("evergreen_webinars")
+    .select("webinar_date, registrants, attendees, seg_no_show, seg_before_pitch, seg_reached_pitch, seg_full_pitch, conversions, recording_label")
+    .eq("org_id", org.id)
+    .order("webinar_date", { ascending: true });
+  if (error || !data) return [];
+  return data.map((r) => ({
+    date: r.webinar_date as string,
+    registrants: Number(r.registrants) || 0,
+    attendees: Number(r.attendees) || 0,
+    noShow: Number(r.seg_no_show) || 0,
+    beforePitch: Number(r.seg_before_pitch) || 0,
+    reachedPitch: Number(r.seg_reached_pitch) || 0,
+    fullPitch: Number(r.seg_full_pitch) || 0,
+    conversions: Number(r.conversions) || 0,
+    recording: (r.recording_label as string) || "",
+    occurred: evgOccurred(r.webinar_date as string),
+  }));
 }
 
 async function fetchCalls(): Promise<CallRow[]> {
