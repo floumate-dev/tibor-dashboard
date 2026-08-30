@@ -451,6 +451,7 @@
 .dept-btn.sales .dept-icon { background: var(--primary); }
 .dept-btn.webinar .dept-icon { background: linear-gradient(135deg, #7895ed, #a3b8f3); }
 .dept-btn.evergreen .dept-icon { background: linear-gradient(135deg, #4fb286, #79d0ad); }
+.dept-btn.dm .dept-icon { background: linear-gradient(135deg, #6b84d9, #7895ed 55%, #5fb59a); }
 .webinar-state { padding: 40px 24px; text-align: center; color: var(--text-muted); font-size: 14px; border: 1px dashed var(--border-md); border-radius: var(--radius); background: var(--bg); }
 .webinar-state.error { color: var(--danger); border-color: var(--danger); }
 .webinar-goal-card {

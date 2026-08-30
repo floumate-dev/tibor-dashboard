@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import DateRangePicker, { presetLabel, Range } from "./DateRangePicker";
-import { CallRow, EvergreenDay, PACKAGES, PACKAGE_FALLBACK_COLOR, Stage } from "./data";
+import { CallRow, DmDay, EvergreenDay, PACKAGES, PACKAGE_FALLBACK_COLOR, Stage } from "./data";
 
 type Account = { slug: string; pin: string; name: string; vocative: string; photo: string };
 
@@ -67,7 +67,7 @@ function fmtDay(iso: string) {
   return `${dd}.${mm}`;
 }
 
-export default function SalesDashboard({ calls, evergreen = [], presetUser }: { calls: CallRow[]; evergreen?: EvergreenDay[]; presetUser?: string }) {
+export default function SalesDashboard({ calls, evergreen = [], dmDaily = [], presetUser }: { calls: CallRow[]; evergreen?: EvergreenDay[]; dmDaily?: DmDay[]; presetUser?: string }) {
   const today = useMemo(() => startOfDay(new Date()), []);
   // Personalizovani login: ?u=<slug> zaključa ekran na taj nalog (PFP + pozdrav,
   // prima samo njegov PIN). Bez toga = generalni login (bez PFP, bilo koji PIN).
@@ -76,7 +76,7 @@ export default function SalesDashboard({ calls, evergreen = [], presetUser }: { 
     [presetUser]
   );
   const router = useRouter();
-  const [screen, setScreen] = useState<"login" | "dept" | "dashboard" | "webinar" | "evergreen">("login");
+  const [screen, setScreen] = useState<"login" | "dept" | "dashboard" | "webinar" | "evergreen" | "dm">("login");
   const [pin, setPin] = useState("");
   const [pinError, setPinError] = useState("");
   const [user, setUser] = useState<Account | null>(null);
@@ -105,6 +105,12 @@ export default function SalesDashboard({ calls, evergreen = [], presetUser }: { 
     presetId: null,
   });
   const [evgSelected, setEvgSelected] = useState<string>("all"); // "all" (zbirno) ili webinar_date
+  // ---- DM department: date-range filter ----
+  const [dmRange, setDmRange] = useState<Range>({
+    start: new Date(today.getFullYear(), today.getMonth(), today.getDate() - 29),
+    end: today,
+    presetId: "last_30",
+  });
 
   const evgAll = useMemo(() => [...evergreen].sort((a, b) => a.date.localeCompare(b.date)), [evergreen]);
   const evgInRange = useMemo(() => {
@@ -151,6 +157,34 @@ export default function SalesDashboard({ calls, evergreen = [], presetUser }: { 
     const convRate = attendees ? (conversions / attendees) * 100 : 0;
     return { days, withRate, registrants, attendees, noShow, beforePitch, reachedPitch, reachedPlus, fullPitch, conversions, occReg, hasOccurred, allUpcoming, showRate, convRate, maxConv, best, worst, maxReg };
   }, [evgShown]);
+
+  // ---- DM department aggregations (Instagram DM funnel) ----
+  const dmAll = useMemo(() => [...dmDaily].sort((a, b) => a.date.localeCompare(b.date)), [dmDaily]);
+  const dmDays = useMemo(() => {
+    const s = dmRange.start.getTime();
+    const e = dmRange.end.getTime() + 86400000 - 1;
+    return dmAll.filter((d) => { const t = new Date(d.date + "T12:00:00").getTime(); return t >= s && t <= e; });
+  }, [dmAll, dmRange]);
+  const dm = useMemo(() => {
+    const days = dmDays;
+    const sum = (f: (d: DmDay) => number) => days.reduce((s, d) => s + f(d), 0);
+    const outbound = sum((d) => d.outbound);
+    const inbound = sum((d) => d.inbound);
+    const conversations = sum((d) => d.conversations);
+    const bookingLinks = sum((d) => d.bookingLinks);
+    const paymentLinks = sum((d) => d.paymentLinks);
+    const appointments = sum((d) => d.appointments);
+    const purchases = sum((d) => d.purchases);
+    const revenue = sum((d) => d.revenue);
+    const replyRate = outbound ? (inbound / outbound) * 100 : 0;
+    const convRate = outbound ? (conversations / outbound) * 100 : 0;
+    const bookRate = bookingLinks ? (appointments / bookingLinks) * 100 : 0;   // booking link → zakazan
+    const closeRate = appointments ? (purchases / appointments) * 100 : 0;     // zakazan → kupovina
+    const payCloseRate = paymentLinks ? (purchases / paymentLinks) * 100 : 0;  // payment link → kupovina
+    const overall = outbound ? (purchases / outbound) * 100 : 0;               // poslato → kupovina
+    const avgDeal = purchases ? revenue / purchases : 0;
+    return { days, outbound, inbound, conversations, bookingLinks, paymentLinks, appointments, purchases, revenue, replyRate, convRate, bookRate, closeRate, payCloseRate, overall, avgDeal };
+  }, [dmDays]);
 
   useEffect(() => {
     if (screen !== "webinar") return;
@@ -266,6 +300,7 @@ export default function SalesDashboard({ calls, evergreen = [], presetUser }: { 
   const pageRows = searched.slice((curPage - 1) * PAGE_SIZE, curPage * PAGE_SIZE);
 
   const rangeLabel = presetLabel(range.presetId, range.start, range.end, today);
+  const dmRangeLabel = presetLabel(dmRange.presetId, dmRange.start, dmRange.end, today);
 
   return (
     <div className="tibor-page">
@@ -306,6 +341,15 @@ export default function SalesDashboard({ calls, evergreen = [], presetUser }: { 
           <div className="dept-greeting">Ćao, {user?.vocative || "Tibore"} 👋</div>
           <div className="dept-greeting-sub">Odaberi odjel</div>
           <div className="dept-grid">
+            <button className="dept-btn dm" type="button" onClick={() => setScreen("dm")}>
+              <div className="dept-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+                </svg>
+              </div>
+              <div className="dept-name">DM</div>
+              <div className="dept-desc">Instagram DM funnel: poslate/primljene poruke, konverzacije, poslati linkovi, zakazani i kupovine.</div>
+            </button>
             <button className="dept-btn setting" type="button" onClick={() => alert("Appointment Setting Department\n\nOvo bi otvorilo postojeći setter tracker. U ovoj verziji aktivan je samo Sales dashboard.")}>
               <div className="dept-icon">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -971,6 +1015,198 @@ export default function SalesDashboard({ calls, evergreen = [], presetUser }: { 
                 </table>
               </div>
             )}
+          </>
+        )}
+      </main>
+      </>
+      )}
+
+      {/* DM DASHBOARD (Instagram DM funnel) */}
+      {screen === "dm" && (
+      <>
+      <header className="app-header">
+        <div className="header-brand">Tibor<em>· DM Dashboard</em></div>
+        <div className="header-right">
+          <div className="header-user"><div className="header-avatar"><img src={user?.photo || "/tibor.png"} alt={user?.name || "Tibor"} /></div><span>{user?.name || "Tibor"}</span></div>
+          <button className="btn-dept" onClick={() => setScreen("dept")}>↔ Odjeli</button>
+          <button className="btn-logout" onClick={() => { setScreen("login"); setPin(""); setPinError(""); }}>Odjava</button>
+        </div>
+      </header>
+
+      <main className="main-content">
+        <div className="page-title-row">
+          <div>
+            <div className="page-title">DM prodaja</div>
+            <div className="page-subtitle">{dmRangeLabel}</div>
+          </div>
+          <DateRangePicker today={today} committed={dmRange} onApply={(r) => setDmRange(r)} />
+        </div>
+
+        {dmAll.length === 0 ? (
+          <div className="webinar-state">Još nema DM podataka. Poveži Instagram / iClosed / Stripe webhookove (vidi setup korake).</div>
+        ) : dm.days.length === 0 ? (
+          <div className="webinar-state">Nema podataka u izabranom periodu. Proširi period.</div>
+        ) : (
+          <>
+            {/* KPI */}
+            <div className="kpi-grid">
+              <div className="kpi-card">
+                <div className="kpi-label">Poslato (outbound)</div>
+                <div className="kpi-value">{fmtNum(dm.outbound)}</div>
+                <div className="kpi-sub">poruka u razdoblju</div>
+              </div>
+              <div className="kpi-card">
+                <div className="kpi-label">Primljeno (inbound)</div>
+                <div className="kpi-value">{fmtNum(dm.inbound)}</div>
+                <div className="kpi-sub"><strong>{dm.replyRate.toFixed(0)}%</strong> reply rate</div>
+              </div>
+              <div className="kpi-card">
+                <div className="kpi-label">Konverzacije</div>
+                <div className="kpi-value">{fmtNum(dm.conversations)}</div>
+                <div className="kpi-sub">&gt;2 poruke · <strong>{dm.convRate.toFixed(0)}%</strong> od poslatih</div>
+              </div>
+              <div className="kpi-card">
+                <div className="kpi-label">Booking linkovi</div>
+                <div className="kpi-value">{fmtNum(dm.bookingLinks)}</div>
+                <div className="kpi-sub">poslato u DM</div>
+              </div>
+              <div className="kpi-card">
+                <div className="kpi-label">Zakazani pozivi</div>
+                <div className="kpi-value">{fmtNum(dm.appointments)}</div>
+                <div className="kpi-sub"><strong>{dm.bookRate.toFixed(0)}%</strong> od booking linkova</div>
+              </div>
+              <div className="kpi-card">
+                <div className="kpi-label">Payment linkovi</div>
+                <div className="kpi-value">{fmtNum(dm.paymentLinks)}</div>
+                <div className="kpi-sub">poslato u DM</div>
+              </div>
+              <div className="kpi-card">
+                <div className="kpi-label">Kupovine</div>
+                <div className="kpi-value green">{fmtNum(dm.purchases)}</div>
+                <div className="kpi-sub"><strong>{dm.closeRate.toFixed(0)}%</strong> od zakazanih</div>
+              </div>
+              <div className="kpi-card">
+                <div className="kpi-label">Prihod</div>
+                <div className="kpi-value green">{fmtNum(dm.revenue)}</div>
+                <div className="kpi-sub">EUR · prosek {fmtNum(Math.round(dm.avgDeal))} / deal</div>
+              </div>
+            </div>
+
+            {/* Funnel + stope */}
+            <div className="grid-2">
+              <div className="section-card">
+                <div className="section-head"><div><div className="section-title">DM funnel</div><div className="section-sub">{fmtNum(dm.outbound)} poslato → {fmtNum(dm.purchases)} kupovina</div></div></div>
+                <div className="pkg-list">
+                  {[
+                    { label: "Poslato", v: dm.outbound, color: "#6b84d9" },
+                    { label: "Konverzacije (>2)", v: dm.conversations, color: "#7895ed" },
+                    { label: "Booking link poslat", v: dm.bookingLinks, color: "#8ea4f0" },
+                    { label: "Zakazani pozivi", v: dm.appointments, color: "#a3b8f3" },
+                    { label: "Payment link poslat", v: dm.paymentLinks, color: "#cdd6f9" },
+                    { label: "Kupovine", v: dm.purchases, color: "#5fb59a" },
+                  ].map((step) => (
+                    <div className="pkg-row" key={step.label}>
+                      <div className="pkg-dot" style={{ background: step.color }} />
+                      <div className="pkg-info">
+                        <div className="pkg-name">{step.label}</div>
+                        <div className="pkg-price-label">{dm.outbound ? ((step.v / dm.outbound) * 100).toFixed(1) : "0"}% od poslatih</div>
+                      </div>
+                      <div className="pkg-bar-wrap"><div className="pkg-bar-fill" style={{ width: `${dm.outbound ? (step.v / dm.outbound) * 100 : 0}%`, background: step.color }} /></div>
+                      <div className="pkg-stats"><div className="pkg-count">{fmtNum(step.v)}</div></div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="section-card">
+                <div className="section-head"><div><div className="section-title">Ključne stope</div><div className="section-sub">konverzija između koraka</div></div></div>
+                <div className="evg-detail">
+                  <div className="evg-detail-row"><span>Reply rate (inbound/outbound)</span><strong>{dm.replyRate.toFixed(1)}%</strong></div>
+                  <div className="evg-detail-row"><span>Konverzacije od poslatih</span><strong>{dm.convRate.toFixed(1)}%</strong></div>
+                  <div className="evg-detail-row"><span>Booking link → zakazan</span><strong>{dm.bookRate.toFixed(1)}%</strong></div>
+                  <div className="evg-detail-row"><span>Zakazan → kupovina (close)</span><strong>{dm.closeRate.toFixed(1)}%</strong></div>
+                  <div className="evg-detail-row"><span>Payment link → kupovina</span><strong>{dm.payCloseRate.toFixed(1)}%</strong></div>
+                  <div className="evg-detail-row"><span>Ukupno: poslato → kupovina</span><strong>{dm.overall.toFixed(2)}%</strong></div>
+                </div>
+                <div className="reasons-footer"><div className="reasons-footer-info"><span>Zakazani (iClosed) i kupovine (Stripe) filtrirani na DM preko source=burno.</span></div></div>
+              </div>
+            </div>
+
+            {/* Dnevna aktivnost — outbound/inbound linije */}
+            <div className="section-card">
+              <div className="section-head">
+                <div><div className="section-title">Dnevna aktivnost</div><div className="section-sub">poslate i primljene poruke po danu</div></div>
+                <div className="evg-legend">
+                  <span className="evg-leg"><i style={{ background: "#7895ed" }} />Poslato</span>
+                  <span className="evg-leg"><i style={{ background: "#5fb59a" }} />Primljeno</span>
+                </div>
+              </div>
+              {(() => {
+                const days = dm.days;
+                const dx = 54, padT = 20, plotH = 140, padB = 40, sidePad = dx / 2;
+                const W = Math.max(days.length, 1) * dx;
+                const H = padT + plotH + padB;
+                const baseY = padT + plotH;
+                const maxY = Math.max(1, ...days.map((d) => Math.max(d.outbound, d.inbound))) * 1.15;
+                const xOf = (i: number) => sidePad + i * dx;
+                const yOf = (v: number) => baseY - (Math.min(v, maxY) / maxY) * plotH;
+                const line = (key: "outbound" | "inbound") => days.map((d, i) => `${i === 0 ? "M" : "L"} ${xOf(i)} ${yOf(d[key])}`).join(" ");
+                return (
+                  <div className="evg-line-wrap">
+                    <svg className="evg-line-svg" width={W} height={H} viewBox={`0 0 ${W} ${H}`} role="img">
+                      <line x1={0} y1={baseY} x2={W} y2={baseY} stroke="rgba(255,255,255,0.10)" />
+                      <path d={line("outbound")} fill="none" stroke="#7895ed" strokeWidth={2.5} strokeLinejoin="round" strokeLinecap="round" />
+                      <path d={line("inbound")} fill="none" stroke="#5fb59a" strokeWidth={2.5} strokeLinejoin="round" strokeLinecap="round" />
+                      {days.map((d, i) => (
+                        <g key={d.date}>
+                          <circle cx={xOf(i)} cy={yOf(d.outbound)} r={2.6} fill="var(--bg)" stroke="#7895ed" strokeWidth={1.6} />
+                          <circle cx={xOf(i)} cy={yOf(d.inbound)} r={2.6} fill="var(--bg)" stroke="#5fb59a" strokeWidth={1.6} />
+                          <text x={xOf(i)} y={baseY + 20} textAnchor="middle" className="evg-line-x">{fmtDay(d.date)}</text>
+                          <rect x={xOf(i) - dx / 2} y={padT} width={dx} height={plotH + padB} fill="transparent">
+                            <title>{`${fmtDay(d.date)}: ${d.outbound} poslato · ${d.inbound} primljeno · ${d.conversations} konv. · ${d.appointments} zakazano · ${d.purchases} kupovina`}</title>
+                          </rect>
+                        </g>
+                      ))}
+                    </svg>
+                  </div>
+                );
+              })()}
+            </div>
+
+            {/* Po danu */}
+            <div className="calls-table-wrap">
+              <div className="calls-table-head"><div><div className="section-title">Po danu</div><div className="section-sub">{dm.days.length} dana u razdoblju</div></div></div>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Datum</th>
+                    <th style={{ textAlign: "right" }}>Poslato</th>
+                    <th style={{ textAlign: "right" }}>Primljeno</th>
+                    <th style={{ textAlign: "right" }}>Konv.</th>
+                    <th style={{ textAlign: "right" }}>Booking</th>
+                    <th style={{ textAlign: "right" }}>Zakazani</th>
+                    <th style={{ textAlign: "right" }}>Payment</th>
+                    <th style={{ textAlign: "right" }}>Kupovine</th>
+                    <th style={{ textAlign: "right" }}>Prihod</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[...dm.days].reverse().map((d) => (
+                    <tr key={d.date}>
+                      <td><div className="cell-primary">{fmtDay(d.date)}</div></td>
+                      <td style={{ textAlign: "right" }}>{fmtNum(d.outbound)}</td>
+                      <td style={{ textAlign: "right" }}>{fmtNum(d.inbound)}</td>
+                      <td style={{ textAlign: "right" }}>{fmtNum(d.conversations)}</td>
+                      <td style={{ textAlign: "right" }} className="cell-muted">{fmtNum(d.bookingLinks)}</td>
+                      <td style={{ textAlign: "right" }} className="cell-revenue">{fmtNum(d.appointments)}</td>
+                      <td style={{ textAlign: "right" }} className="cell-muted">{fmtNum(d.paymentLinks)}</td>
+                      <td style={{ textAlign: "right" }} className="cell-revenue">{fmtNum(d.purchases)}</td>
+                      <td style={{ textAlign: "right" }} className={d.revenue ? "cell-revenue" : "cell-muted"}>{d.revenue ? `${fmtNum(d.revenue)} €` : "—"}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </>
         )}
       </main>

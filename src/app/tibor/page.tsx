@@ -1,6 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import SalesDashboard from "./SalesDashboard";
-import { CallRow, DEMO_CALLS, EvergreenDay, Stage } from "./data";
+import { CallRow, DEMO_CALLS, DEMO_DM, DmDay, EvergreenDay, Stage } from "./data";
 import "./dashboard.css";
 
 export const dynamic = "force-dynamic";
@@ -53,6 +53,32 @@ async function fetchEvergreen(): Promise<EvergreenDay[]> {
   }));
 }
 
+// DM department (Instagram DM funnel) — čita precomputed `dm_daily` store, koji
+// webhook rute (instagram/iclosed/stripe) održavaju svežim. Jedan brz query.
+async function fetchDmDaily(): Promise<DmDay[]> {
+  const supabase = serviceClient();
+  if (!supabase) return [];
+  const { data: org } = await supabase.from("organizations").select("id").eq("slug", "tibor").single();
+  if (!org) return [];
+  const { data, error } = await supabase
+    .from("dm_daily")
+    .select("day, outbound, inbound, conversations, booking_links, payment_links, appointments, purchases, revenue")
+    .eq("org_id", org.id)
+    .order("day", { ascending: true });
+  if (error || !data) return [];
+  return data.map((r) => ({
+    date: r.day as string,
+    outbound: Number(r.outbound) || 0,
+    inbound: Number(r.inbound) || 0,
+    conversations: Number(r.conversations) || 0,
+    bookingLinks: Number(r.booking_links) || 0,
+    paymentLinks: Number(r.payment_links) || 0,
+    appointments: Number(r.appointments) || 0,
+    purchases: Number(r.purchases) || 0,
+    revenue: Number(r.revenue) || 0,
+  }));
+}
+
 async function fetchCalls(): Promise<CallRow[]> {
   // force-dynamic alone doesn't reliably bypass Next's fetch cache for the
   // supabase-js client, so calls can go stale after a webhook fires. The shared
@@ -91,14 +117,16 @@ export default async function TiborSalesPage({
 }) {
   let calls: CallRow[];
   let evergreen: EvergreenDay[] = [];
+  let dmDaily: DmDay[] = [];
   if (searchParams.demo === "1") {
     calls = DEMO_CALLS;
+    dmDaily = DEMO_DM;
   } else {
     try {
-      [calls, evergreen] = await Promise.all([fetchCalls(), fetchEvergreen()]);
+      [calls, evergreen, dmDaily] = await Promise.all([fetchCalls(), fetchEvergreen(), fetchDmDaily()]);
     } catch {
       calls = [];
     }
   }
-  return <SalesDashboard calls={calls} evergreen={evergreen} presetUser={searchParams.u} />;
+  return <SalesDashboard calls={calls} evergreen={evergreen} dmDaily={dmDaily} presetUser={searchParams.u} />;
 }

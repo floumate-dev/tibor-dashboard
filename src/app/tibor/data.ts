@@ -40,6 +40,40 @@ export interface EvergreenDay {
   occurred: boolean;     // webinar (20:00 Belgrade) already started? if not, attendance is N/A
 }
 
+// ── DM department (Instagram DM funnel) ──
+// Jedan dan agregata iz dm_daily. Sve metrike su dnevne. Redosled levka:
+// outbound → konverzacije (>2 poruke) → booking link → zakazan → payment link → kupovina.
+export interface DmDay {
+  date: string;        // YYYY-MM-DD (Europe/Belgrade)
+  outbound: number;    // poruke poslate (Burno)
+  inbound: number;     // poruke primljene
+  conversations: number; // nove konverzacije (>2 poruke) tog dana
+  bookingLinks: number;  // poslati iClosed booking linkovi
+  paymentLinks: number;  // poslati payment linkovi
+  appointments: number;  // zakazani pozivi (iClosed, source=burno)
+  purchases: number;     // kupovine (Stripe, source=burno)
+  revenue: number;       // prihod (EUR)
+}
+
+// Demo dataset za vizuelnu proveru DM taba pre nego što webhooks pošalju podatke
+// (/tibor?demo=1). Dani u zadnjih ~14 dana relativno na 2026-08-29.
+export const DEMO_DM: DmDay[] = [
+  { date: "2026-08-16", outbound: 62, inbound: 28, conversations: 11, bookingLinks: 5, paymentLinks: 2, appointments: 3, purchases: 1, revenue: 2500 },
+  { date: "2026-08-17", outbound: 74, inbound: 33, conversations: 14, bookingLinks: 6, paymentLinks: 1, appointments: 4, purchases: 0, revenue: 0 },
+  { date: "2026-08-18", outbound: 58, inbound: 21, conversations: 9, bookingLinks: 4, paymentLinks: 3, appointments: 2, purchases: 2, revenue: 4000 },
+  { date: "2026-08-19", outbound: 81, inbound: 39, conversations: 16, bookingLinks: 7, paymentLinks: 2, appointments: 5, purchases: 1, revenue: 2500 },
+  { date: "2026-08-20", outbound: 69, inbound: 30, conversations: 12, bookingLinks: 5, paymentLinks: 2, appointments: 3, purchases: 1, revenue: 1800 },
+  { date: "2026-08-21", outbound: 47, inbound: 18, conversations: 7, bookingLinks: 3, paymentLinks: 1, appointments: 2, purchases: 0, revenue: 0 },
+  { date: "2026-08-22", outbound: 35, inbound: 12, conversations: 5, bookingLinks: 2, paymentLinks: 0, appointments: 1, purchases: 0, revenue: 0 },
+  { date: "2026-08-23", outbound: 41, inbound: 15, conversations: 6, bookingLinks: 3, paymentLinks: 1, appointments: 1, purchases: 1, revenue: 2500 },
+  { date: "2026-08-24", outbound: 78, inbound: 36, conversations: 15, bookingLinks: 8, paymentLinks: 3, appointments: 6, purchases: 2, revenue: 5000 },
+  { date: "2026-08-25", outbound: 85, inbound: 42, conversations: 18, bookingLinks: 9, paymentLinks: 4, appointments: 5, purchases: 2, revenue: 4300 },
+  { date: "2026-08-26", outbound: 72, inbound: 31, conversations: 13, bookingLinks: 6, paymentLinks: 2, appointments: 4, purchases: 1, revenue: 2500 },
+  { date: "2026-08-27", outbound: 90, inbound: 45, conversations: 19, bookingLinks: 10, paymentLinks: 5, appointments: 7, purchases: 3, revenue: 6800 },
+  { date: "2026-08-28", outbound: 66, inbound: 27, conversations: 11, bookingLinks: 5, paymentLinks: 2, appointments: 3, purchases: 1, revenue: 2500 },
+  { date: "2026-08-29", outbound: 53, inbound: 22, conversations: 8, bookingLinks: 4, paymentLinks: 1, appointments: 2, purchases: 1, revenue: 2500 },
+];
+
 // Sample dataset for visual verification before the Supabase calls table is
 // wired. Dates land inside the last-30-days window relative to 2026-06-08.
 export const DEMO_CALLS: CallRow[] = [
