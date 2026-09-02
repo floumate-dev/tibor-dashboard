@@ -52,26 +52,48 @@ export async function GET(request: NextRequest) {
   const orgId = org.id as string;
 
   const charges = await listCharges(stripeKey, sinceUnix);
-  let sales = charges.filter(isEvergreenSale);
+  const sales = charges.filter(isEvergreenSale);
 
-  if (skipExisting && sales.length) {
+  // Which of these are already stored? Reconcile must NOT re-attribute an
+  // existing sale — attribution can only improve with extra data (e.g. Hyros
+  // phones), and re-running with Stripe-only data would DOWNGRADE a recovered
+  // day back to a purchase-time guess. So: existing rows get only a refund-state
+  // refresh; new (missed) sales get the full attribute + insert.
+  const idList = sales.map((c) => c.id);
+  const existing = new Map<string, boolean>();
+  if (idList.length) {
     const { data: have } = await supabase
       .from("evergreen_sales")
-      .select("stripe_id")
+      .select("stripe_id, refunded")
       .eq("org_id", orgId)
-      .in("stripe_id", sales.map((c) => c.id));
-    const seen = new Set((have || []).map((r) => r.stripe_id as string));
-    sales = sales.filter((c) => !seen.has(c.id));
+      .in("stripe_id", idList);
+    for (const r of have || []) existing.set(r.stripe_id as string, r.refunded as boolean);
+  }
+  const newSales = sales.filter((c) => !existing.has(c.id));
+
+  // Refund-state sync for existing rows (cheap, no GHL).
+  let refundSynced = 0;
+  for (const c of sales) {
+    if (!existing.has(c.id)) continue;
+    const nowRefunded = c.refunded || c.amount_refunded > 0;
+    if (nowRefunded !== existing.get(c.id)) {
+      await supabase
+        .from("evergreen_sales")
+        .update({ refunded: nowRefunded, updated_at: new Date().toISOString() })
+        .eq("org_id", orgId)
+        .eq("stripe_id", c.id);
+      refundSynced++;
+    }
   }
 
-  // Bounded concurrency: one GHL lookup per sale, rate-limit friendly.
+  // Bounded concurrency: one GHL lookup per NEW sale, rate-limit friendly.
   let ok = 0,
     failed = 0;
   const counts: Record<string, number> = { attended: 0, optin: 0, phone_optin: 0, purchase_time: 0, unmatched: 0 };
   let i = 0;
   const worker = async () => {
-    while (i < sales.length) {
-      const c: StripeCharge = sales[i++];
+    while (i < newSales.length) {
+      const c: StripeCharge = newSales[i++];
       try {
         const attr = await attributeSale(
           supabase,
@@ -95,12 +117,17 @@ export async function GET(request: NextRequest) {
   };
   await Promise.all([worker(), worker()]);
 
+  // `skipExisting` retained for API compatibility; existing rows are already
+  // never re-attributed above, so it's a no-op now.
+  void skipExisting;
+
   return NextResponse.json({
     ok: true,
     window_since: new Date(sinceUnix * 1000).toISOString().slice(0, 10),
     charges_scanned: charges.length,
     evergreen_sales: sales.length,
-    upserted: ok,
+    new_attributed: ok,
+    refund_synced: refundSynced,
     failed,
     attribution: counts,
   });

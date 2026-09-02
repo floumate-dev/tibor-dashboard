@@ -90,6 +90,27 @@ export async function POST(request: NextRequest) {
   if (!charge) return NextResponse.json({ ok: true, unresolved: true });
   if (!isEvergreenSale(charge)) return NextResponse.json({ ok: true, skipped: "not evergreen" });
 
+  // A refund of an already-captured sale must NOT re-run attribution — that
+  // would clobber a good day (e.g. one recovered from Hyros) with a weaker
+  // guess. Just flip the refunded flag; the trigger drops it from conversions.
+  if (event.type === "charge.refunded") {
+    const { data: existing } = await supabase
+      .from("evergreen_sales")
+      .select("stripe_id")
+      .eq("org_id", orgId)
+      .eq("stripe_id", charge.id)
+      .maybeSingle();
+    if (existing) {
+      await supabase
+        .from("evergreen_sales")
+        .update({ refunded: charge.refunded || charge.amount_refunded > 0, updated_at: new Date().toISOString() })
+        .eq("org_id", orgId)
+        .eq("stripe_id", charge.id);
+      return NextResponse.json({ ok: true, type: event.type, stripe_id: charge.id, refunded: true });
+    }
+    // else: fall through to attribute + insert (a refund for a sale we missed).
+  }
+
   const attr = await attributeSale(
     supabase,
     ghlToken,

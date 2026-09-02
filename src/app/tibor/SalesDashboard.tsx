@@ -67,7 +67,7 @@ function fmtDay(iso: string) {
   return `${dd}.${mm}`;
 }
 
-export default function SalesDashboard({ calls, evergreen = [], dmDaily = [], presetUser }: { calls: CallRow[]; evergreen?: EvergreenDay[]; dmDaily?: DmDay[]; presetUser?: string }) {
+export default function SalesDashboard({ calls, evergreen = [], dmDaily = [], evgSales = { total: 0, unattributed: 0 }, presetUser }: { calls: CallRow[]; evergreen?: EvergreenDay[]; dmDaily?: DmDay[]; evgSales?: { total: number; unattributed: number }; presetUser?: string }) {
   const today = useMemo(() => startOfDay(new Date()), []);
   // Personalizovani login: ?u=<slug> zaključa ekran na taj nalog (PFP + pozdrav,
   // prima samo njegov PIN). Bez toga = generalni login (bez PFP, bilo koji PIN).
@@ -758,6 +758,13 @@ export default function SalesDashboard({ calls, evergreen = [], dmDaily = [], pr
                 <div className="kpi-sub"><strong>{evg.attendees ? ((evg.conversions / evg.attendees) * 100).toFixed(1) : "0"}%</strong> od došlih</div>
               </div>
             </div>
+
+            {!evgSingle && evgSales.unattributed > 0 && (
+              <div className="evg-reconcile">
+                Ukupno €97.99 prodaja (Stripe, sve vreme): <strong>{fmtNum(evgSales.total)}</strong>
+                {" · od toga "}<strong>{fmtNum(evgSales.unattributed)}</strong> van webinara (direktna prodaja, bez prijave — zato nisu na dnevnoj krivi)
+              </div>
+            )}
 
             {!evgSingle ? (
               <div className="section-card">

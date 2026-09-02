@@ -53,6 +53,29 @@ async function fetchEvergreen(): Promise<EvergreenDay[]> {
   }));
 }
 
+// Evergreen sales reconciliation totals (Stripe = source of truth). Conversions
+// on the per-day chart sum only the sales we could tie to a webinar day; a few
+// buyers bought €97.99 without ever registering for the webinar (direct/ad),
+// so they have no day. Surfacing both keeps the dashboard total == Stripe.
+async function fetchEvergreenSales(): Promise<{ total: number; unattributed: number }> {
+  const supabase = serviceClient();
+  if (!supabase) return { total: 0, unattributed: 0 };
+  const { data: org } = await supabase.from("organizations").select("id").eq("slug", "tibor").single();
+  if (!org) return { total: 0, unattributed: 0 };
+  const { count: total } = await supabase
+    .from("evergreen_sales")
+    .select("id", { count: "exact", head: true })
+    .eq("org_id", org.id)
+    .eq("refunded", false);
+  const { count: unattributed } = await supabase
+    .from("evergreen_sales")
+    .select("id", { count: "exact", head: true })
+    .eq("org_id", org.id)
+    .eq("refunded", false)
+    .is("webinar_date", null);
+  return { total: total || 0, unattributed: unattributed || 0 };
+}
+
 // DM department (Instagram DM funnel) — čita precomputed `dm_daily` store, koji
 // webhook rute (instagram/iclosed/stripe) održavaju svežim. Jedan brz query.
 async function fetchDmDaily(): Promise<DmDay[]> {
@@ -118,15 +141,16 @@ export default async function TiborSalesPage({
   let calls: CallRow[];
   let evergreen: EvergreenDay[] = [];
   let dmDaily: DmDay[] = [];
+  let evgSales = { total: 0, unattributed: 0 };
   if (searchParams.demo === "1") {
     calls = DEMO_CALLS;
     dmDaily = DEMO_DM;
   } else {
     try {
-      [calls, evergreen, dmDaily] = await Promise.all([fetchCalls(), fetchEvergreen(), fetchDmDaily()]);
+      [calls, evergreen, dmDaily, evgSales] = await Promise.all([fetchCalls(), fetchEvergreen(), fetchDmDaily(), fetchEvergreenSales()]);
     } catch {
       calls = [];
     }
   }
-  return <SalesDashboard calls={calls} evergreen={evergreen} dmDaily={dmDaily} presetUser={searchParams.u} />;
+  return <SalesDashboard calls={calls} evergreen={evergreen} dmDaily={dmDaily} evgSales={evgSales} presetUser={searchParams.u} />;
 }
