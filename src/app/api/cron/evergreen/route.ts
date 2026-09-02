@@ -52,7 +52,10 @@ export async function GET(request: NextRequest) {
     seg_before_pitch: d.beforePitch,
     seg_reached_pitch: d.reachedPitch,
     seg_full_pitch: d.fullPitch,
-    conversions: d.conversions,
+    // NOTE: conversions are NOT written here. Stripe is the source of truth —
+    // /api/webhooks/stripe + /api/cron/sales write evergreen_sales, and a DB
+    // trigger keeps evergreen_webinars.conversions in sync. Writing the GHL
+    // bought_eun count here would clobber that (it was the old, lossy source).
     recording_label: d.recording || null,
     updated_at: now,
   }));

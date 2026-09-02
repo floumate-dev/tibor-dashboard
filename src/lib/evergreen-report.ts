@@ -44,6 +44,21 @@ export async function buildEvergreenReport(): Promise<string> {
   const upcoming = rows.filter((r) => !occurred(r.webinar_date));
   if (!done.length) return "Još nema održanih evergreen webinara u bazi.";
 
+  // Sales come from Stripe (source of truth) via evergreen_sales; the per-day
+  // `conversions` above are the attributed subset. Pull grand totals so the
+  // report reconciles exactly with Stripe (attributed + unattributed).
+  const { count: salesTotal } = await sb
+    .from("evergreen_sales")
+    .select("id", { count: "exact", head: true })
+    .eq("org_id", org.id)
+    .eq("refunded", false);
+  const { count: salesUnattributed } = await sb
+    .from("evergreen_sales")
+    .select("id", { count: "exact", head: true })
+    .eq("org_id", org.id)
+    .eq("refunded", false)
+    .is("webinar_date", null);
+
   const sum = (a: Row[], f: (r: Row) => number) => a.reduce((s, r) => s + f(r), 0);
   const reg = sum(done, (r) => r.registrants);
   const att = sum(done, (r) => r.attendees);
@@ -75,7 +90,7 @@ export async function buildEvergreenReport(): Promise<string> {
 
   return [
     "# Evergreen webinar — performanse (Tibor / Editunovac)",
-    "Izvor: GHL tagovi, osvežava se ~10 min. Evergreen webinar je dnevni, u 20:00 (Europe/Belgrade). VAŽNO: sve rate-ove računaj TEŽINSKI (Σ brojnik / Σ imenilac za period), NE kao prosek dnevnih procenata. Za \"najbolji/najslabiji dan\" koristi samo dane sa dovoljno uzorka (≥" + MIN_SAMPLE + " došlih).",
+    "Izvor: prijave/dolasci iz GHL tagova (~10 min svežina); PRODAJE iz Stripe-a (source of truth, evergreen_sales) atribuirane na dan webinara. Evergreen webinar je dnevni, u 20:00 (Europe/Belgrade). VAŽNO: sve rate-ove računaj TEŽINSKI (Σ brojnik / Σ imenilac za period), NE kao prosek dnevnih procenata. Za \"najbolji/najslabiji dan\" koristi samo dane sa dovoljno uzorka (≥" + MIN_SAMPLE + " došlih).",
     "",
     `## Ukupno (${done.length} održanih: ${done[0].webinar_date} → ${done[done.length - 1].webinar_date})`,
     `- Prijave: ${reg}`,
@@ -83,6 +98,7 @@ export async function buildEvergreenReport(): Promise<string> {
     `- Dočekali pitch (reached+full): ${reached} — ${f1(pct(reached, att))}% od došlih`,
     `- Full pitch: ${full} — ${f1(pct(full, att))}% od došlih`,
     `- Kupili: ${conv} — ${f1(pct(conv, att))}% od došlih (conv-rate), ${f1(pct(conv, reg))}% od prijava`,
+    `- Ukupno prodaja (Stripe, sve dane): ${salesTotal ?? conv}${salesUnattributed ? ` — od toga ${salesUnattributed} nije vezano za konkretan dan` : ""}`,
     "",
     "## Trendovi (težinski)",
     `- Zadnjih 7 dana: show ${f1(l7.show)}%, conv ${f1(l7.cr)}% (${l7.conv} kupili / ${l7.att} došli). Prethodnih 7: show ${f1(p7.show)}%, conv ${f1(p7.cr)}%. → conv ${arrow(l7.cr, p7.cr)}, show ${arrow(l7.show, p7.show)}.`,
@@ -98,7 +114,7 @@ export async function buildEvergreenReport(): Promise<string> {
     `## Dnevni podaci (poslednjih ${Math.min(90, withR.length)} dana)`,
     daily,
     "",
-    "Napomene: show-rate = došli/prijave; conv-rate = kupili/došli. Segmenti su watch-depth: no-show → <pitch (otišli pre pitcha) → pitch (dočekali pitch) → full (full pitch). Ako pitanje traži nešto van ovih agregata (npr. imena/emailove pojedinaca, izvor saobraćaja), reci da to nije dostupno u ovom izvoru.",
+    "Napomene: show-rate = došli/prijave; conv-rate = kupili/došli. \"Kupili\" = stvarna Stripe plaćanja (početna Editunovac pretplata, bez obnova), atribuirana na dan webinara (last-touch preko optin taga, pa vreme kupovine). Segmenti su watch-depth: no-show → <pitch (otišli pre pitcha) → pitch (dočekali pitch) → full (full pitch). Ako pitanje traži nešto van ovih agregata (npr. imena/emailove pojedinaca, izvor saobraćaja), reci da to nije dostupno u ovom izvoru.",
   ]
     .filter((x) => x !== "")
     .join("\n");
