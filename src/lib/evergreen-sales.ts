@@ -50,9 +50,17 @@ async function stripeGet(path: string, key: string): Promise<Record<string, unkn
   throw new Error("Stripe: max retries");
 }
 
-// A charge is a countable evergreen sale: paid Editunovac, not a rebill.
+// The evergreen webinar product costs 97.99 EUR (accept 98.00 too). The
+// "EDIT U NOVAC" statement descriptor is shared by OTHER Editunovac products
+// (a 47€ offer, 141€, and the 2500€ high-ticket + its installments), so the
+// price is what pins a charge to the evergreen funnel — descriptor alone is not
+// enough. Amounts are integer cents.
+const EVERGREEN_CENTS = new Set([9799, 9800]);
+
+// A charge is a countable evergreen sale: paid 97.99/98 EUR Editunovac, not a rebill.
 export function isEvergreenSale(c: StripeCharge): boolean {
   if (!c.paid) return false;
+  if (c.currency !== "eur" || !EVERGREEN_CENTS.has(c.amount)) return false;
   const sd = `${c.calculated_statement_descriptor || ""} ${c.statement_descriptor || ""}`;
   if (!/edit\s*u\s*novac/i.test(sd)) return false;
   if (/update/i.test(c.description || "")) return false; // renewal/rebill, not a new sale
