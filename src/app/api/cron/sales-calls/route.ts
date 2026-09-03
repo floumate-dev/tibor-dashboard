@@ -39,11 +39,11 @@ export async function GET(request: NextRequest) {
   const charges = (await listCharges(stripeKey, since)).filter(
     (c) => c.paid && c.currency === "eur" && c.amount >= HIGH_TICKET_CENTS
   );
-  const buyers = new Map<string, { net: number; last: string }>();
+  const buyers = new Map<string, { net: number; last: string; name: string | null }>();
   for (const c of charges) {
     const e = (c.billing_details?.email || "").trim().toLowerCase();
     if (!e) continue;
-    const b = buyers.get(e) || { net: 0, last: "" };
+    const b = buyers.get(e) || { net: 0, last: "", name: c.billing_details?.name || null };
     if (!(c.refunded || c.amount_refunded > 0)) b.net += c.amount / 100;
     const d = new Date(c.created * 1000).toISOString();
     if (d > b.last) b.last = d;
@@ -53,7 +53,7 @@ export async function GET(request: NextRequest) {
   // All booked (non-lead) calls, indexed by email + phone.
   const { data: calls } = await supabase
     .from("calls")
-    .select("id, contact_email, contact_phone, stage")
+    .select("id, external_id, contact_email, contact_phone, stage")
     .eq("org_id", orgId)
     .neq("stage", "lead");
   const byEmail = new Map<string, { id: string; stage: string }>();
@@ -65,32 +65,67 @@ export async function GET(request: NextRequest) {
     if (p.length >= 8) byPhone.set(p, rec);
   }
 
-  // Flip matched booked calls to won (net>0); collect which ids are legit wins.
-  let won = 0;
-  const wonIds = new Set<string>();
+  // Mlađan closes ALL high-ticket (burno only sets), so every high-ticket buyer
+  // is a won: update their booked call if one exists, else create a won row
+  // (external_id "stripe:<email>"). Idempotent.
+  const now = new Date().toISOString();
+  const buyerEmails = new Set<string>();
+  let wonFromBooked = 0,
+    wonCreated = 0;
   for (const [email, b] of Array.from(buyers.entries())) {
     if (b.net <= 0) continue;
-    const hit = byEmail.get(email); // Stripe has email only; iClosed row carries it
-    if (!hit) continue; // no booked call -> not Mlađan's close (rule)
-    wonIds.add(hit.id);
-    await supabase
-      .from("calls")
-      .update({ stage: "won", package: "Korak Ispred", amount: b.net, currency: "EUR", closed_at: b.last, updated_at: new Date().toISOString() })
-      .eq("org_id", orgId)
-      .eq("id", hit.id);
-    won++;
-  }
-
-  // Revert stale wins (refunded to €0, or no longer matching) back to showed_up.
-  let reverted = 0;
-  for (const c of calls || []) {
-    if (c.stage === "won" && !wonIds.has(c.id as string)) {
+    buyerEmails.add(email);
+    const hit = byEmail.get(email);
+    if (hit) {
       await supabase
         .from("calls")
-        .update({ stage: "showed_up", amount: 0, package: null, updated_at: new Date().toISOString() })
+        .update({ stage: "won", package: "Korak Ispred", amount: b.net, currency: "EUR", closed_at: b.last, updated_at: now })
         .eq("org_id", orgId)
-        .eq("id", c.id);
+        .eq("id", hit.id);
+      wonFromBooked++;
+    } else {
+      await supabase.from("calls").upsert(
+        {
+          org_id: orgId,
+          external_id: "stripe:" + email,
+          contact_name: b.name,
+          contact_email: email,
+          package: "Korak Ispred",
+          amount: b.net,
+          currency: "EUR",
+          stage: "won",
+          closer: "Mlađan",
+          source: "stripe",
+          scheduled_at: b.last,
+          closed_at: b.last,
+          updated_at: now,
+        },
+        { onConflict: "org_id,external_id" }
+      );
+      wonCreated++;
+    }
+  }
+
+  // Revert stale wins: a booked (GHL) call whose buyer refunded to €0 -> showed_up.
+  let reverted = 0;
+  for (const c of calls || []) {
+    const ext = String(c.external_id || "");
+    if (c.stage === "won" && !ext.startsWith("stripe:") && !buyerEmails.has((c.contact_email as string || "").toLowerCase())) {
+      await supabase.from("calls").update({ stage: "showed_up", amount: 0, package: null, updated_at: now }).eq("org_id", orgId).eq("id", c.id);
       reverted++;
+    }
+  }
+  // Delete stripe-origin won rows whose buyer is no longer a high-ticket buyer.
+  let deleted = 0;
+  const { data: stripeRows } = await supabase
+    .from("calls")
+    .select("id, contact_email")
+    .eq("org_id", orgId)
+    .like("external_id", "stripe:%");
+  for (const r of stripeRows || []) {
+    if (!buyerEmails.has((r.contact_email as string || "").toLowerCase())) {
+      await supabase.from("calls").delete().eq("org_id", orgId).eq("id", r.id);
+      deleted++;
     }
   }
 
@@ -99,8 +134,9 @@ export async function GET(request: NextRequest) {
     ok: true,
     high_ticket_buyers: buyers.size,
     high_ticket_total: highTicketTotal,
-    won_matched: won,
+    won_from_booked: wonFromBooked,
+    won_created: wonCreated,
     reverted,
-    unmatched_buyers: buyers.size - won,
+    deleted,
   });
 }

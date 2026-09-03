@@ -29,7 +29,7 @@ export interface StripeCharge {
   description: string | null;
   calculated_statement_descriptor: string | null;
   statement_descriptor: string | null;
-  billing_details?: { email?: string | null; phone?: string | null };
+  billing_details?: { email?: string | null; phone?: string | null; name?: string | null };
   receipt_email?: string | null;
 }
 
