@@ -84,6 +84,11 @@ export async function POST(request: NextRequest) {
   const name = `${first} ${last}`.trim() || pick(src, "name", "full_name", "contact_name") || null;
   const statusStr = pick(src, "status", "disposition", "outcome", "event", "type", "event_type", "eventType", "scheduling_status", "last_interaction_type");
   const stage = toStage(statusStr);
+  // We don't track raw leads/Potentials in the Sales dashboard (bookings come
+  // from GHL). Ignore lead-stage events so they don't create noise rows.
+  if (stage === "lead") {
+    return NextResponse.json({ ok: true, skipped: "lead stage not tracked", status: statusStr });
+  }
   const when = pick(src, "scheduled_at", "start_time", "startTime", "start", "created_at", "createdAt") || new Date().toISOString();
   const source = pick(src, "utm_source", "source", "utmSource") || "iclosed";
 
