@@ -35,14 +35,19 @@ function pick(obj: Record<string, unknown>, ...keys: string[]): string {
 }
 const norm9 = (p: string) => (p || "").replace(/[^0-9]/g, "").slice(-9);
 
-// Map an iClosed status/event string to our call stage. Defensive: iClosed
-// payloads vary, so match on keywords. Unknown -> "scheduled" (a booking).
-function toStage(s: string): "scheduled" | "showed_up" | "no_show" | "lost" | null {
+// Map an iClosed status to our call stage. iClosed's statuses are scheduling
+// states (Potential / Qualified / Disqualified / Strategy|Discovery Call Booked),
+// not call outcomes — there is no show/no-show/won here (won comes from Stripe).
+// Order matters: "Disqualified" contains "qualified", so test it first.
+function toStage(s: string): "lead" | "scheduled" | "showed_up" | "no_show" | "lost" | null {
   const t = s.toLowerCase();
+  if (/disqualif/.test(t)) return "lost";                    // Disqualified
   if (/cancel/.test(t)) return "lost";
   if (/no[\s_-]?show|didn'?t\s?show|absent/.test(t)) return "no_show";
-  if (/show(ed)?|attend|complete|held|done|qualified/.test(t)) return "showed_up";
-  if (/book|schedul|created|new|potential|reschedul/.test(t)) return "scheduled";
+  if (/call\s*booked|strategy|discovery|book|schedul|reschedul/.test(t)) return "scheduled"; // Strategy/Discovery Call Booked
+  if (/qualified/.test(t)) return "scheduled";               // Qualified (engaged lead)
+  if (/show(ed)?|attend|complete|held|done/.test(t)) return "showed_up";
+  if (/potential|new\b/.test(t)) return "lead";              // Potential - Primary / Phone AND Email
   return null;
 }
 
