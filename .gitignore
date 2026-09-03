@@ -30,3 +30,7 @@ next-env.d.ts
 .vercel-token
 
 scripts/.dbpass
+
+# local data backups (contain contact PII)
+scripts/backup-calls-*.json
+/tmp/iclosed.csv
